@@ -1,0 +1,512 @@
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Animated, Dimensions, Pressable } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { useAuth } from "@/contexts/auth";
+import { supabase } from "@/lib/supabase";
+import { User } from "@/lib/types";
+import { useQuery } from "@tanstack/react-query";
+import { colors } from "@/constants/colors";
+import { useMemo, useState, useRef, useEffect } from "react";
+import { Droplet, UserPlus, Menu, X, Users, Utensils, BookOpen, Settings, Bell, BarChart3, MessageCircle, LayoutDashboard } from "lucide-react-native";
+
+const { width } = Dimensions.get("window");
+const DRAWER_WIDTH = width * 0.75;
+
+const menuItems = [
+  { id: "dashboard", title: "מסך ניהול", icon: LayoutDashboard },
+  { id: "clients", title: "לקוחות", icon: Users },
+  { id: "notifications", title: "ניהול התראות", icon: Bell },
+  { id: "add-food", title: "הוסף מזון", icon: Utensils },
+  { id: "guides", title: "מדריכים", icon: BookOpen },
+  { id: "analytics", title: "דוחות ואנליטיקה", icon: BarChart3 },
+  { id: "settings", title: "הגדרות", icon: Settings },
+  { id: "support", title: "תמיכה ופניות", icon: MessageCircle },
+];
+
+export default function AdminClientsScreen() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const drawerAnim = useRef(new Animated.Value(width)).current;
+  const overlayAnim = useRef(new Animated.Value(0)).current;
+  const [selectedMenu, setSelectedMenu] = useState("clients");
+
+  const today = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  const { data: clientsData, isLoading } = useQuery({
+    queryKey: ["admin-clients", user?.user_id, today],
+    queryFn: async () => {
+      console.log("[AdminClients] Fetching clients and their daily logs");
+      
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("*")
+        .neq("user_id", user?.user_id)
+        .order("name", { ascending: true });
+
+      if (profilesError) {
+        console.error("[AdminClients] Error fetching clients:", profilesError);
+        throw profilesError;
+      }
+
+      const { data: dailyLogs, error: logsError } = await supabase
+        .from("daily_logs")
+        .select("*")
+        .eq("date", today);
+
+      if (logsError) {
+        console.error("[AdminClients] Error fetching daily logs:", logsError);
+        throw logsError;
+      }
+
+      console.log("[AdminClients] Clients fetched:", profiles?.length, "Daily logs:", dailyLogs?.length);
+      
+      return {
+        profiles: profiles as User[],
+        dailyLogs: dailyLogs || [],
+      };
+    },
+    enabled: user?.role === "admin",
+    refetchInterval: 60000,
+  });
+
+  const clients = useMemo(() => clientsData?.profiles || [], [clientsData?.profiles]);
+  const dailyLogs = useMemo(() => clientsData?.dailyLogs || [], [clientsData?.dailyLogs]);
+
+  const clientsWithProgress = useMemo(() => {
+    return clients.map((client) => {
+      const log = dailyLogs.find((l: any) => l.user_id === client.user_id);
+      return {
+        ...client,
+        todayLog: log || null,
+      };
+    });
+  }, [clients, dailyLogs]);
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(drawerAnim, {
+        toValue: isDrawerOpen ? 0 : width,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11,
+      }),
+      Animated.timing(overlayAnim, {
+        toValue: isDrawerOpen ? 1 : 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [isDrawerOpen]);
+
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const handleMenuSelect = (menuId: string) => {
+    setSelectedMenu(menuId);
+    setIsDrawerOpen(false);
+    
+    if (menuId === "dashboard") {
+      router.push("/admin-dashboard" as any);
+    } else if (menuId === "clients") {
+      return;
+    } else if (menuId === "notifications") {
+      router.push("/admin-notifications" as any);
+    } else if (menuId === "add-food") {
+      router.push("/admin-add-food" as any);
+    } else if (menuId === "guides") {
+      router.push("/admin-guides" as any);
+    } else if (menuId === "analytics") {
+      router.push("/admin-analytics" as any);
+    } else if (menuId === "settings") {
+      router.push("/admin-settings" as any);
+    } else if (menuId === "support") {
+      router.push("/admin-support" as any);
+    }
+  };
+
+  if (user?.role !== "admin") {
+    return (
+      <LinearGradient
+        colors={["#3FCDD1", "#FFFFFF"]}
+        locations={[0, 0.4]}
+        style={styles.container}
+      >
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: "לקוחות",
+            headerStyle: {
+              backgroundColor: "#3FCDD1",
+            },
+            headerTintColor: "#FFFFFF",
+            headerTitleAlign: "center",
+            headerRight: () => (
+              <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+                <Menu size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            ),
+          }}
+        />
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>אין לך הרשאות גישה</Text>
+        </View>
+      </LinearGradient>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <LinearGradient
+        colors={["#3FCDD1", "#FFFFFF"]}
+        locations={[0, 0.4]}
+        style={styles.container}
+      >
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: "לקוחות",
+            headerStyle: {
+              backgroundColor: "#3FCDD1",
+            },
+            headerTintColor: "#FFFFFF",
+            headerTitleAlign: "center",
+            headerRight: () => (
+              <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+                <Menu size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            ),
+          }}
+        />
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </LinearGradient>
+    );
+  }
+
+  return (
+    <LinearGradient
+      colors={["#3FCDD1", "#FFFFFF"]}
+      locations={[0, 0.4]}
+      style={styles.container}
+    >
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: "לקוחות",
+          headerStyle: {
+            backgroundColor: "#3FCDD1",
+          },
+          headerTintColor: "#FFFFFF",
+          headerTitleAlign: "center",
+        }}
+      />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[styles.content, { paddingBottom: 150 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.headerSection}>
+          <Text style={styles.title}>רשימת לקוחות</Text>
+          <Text style={styles.subtitle}>{clients.length} לקוחות במערכת</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.addClientButton}
+          onPress={() => router.push("/admin-add-client")}
+          activeOpacity={0.8}
+        >
+          <UserPlus color="#FFFFFF" size={24} />
+          <Text style={styles.addClientButtonText}>הוסף ליווי חדש</Text>
+        </TouchableOpacity>
+
+        <View style={styles.clientsGrid}>
+          {clientsWithProgress.length > 0 ? (
+            clientsWithProgress.map((client) => {
+              const log = client.todayLog as any;
+              const calorieProgress = client.kcal_goal && log ? Math.min((log.total_kcal / client.kcal_goal) * 100, 100) : 0;
+              const proteinProgress = client.protein_units && log ? Math.min((log.total_protein_units / client.protein_units) * 100, 100) : 0;
+              const carbProgress = client.carb_units && log ? Math.min((log.total_carb_units / client.carb_units) * 100, 100) : 0;
+              const fatProgress = client.fat_units && log ? Math.min((log.total_fat_units / client.fat_units) * 100, 100) : 0;
+              const waterCount = log?.water_glasses || 0;
+              const waterGoal = client.water_daily_goal || 12;
+
+              return (
+                <TouchableOpacity 
+                  key={client.user_id} 
+                  style={styles.clientCard}
+                  onPress={() => {
+                    console.log("[AdminClients] Navigating to user dashboard:", client.user_id, client.name);
+                    router.push({
+                      pathname: "/user-dashboard",
+                      params: { userId: client.user_id, userName: client.name || "משתמש" },
+                    });
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.clientHeader}>
+                    <View style={styles.clientInfo}>
+                      <View style={styles.clientAvatar}>
+                        <Text style={styles.clientAvatarText}>
+                          {client.name?.charAt(0) || "?"}
+                        </Text>
+                      </View>
+                      <View style={styles.clientDetails}>
+                        <Text style={styles.clientName}>{client.name || "ללא שם"}</Text>
+                        <Text style={styles.clientEmail}>{client.email}</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={styles.progressBars}>
+                    <View style={styles.progressItem}>
+                      <View style={styles.progressLabelRow}>
+                        <Text style={styles.progressValue}>
+                          {log ? Math.round(log.total_kcal) : 0}/{client.kcal_goal || 0}
+                        </Text>
+                        <Text style={styles.progressLabel}>קלוריות</Text>
+                      </View>
+                      <View style={styles.progressBarContainer}>
+                        <View style={[styles.progressBarFill, { width: `${calorieProgress}%`, backgroundColor: colors.primary }]} />
+                      </View>
+                    </View>
+
+                    <View style={styles.progressItem}>
+                      <View style={styles.progressLabelRow}>
+                        <Text style={styles.progressValue}>
+                          {log ? log.total_protein_units : 0}/{client.protein_units || 0}
+                        </Text>
+                        <Text style={styles.progressLabel}>חלבון</Text>
+                      </View>
+                      <View style={styles.progressBarContainer}>
+                        <View style={[styles.progressBarFill, { width: `${proteinProgress}%`, backgroundColor: colors.protein }]} />
+                      </View>
+                    </View>
+
+                    <View style={styles.progressItem}>
+                      <View style={styles.progressLabelRow}>
+                        <Text style={styles.progressValue}>
+                          {log ? log.total_carb_units : 0}/{client.carb_units || 0}
+                        </Text>
+                        <Text style={styles.progressLabel}>פחמימות</Text>
+                      </View>
+                      <View style={styles.progressBarContainer}>
+                        <View style={[styles.progressBarFill, { width: `${carbProgress}%`, backgroundColor: colors.carb }]} />
+                      </View>
+                    </View>
+
+                    <View style={styles.progressItem}>
+                      <View style={styles.progressLabelRow}>
+                        <Text style={styles.progressValue}>
+                          {log ? log.total_fat_units : 0}/{client.fat_units || 0}
+                        </Text>
+                        <Text style={styles.progressLabel}>שומן</Text>
+                      </View>
+                      <View style={styles.progressBarContainer}>
+                        <View style={[styles.progressBarFill, { width: `${fatProgress}%`, backgroundColor: colors.fat }]} />
+                      </View>
+                    </View>
+
+                    <View style={styles.waterProgressItem}>
+                      <View style={styles.waterProgressHeader}>
+                        <Text style={styles.waterProgressText}>{waterCount}/{waterGoal}</Text>
+                        <View style={styles.waterProgressLabel}>
+                          <Droplet color="#3FCDD1" size={16} />
+                          <Text style={styles.progressLabel}>מים</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>אין לקוחות במערכת</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </LinearGradient>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 18,
+    color: "#666",
+    textAlign: "center",
+  },
+  headerSection: {
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "right",
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#718096",
+    textAlign: "right",
+  },
+  clientsGrid: {
+    gap: 12,
+  },
+  clientCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  clientHeader: {
+    marginBottom: 16,
+  },
+  clientInfo: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    flex: 1,
+  },
+  clientAvatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+  },
+  clientAvatarText: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+  },
+  clientDetails: {
+    flex: 1,
+    alignItems: "flex-end",
+  },
+  clientName: {
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    marginBottom: 4,
+  },
+  clientEmail: {
+    fontSize: 14,
+    color: "#718096",
+    marginBottom: 8,
+  },
+  progressBars: {
+    gap: 12,
+  },
+  progressItem: {
+    gap: 4,
+  },
+  progressLabelRow: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  progressLabel: {
+    fontSize: 12,
+    color: "#718096",
+    fontWeight: "600" as const,
+  },
+  progressValue: {
+    fontSize: 12,
+    color: "#4B5563",
+    fontWeight: "500" as const,
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: "#E5E7EB",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: "100%",
+    borderRadius: 4,
+  },
+  waterProgressItem: {
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+  },
+  waterProgressHeader: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  waterProgressLabel: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    gap: 4,
+  },
+  waterProgressText: {
+    fontSize: 14,
+    color: "#4B5563",
+    fontWeight: "600" as const,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 100,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#718096",
+    textAlign: "center",
+  },
+  addClientButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    flexDirection: "row" as any,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  addClientButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700" as const,
+  },
+});

@@ -1,0 +1,857 @@
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Animated, Dimensions, Pressable, Platform } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { useAuth } from "@/contexts/auth";
+import { supabase } from "@/lib/supabase";
+import { User } from "@/lib/types";
+import { useQuery } from "@tanstack/react-query";
+import { colors } from "@/constants/colors";
+import { useMemo, useState, useRef, useEffect } from "react";
+import { AlertTriangle, Clock, Droplet, Flame, TrendingUp, Activity, Database, Zap, AlertCircle, Menu, X, Users, Utensils, BookOpen, Settings, Bell, BarChart3, MessageCircle, LayoutDashboard } from "lucide-react-native";
+
+const { width } = Dimensions.get("window");
+const DRAWER_WIDTH = width * 0.75;
+
+const menuItems = [
+  { id: "dashboard", title: "מסך ניהול", icon: LayoutDashboard },
+  { id: "clients", title: "לקוחות", icon: Users },
+  { id: "notifications", title: "ניהול התראות", icon: Bell },
+  { id: "add-food", title: "הוסף מזון", icon: Utensils },
+  { id: "guides", title: "מדריכים", icon: BookOpen },
+  { id: "analytics", title: "דוחות ואנליטיקה", icon: BarChart3 },
+  { id: "settings", title: "הגדרות", icon: Settings },
+  { id: "support", title: "תמיכה ופניות", icon: MessageCircle },
+];
+
+export default function AdminDashboardScreen() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const drawerAnim = useRef(new Animated.Value(width)).current;
+  const overlayAnim = useRef(new Animated.Value(0)).current;
+  const [selectedMenu, setSelectedMenu] = useState("dashboard");
+
+  const today = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  const startOfDay = useMemo(() => {
+    const now = new Date();
+    now.setHours(6, 0, 0, 0);
+    return now.toISOString();
+  }, []);
+
+  const { data: clientsData, isLoading } = useQuery({
+    queryKey: ["admin-dashboard-data", user?.user_id, today],
+    queryFn: async () => {
+      console.log("[AdminDashboard] Fetching dashboard data");
+      
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("*")
+        .neq("user_id", user?.user_id)
+        .order("name", { ascending: true });
+
+      if (profilesError) {
+        console.error("[AdminDashboard] Error fetching clients:", profilesError);
+        throw profilesError;
+      }
+
+      const { data: dailyLogs, error: logsError } = await supabase
+        .from("daily_logs")
+        .select("*")
+        .eq("date", today);
+
+      if (logsError) {
+        console.error("[AdminDashboard] Error fetching daily logs:", logsError);
+        throw logsError;
+      }
+
+      const twoWeeksAgo = new Date();
+      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+      
+      const { data: measurements, error: measurementsError } = await supabase
+        .from("body_measurements")
+        .select("user_id, measurement_date")
+        .order("measurement_date", { ascending: false });
+
+      if (measurementsError) {
+        console.error("[AdminDashboard] Error fetching measurements:", measurementsError);
+      }
+
+      console.log("[AdminDashboard] Data fetched:", profiles?.length, "clients");
+      
+      return {
+        profiles: profiles as User[],
+        dailyLogs: dailyLogs || [],
+        measurements: measurements || [],
+      };
+    },
+    enabled: user?.role === "admin",
+    refetchInterval: 60000,
+  });
+
+  const clients = useMemo(() => clientsData?.profiles || [], [clientsData?.profiles]);
+  const dailyLogs = useMemo(() => clientsData?.dailyLogs || [], [clientsData?.dailyLogs]);
+  const measurements = useMemo(() => clientsData?.measurements || [], [clientsData?.measurements]);
+
+  const alerts = useMemo(() => {
+    const issues = {
+      critical: [] as { title: string; name: string; details: string }[],
+      warning: [] as { title: string; name: string; details: string }[],
+      info: [] as { title: string; name: string; details: string }[],
+    };
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+    clients.forEach((client) => {
+      const log = dailyLogs.find((l: any) => l.user_id === client.user_id);
+      
+      if (log && client.kcal_goal && log.total_kcal > client.kcal_goal + 500) {
+        issues.critical.push({
+          title: "חריגות קלוריות חמורה",
+          name: client.name || "ללא שם",
+          details: `${Math.round(log.total_kcal - client.kcal_goal)}+ קלוריות מעל יעד`,
+        });
+      } else if (log && client.kcal_goal && log.total_kcal > client.kcal_goal) {
+        issues.warning.push({
+          title: "חריגות בקלוריות",
+          name: client.name || "ללא שם",
+          details: `${Math.round(log.total_kcal - client.kcal_goal)} קלוריות מעל יעד`,
+        });
+      }
+
+      if (log && (log.water_glasses || 0) < 1) {
+        const hoursSinceStart = Math.floor((now.getTime() - new Date(startOfDay).getTime()) / (1000 * 60 * 60));
+        if (hoursSinceStart >= 4) {
+          issues.critical.push({
+            title: "לא שתה מים בכלל",
+            name: client.name || "ללא שם",
+            details: "לא נרשמה שתיית מים היום",
+          });
+        }
+      }
+
+      if (currentHour >= 12 && !log) {
+        issues.warning.push({
+          title: "לא נכנס/ה לאפליקציה",
+          name: client.name || "ללא שם",
+          details: "לא רשם אוכל עד השעה 12:00",
+        });
+      }
+
+      const clientMeasurements = measurements.filter((m: any) => m.user_id === client.user_id);
+      if (clientMeasurements.length > 0) {
+        const lastMeasurement = new Date(clientMeasurements[0].measurement_date);
+        if (lastMeasurement < twoWeeksAgo) {
+          issues.warning.push({
+            title: "מדידות לא עודכנו",
+            name: client.name || "ללא שם",
+            details: "חלפו 2+ שבועות מאז מדידה אחרונה",
+          });
+        }
+      }
+
+      if (log && log.total_protein_units && client.protein_units && 
+          Math.abs(log.total_protein_units - client.protein_units) > client.protein_units * 0.3) {
+        issues.warning.push({
+          title: "חריגות במאקרו חלבון",
+          name: client.name || "ללא שם",
+          details: `${log.total_protein_units}/${client.protein_units} יחידות`,
+        });
+      }
+    });
+
+    return issues;
+  }, [clients, dailyLogs, measurements, startOfDay]);
+
+  const stats = useMemo(() => {
+    return {
+      totalClients: clients.length,
+      activeToday: dailyLogs.length,
+      avgCalories: dailyLogs.length > 0 
+        ? Math.round(dailyLogs.reduce((sum: number, log: any) => sum + log.total_kcal, 0) / dailyLogs.length)
+        : 0,
+      compliance: clients.length > 0 
+        ? Math.round((dailyLogs.length / clients.length) * 100)
+        : 0,
+    };
+  }, [clients, dailyLogs]);
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(drawerAnim, {
+        toValue: isDrawerOpen ? 0 : width,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11,
+      }),
+      Animated.timing(overlayAnim, {
+        toValue: isDrawerOpen ? 1 : 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [isDrawerOpen]);
+
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const handleMenuSelect = (menuId: string) => {
+    console.log("[AdminDashboard] Menu selected:", menuId);
+    setSelectedMenu(menuId);
+    setIsDrawerOpen(false);
+    
+    if (menuId === "dashboard") {
+      return;
+    } else if (menuId === "clients") {
+      router.push("/admin-clients" as any);
+    } else if (menuId === "notifications") {
+      router.push("/admin-notifications" as any);
+    } else if (menuId === "add-food") {
+      router.push("/admin-add-food" as any);
+    } else if (menuId === "guides") {
+      router.push("/admin-guides" as any);
+    } else if (menuId === "analytics") {
+      router.push("/admin-analytics" as any);
+    } else if (menuId === "settings") {
+      router.push("/admin-settings" as any);
+    } else if (menuId === "support") {
+      router.push("/admin-support" as any);
+    }
+  };
+
+  if (user?.role !== "admin") {
+    return (
+      <LinearGradient
+        colors={["#3FCDD1", "#FFFFFF"]}
+        locations={[0, 0.4]}
+        style={styles.container}
+      >
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: "מסך ניהול",
+            headerStyle: {
+              backgroundColor: "#3FCDD1",
+            },
+            headerTintColor: "#FFFFFF",
+            headerTitleAlign: "center",
+            headerRight: () => (
+              <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+                <Menu size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            ),
+          }}
+        />
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>אין לך הרשאות גישה</Text>
+        </View>
+      </LinearGradient>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <LinearGradient
+        colors={["#3FCDD1", "#FFFFFF"]}
+        locations={[0, 0.4]}
+        style={styles.container}
+      >
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: "מסך ניהול",
+            headerStyle: {
+              backgroundColor: "#3FCDD1",
+            },
+            headerTintColor: "#FFFFFF",
+            headerTitleAlign: "center",
+            headerRight: () => (
+              <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+                <Menu size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            ),
+          }}
+        />
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </LinearGradient>
+    );
+  }
+
+  return (
+    <LinearGradient
+      colors={["#3FCDD1", "#FFFFFF"]}
+      locations={[0, 0.4]}
+      style={styles.container}
+    >
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: "מסך ניהול",
+          headerStyle: {
+            backgroundColor: "#3FCDD1",
+          },
+          headerTintColor: "#FFFFFF",
+          headerTitleAlign: "center",
+          headerRight: () => (
+            <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+              <Menu size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[styles.content, { paddingBottom: 150 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.headerSection}>
+          <Text style={styles.welcomeText}>שלום, {user?.email?.split("@")[0]}</Text>
+          <Text style={styles.dateText}>{new Date().toLocaleDateString("he-IL", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</Text>
+        </View>
+
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <View style={styles.statIconContainer}>
+              <Activity color="#FFFFFF" size={24} />
+            </View>
+            <Text style={styles.statValue}>{stats.totalClients}</Text>
+            <Text style={styles.statLabel}>סה&quot;כ לקוחות</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, { backgroundColor: "#34D399" }]}>
+              <TrendingUp color="#FFFFFF" size={24} />
+            </View>
+            <Text style={styles.statValue}>{stats.activeToday}</Text>
+            <Text style={styles.statLabel}>פעילים היום</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, { backgroundColor: "#F59E0B" }]}>
+              <Flame color="#FFFFFF" size={24} />
+            </View>
+            <Text style={styles.statValue}>{stats.avgCalories}</Text>
+            <Text style={styles.statLabel}>ממוצע קלוריות</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, { backgroundColor: "#8B5CF6" }]}>
+              <Zap color="#FFFFFF" size={24} />
+            </View>
+            <Text style={styles.statValue}>{stats.compliance}%</Text>
+            <Text style={styles.statLabel}>שיעור עמידה</Text>
+          </View>
+        </View>
+
+        <View style={styles.notificationsSection}>
+          <Text style={styles.sectionTitle}>התראות קריטיות</Text>
+          
+          {alerts.critical.length === 0 && alerts.warning.length === 0 ? (
+            <View style={styles.noAlertsCard}>
+              <Text style={styles.noAlertsText}>🎉 אין התראות פתוחות</Text>
+              <Text style={styles.noAlertsSubtext}>כל הלקוחות בטווח היעד</Text>
+            </View>
+          ) : (
+            <>
+              {alerts.critical.map((alert, idx) => (
+                <TouchableOpacity key={`critical-${idx}`} style={[styles.alertCard, styles.alertCardCritical]} activeOpacity={0.8}>
+                  <View style={styles.alertIconContainer}>
+                    <AlertTriangle color="#EF4444" size={24} />
+                  </View>
+                  <View style={styles.alertContent}>
+                    <Text style={styles.alertTitle}>{alert.title}</Text>
+                    <Text style={styles.alertName}>{alert.name}</Text>
+                    <Text style={styles.alertDetails}>{alert.details}</Text>
+                  </View>
+                  <View style={[styles.alertBadge, { backgroundColor: "#EF4444" }]}>
+                    <Text style={styles.alertBadgeText}>דחוף</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+
+              {alerts.warning.map((alert, idx) => (
+                <TouchableOpacity key={`warning-${idx}`} style={[styles.alertCard, styles.alertCardWarning]} activeOpacity={0.8}>
+                  <View style={styles.alertIconContainer}>
+                    <Clock color="#F59E0B" size={24} />
+                  </View>
+                  <View style={styles.alertContent}>
+                    <Text style={styles.alertTitle}>{alert.title}</Text>
+                    <Text style={styles.alertName}>{alert.name}</Text>
+                    <Text style={styles.alertDetails}>{alert.details}</Text>
+                  </View>
+                  <View style={[styles.alertBadge, { backgroundColor: "#F59E0B" }]}>
+                    <Text style={styles.alertBadgeText}>אזהרה</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </>
+          )}
+        </View>
+
+        <View style={styles.systemSection}>
+          <Text style={styles.sectionTitle}>דוחות מערכת</Text>
+          
+          <TouchableOpacity style={styles.systemCard} activeOpacity={0.8}>
+            <View style={styles.systemCardHeader}>
+              <View style={styles.systemIconContainer}>
+                <Zap color={colors.primary} size={24} />
+              </View>
+              <Text style={styles.systemCardTitle}>ביצועי אפליקציה</Text>
+            </View>
+            <View style={styles.systemMetrics}>
+              <View style={styles.metricRow}>
+                <Text style={styles.metricValue}>98ms</Text>
+                <Text style={styles.metricLabel}>זמן תגובה ממוצע</Text>
+              </View>
+              <View style={styles.metricRow}>
+                <Text style={styles.metricValue}>99.9%</Text>
+                <Text style={styles.metricLabel}>זמינות</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.systemCard} activeOpacity={0.8}>
+            <View style={styles.systemCardHeader}>
+              <View style={[styles.systemIconContainer, { backgroundColor: "#8B5CF6" }]}>
+                <Database color="#FFFFFF" size={24} />
+              </View>
+              <Text style={styles.systemCardTitle}>Supabase</Text>
+            </View>
+            <View style={styles.systemMetrics}>
+              <View style={styles.metricRow}>
+                <Text style={styles.metricValue}>{dailyLogs.length}</Text>
+                <Text style={styles.metricLabel}>רשומות יומיות</Text>
+              </View>
+              <View style={styles.metricRow}>
+                <Text style={styles.metricValue}>~{Math.round((dailyLogs.length * 0.5) / 1000)}MB</Text>
+                <Text style={styles.metricLabel}>נפח DB</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.systemCard} activeOpacity={0.8}>
+            <View style={styles.systemCardHeader}>
+              <View style={[styles.systemIconContainer, { backgroundColor: "#10B981" }]}>
+                <Activity color="#FFFFFF" size={24} />
+              </View>
+              <Text style={styles.systemCardTitle}>מעורבות משתמשים</Text>
+            </View>
+            <View style={styles.systemMetrics}>
+              <View style={styles.metricRow}>
+                <Text style={styles.metricValue}>{stats.activeToday}/{stats.totalClients}</Text>
+                <Text style={styles.metricLabel}>DAU (משתמשים פעילים יומיים)</Text>
+              </View>
+              <View style={styles.metricRow}>
+                <Text style={styles.metricValue}>{stats.compliance}%</Text>
+                <Text style={styles.metricLabel}>שיעור מעורבות</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      <Animated.View
+        pointerEvents={isDrawerOpen ? "auto" : "none"}
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            backgroundColor: "rgba(0,0,0,0.5)",
+            opacity: overlayAnim,
+          },
+        ]}
+      >
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={toggleDrawer}
+        />
+      </Animated.View>
+
+      <Animated.View
+        style={[
+          styles.drawer,
+          {
+            transform: [{ translateX: drawerAnim }],
+          },
+        ]}
+      >
+        <LinearGradient
+          colors={["#3FCDD1", "#2AB8BC"]}
+          style={styles.drawerHeader}
+        >
+          <View style={styles.drawerHeaderContent}>
+            <Text style={styles.drawerTitle}>תפריט מנהל</Text>
+            <TouchableOpacity onPress={toggleDrawer}>
+              <X size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.adminInfo}>
+            <View style={styles.adminAvatar}>
+              <Text style={styles.adminAvatarText}>{user?.email?.charAt(0).toUpperCase() || "A"}</Text>
+            </View>
+            <View style={styles.adminDetails}>
+              <Text style={styles.adminName}>{user?.email?.split("@")[0] || "מנהל"}</Text>
+              <Text style={styles.adminRole}>מנהל מערכת</Text>
+            </View>
+          </View>
+        </LinearGradient>
+
+        <ScrollView style={styles.drawerContent} showsVerticalScrollIndicator={false}>
+          {menuItems.map((item) => {
+            const IconComponent = item.icon;
+            const isSelected = selectedMenu === item.id;
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={[
+                  styles.menuItem,
+                  isSelected && styles.menuItemSelected,
+                ]}
+                onPress={() => handleMenuSelect(item.id)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.menuItemContent}>
+                  <Text style={[
+                    styles.menuItemText,
+                    isSelected && styles.menuItemTextSelected,
+                  ]}>
+                    {item.title}
+                  </Text>
+                  <IconComponent
+                    size={22}
+                    color={isSelected ? "#3FCDD1" : "#64748B"}
+                  />
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </Animated.View>
+    </LinearGradient>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 18,
+    color: "#666",
+    textAlign: "center",
+  },
+  headerSection: {
+    marginBottom: 24,
+  },
+  welcomeText: {
+    fontSize: 32,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "right",
+    marginBottom: 4,
+  },
+  dateText: {
+    fontSize: 16,
+    color: "#718096",
+    textAlign: "right",
+  },
+  statsGrid: {
+    flexDirection: "row-reverse" as any,
+    flexWrap: "wrap" as any,
+    gap: 12,
+    marginBottom: 24,
+  },
+  statCard: {
+    flex: 1,
+    minWidth: "46%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  statIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  statValue: {
+    fontSize: 28,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: "#718096",
+    textAlign: "center",
+  },
+  notificationsSection: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "right",
+    marginBottom: 16,
+  },
+  noAlertsCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 32,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  noAlertsText: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#10B981",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  noAlertsSubtext: {
+    fontSize: 16,
+    color: "#718096",
+    textAlign: "center",
+  },
+  alertCard: {
+    flexDirection: "row-reverse" as any,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  alertCardCritical: {
+    borderRightWidth: 4,
+    borderRightColor: "#EF4444",
+  },
+  alertCardWarning: {
+    borderRightWidth: 4,
+    borderRightColor: "#F59E0B",
+  },
+  alertIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+  },
+  alertContent: {
+    flex: 1,
+    alignItems: "flex-end",
+  },
+  alertTitle: {
+    fontSize: 16,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    marginBottom: 4,
+  },
+  alertName: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: colors.primary,
+    marginBottom: 2,
+  },
+  alertDetails: {
+    fontSize: 13,
+    color: "#718096",
+  },
+  alertBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginTop: 4,
+  },
+  alertBadgeText: {
+    fontSize: 11,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+  },
+  systemSection: {
+    marginBottom: 24,
+  },
+  systemCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  systemCardHeader: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    marginBottom: 16,
+    gap: 12,
+  },
+  systemIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  systemCardTitle: {
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+  },
+  systemMetrics: {
+    gap: 12,
+  },
+  metricRow: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  metricLabel: {
+    fontSize: 14,
+    color: "#718096",
+  },
+  metricValue: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#2d3748",
+  },
+  drawer: {
+    position: "absolute" as const,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: DRAWER_WIDTH,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: -2, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 16,
+  },
+  drawerHeader: {
+    paddingTop: 60,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+  },
+  drawerHeaderContent: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  drawerTitle: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+  },
+  adminInfo: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    gap: 12,
+  },
+  adminAvatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  adminAvatarText: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+  },
+  adminDetails: {
+    flex: 1,
+    alignItems: "flex-end",
+  },
+  adminName: {
+    fontSize: 18,
+    fontWeight: "600" as const,
+    color: "#FFFFFF",
+    marginBottom: 4,
+  },
+  adminRole: {
+    fontSize: 14,
+    color: "rgba(255, 255, 255, 0.8)",
+  },
+  drawerContent: {
+    flex: 1,
+    paddingTop: 8,
+  },
+  menuItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  menuItemSelected: {
+    backgroundColor: "rgba(63, 205, 209, 0.1)",
+    borderLeftWidth: 4,
+    borderLeftColor: "#3FCDD1",
+  },
+  menuItemContent: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  menuItemText: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#64748B",
+  },
+  menuItemTextSelected: {
+    color: "#3FCDD1",
+    fontWeight: "700" as const,
+  },
+});

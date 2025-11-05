@@ -1,0 +1,1130 @@
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions, Platform } from "react-native";
+import { Stack, useLocalSearchParams, router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { supabase } from "@/lib/supabase";
+import { useQuery } from "@tanstack/react-query";
+import { colors } from "@/constants/colors";
+import { useMemo } from "react";
+import { User, TrendingUp, Scale, Weight, Percent, Edit } from "lucide-react-native";
+import { LineChart } from "react-native-chart-kit";
+import Svg, { Circle, Path } from "react-native-svg";
+import { BodyMeasurement } from "@/lib/types";
+
+const screenWidth = Dimensions.get("window").width;
+
+export default function UserDashboardScreen() {
+  const { userId, userName } = useLocalSearchParams<{ userId: string; userName: string }>();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["user-calories-7days", userId],
+    queryFn: async () => {
+      console.log("[UserDashboard] Fetching 7-day calorie data for user:", userId);
+
+      const today = new Date();
+      const dates: string[] = [];
+      
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        dates.push(dateStr);
+      }
+
+      const { data: logs, error } = await supabase
+        .from("daily_logs")
+        .select("date, total_kcal, total_protein_units, total_carb_units, total_fat_units, total_fruit_units, total_veg_units")
+        .eq("user_id", userId)
+        .in("date", dates);
+
+      if (error) {
+        console.error("[UserDashboard] Error fetching logs:", error);
+        throw error;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("kcal_goal, protein_units, carb_units, fat_units, fruit_units, veg_units, weekly_cardio_minutes, weekly_strength_workouts")
+        .eq("user_id", userId)
+        .single();
+
+      if (profileError) {
+        console.error("[UserDashboard] Error fetching profile:", profileError);
+      }
+
+      console.log("[UserDashboard] Profile data:", profile);
+
+      const logsMap = new Map(logs?.map(log => [log.date, log]) || []);
+      
+      const weekData = dates.map((date, index) => {
+        const dayNames = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+        const dateObj = new Date(date);
+        const dayIndex = dateObj.getDay();
+        const log = logsMap.get(date);
+        
+        return {
+          date,
+          dayName: dayNames[dayIndex],
+          calories: log?.total_kcal || 0,
+        };
+      });
+
+      console.log("[UserDashboard] Week data:", weekData);
+
+      const lastLog = logsMap.get(dates[dates.length - 1]);
+
+      const { data: measurements, error: measurementsError } = await supabase
+        .from("body_measurements")
+        .select("*")
+        .eq("user_id", userId)
+        .order("measurement_date", { ascending: true });
+
+      if (measurementsError) {
+        console.error("[UserDashboard] Error fetching measurements:", measurementsError);
+      }
+
+      const getCurrentWeekRange = () => {
+        const now = new Date();
+        const dayOfWeek = now.getDay();
+        
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - dayOfWeek);
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+        
+        const formatDateString = (d: Date) => {
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        };
+        
+        return {
+          start: formatDateString(startOfWeek),
+          end: formatDateString(endOfWeek),
+        };
+      };
+
+      const { start, end } = getCurrentWeekRange();
+      const { data: workoutLogs } = await supabase
+        .from("workout_logs")
+        .select("*")
+        .eq("user_id", userId)
+        .gte("log_date", start)
+        .lte("log_date", end);
+
+      const strengthLogs = workoutLogs?.filter((log) => log.workout_type === "strength") || [];
+      const cardioLogs = workoutLogs?.filter((log) => log.workout_type === "cardio") || [];
+
+      const totalStrengthWorkouts = strengthLogs.reduce((sum, log) => sum + Number(log.amount), 0);
+      const totalCardioMinutes = cardioLogs.reduce((sum, log) => sum + Number(log.amount), 0);
+
+      return {
+        weekData,
+        goal: profile?.kcal_goal || 0,
+        lastLog,
+        profile,
+        measurements: measurements || [],
+        workoutData: {
+          totalStrengthWorkouts,
+          totalCardioMinutes,
+          weeklyStrengthGoal: profile?.weekly_strength_workouts || 0,
+          weeklyCardioGoal: profile?.weekly_cardio_minutes || 0,
+        },
+      };
+    },
+    enabled: !!userId,
+  });
+
+  const maxCalories = useMemo(() => {
+    if (!data) return 0;
+    const max = Math.max(...data.weekData.map(d => d.calories), data.goal);
+    return max;
+  }, [data]);
+
+  if (isLoading) {
+    return (
+      <LinearGradient
+        colors={["#3FCDD1", "#FFFFFF"]}
+        locations={[0, 0.4]}
+        style={styles.container}
+      >
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: `${userName || "משתמש"}`,
+            headerStyle: {
+              backgroundColor: "#3FCDD1",
+            },
+            headerTintColor: "#FFFFFF",
+            headerTitleAlign: "center",
+          }}
+        />
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </LinearGradient>
+    );
+  }
+
+  return (
+    <LinearGradient
+      colors={["#3FCDD1", "#FFFFFF"]}
+      locations={[0, 0.4]}
+      style={styles.container}
+    >
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: `${userName || "משתמש"}`,
+          headerStyle: {
+            backgroundColor: "#3FCDD1",
+          },
+          headerTintColor: "#FFFFFF",
+          headerTitleAlign: "center",
+        }}
+      />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>צריכת קלוריות שבועית</Text>
+          <Text style={styles.subtitle}>7 ימים אחרונים</Text>
+        </View>
+
+        <View style={styles.chartCard}>
+          <View style={styles.chartContainer}>
+            {data?.weekData.map((day, index) => {
+              const heightPercent = maxCalories > 0 ? (day.calories / maxCalories) * 100 : 0;
+              const isToday = index === 6;
+              
+              return (
+                <View key={day.date} style={styles.barContainer}>
+                  <View style={styles.barWrapper}>
+                    <View style={styles.barOuterLayer3}>
+                      <View style={styles.barOuterLayer2}>
+                        <View style={styles.barOuterLayer1}>
+                          <View style={styles.barBackground}>
+                            <View 
+                              style={[
+                                styles.barFill, 
+                                { 
+                                  height: `${heightPercent}%`,
+                                  backgroundColor: isToday ? "#262135" : "rgba(41, 45, 48, 0.29)",
+                                }
+                              ]} 
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <Text style={styles.dayLabel}>{day.dayName}</Text>
+                </View>
+              );
+            })}
+          </View>
+
+          <View style={styles.legend}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: "#262135" }]} />
+              <Text style={styles.legendText}>היום</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: "rgba(41, 45, 48, 0.29)" }]} />
+              <Text style={styles.legendText}>ימים קודמים</Text>
+            </View>
+          </View>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>{Math.round(data?.goal || 0)}</Text>
+              <Text style={styles.statLabel}>יעד יומי</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>
+                {data ? Math.round(data.weekData.reduce((sum, d) => sum + d.calories, 0) / 7) : 0}
+              </Text>
+              <Text style={styles.statLabel}>ממוצע שבועי</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.workoutProgressSection}>
+          <Text style={styles.title}>התקדמות אימונים שבועית</Text>
+          <View style={styles.workoutCardsRow}>
+            <View style={styles.workoutCard}>
+              <View style={styles.workoutCardHeader}>
+                <Text style={styles.workoutCardTitle}>אימוני כוח בשבוע</Text>
+              </View>
+              <View style={styles.circularProgressContainer}>
+                {(() => {
+                  const progress = data?.workoutData?.weeklyStrengthGoal 
+                    ? Math.min(data.workoutData.totalStrengthWorkouts / data.workoutData.weeklyStrengthGoal, 1)
+                    : 0;
+                  const size = 100;
+                  const strokeWidth = 10;
+                  const radius = (size - strokeWidth) / 2;
+                  const circumference = 2 * Math.PI * radius;
+                  const strokeDashoffset = circumference - (circumference * progress);
+
+                  return (
+                    <Svg width={size} height={size}>
+                      <Circle
+                        cx={size / 2}
+                        cy={size / 2}
+                        r={radius}
+                        stroke="#E0E0E0"
+                        strokeWidth={strokeWidth}
+                        fill="none"
+                      />
+                      <Circle
+                        cx={size / 2}
+                        cy={size / 2}
+                        r={radius}
+                        stroke={colors.primary}
+                        strokeWidth={strokeWidth}
+                        fill="none"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        rotation="-90"
+                        origin={`${size / 2}, ${size / 2}`}
+                      />
+                      <View style={styles.progressTextContainer}>
+                        <Text style={styles.progressValue}>
+                          {data?.workoutData?.totalStrengthWorkouts || 0}
+                        </Text>
+                        <Text style={styles.progressGoal}>/{data?.workoutData?.weeklyStrengthGoal || 0}</Text>
+                      </View>
+                    </Svg>
+                  );
+                })()}
+              </View>
+            </View>
+
+            <View style={styles.workoutCard}>
+              <View style={styles.workoutCardHeader}>
+                <Text style={styles.workoutCardTitle}>דקות אירובי בשבוע</Text>
+              </View>
+              <View style={styles.circularProgressContainer}>
+                {(() => {
+                  const progress = data?.workoutData?.weeklyCardioGoal
+                    ? Math.min(data.workoutData.totalCardioMinutes / data.workoutData.weeklyCardioGoal, 1)
+                    : 0;
+                  const size = 100;
+                  const strokeWidth = 10;
+                  const radius = (size - strokeWidth) / 2;
+                  const circumference = 2 * Math.PI * radius;
+                  const strokeDashoffset = circumference - (circumference * progress);
+
+                  return (
+                    <Svg width={size} height={size}>
+                      <Circle
+                        cx={size / 2}
+                        cy={size / 2}
+                        r={radius}
+                        stroke="#E0E0E0"
+                        strokeWidth={strokeWidth}
+                        fill="none"
+                      />
+                      <Circle
+                        cx={size / 2}
+                        cy={size / 2}
+                        r={radius}
+                        stroke={"#FF6B6B"}
+                        strokeWidth={strokeWidth}
+                        fill="none"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        rotation="-90"
+                        origin={`${size / 2}, ${size / 2}`}
+                      />
+                      <View style={styles.progressTextContainer}>
+                        <Text style={styles.progressValue}>
+                          {data?.workoutData?.totalCardioMinutes || 0}
+                        </Text>
+                        <Text style={styles.progressGoal}>/{data?.workoutData?.weeklyCardioGoal || 0}</Text>
+                      </View>
+                    </Svg>
+                  );
+                })()}
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.buttonsRow}>
+          <TouchableOpacity
+            style={styles.updateButton}
+            onPress={() => router.push({
+              pathname: "/update-measurements",
+              params: { userId, userName }
+            })}
+            activeOpacity={0.8}
+          >
+            <User color="#FFFFFF" size={24} />
+            <Text style={styles.updateButtonText}>עדכון מדידות</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.updateButton, styles.editButton]}
+            onPress={() => router.push({
+              pathname: "/admin-edit-client",
+              params: { userId, userName }
+            })}
+            activeOpacity={0.8}
+          >
+            <Edit color="#FFFFFF" size={24} />
+            <Text style={styles.updateButtonText}>ביצוע שינויים</Text>
+          </TouchableOpacity>
+        </View>
+
+        {data?.measurements && data.measurements.length > 0 && (
+          <>
+            <View style={styles.measurementsTitleSection}>
+              <Text style={styles.title}>מדידות גוף</Text>
+            </View>
+
+            {(() => {
+              const measurements = data.measurements as BodyMeasurement[];
+              const latestMeasurement = measurements[measurements.length - 1];
+              const firstMeasurement = measurements[0];
+              
+              const waistData = {
+                labels: measurements.slice(-6).map((m) => {
+                  const date = new Date(m.measurement_date);
+                  return `${date.getDate()}/${date.getMonth() + 1}`;
+                }),
+                datasets: [
+                  {
+                    data:
+                      measurements
+                        .slice(-6)
+                        .map((m) => m.waist_circumference || 0)
+                        .filter((v) => v > 0).length > 0
+                        ? measurements
+                            .slice(-6)
+                            .map((m) => m.waist_circumference || 0)
+                        : [0],
+                    color: () => "#4ECDC4",
+                    strokeWidth: 3,
+                  },
+                ],
+              };
+
+              const armData = {
+                labels: measurements.slice(-6).map((m) => {
+                  const date = new Date(m.measurement_date);
+                  return `${date.getDate()}/${date.getMonth() + 1}`;
+                }),
+                datasets: [
+                  {
+                    data:
+                      measurements
+                        .slice(-6)
+                        .map((m) => m.arm_circumference || 0)
+                        .filter((v) => v > 0).length > 0
+                        ? measurements
+                            .slice(-6)
+                            .map((m) => m.arm_circumference || 0)
+                        : [0],
+                    color: () => "#FFD93D",
+                    strokeWidth: 3,
+                  },
+                ],
+              };
+
+              const thighData = {
+                labels: measurements.slice(-6).map((m) => {
+                  const date = new Date(m.measurement_date);
+                  return `${date.getDate()}/${date.getMonth() + 1}`;
+                }),
+                datasets: [
+                  {
+                    data:
+                      measurements
+                        .slice(-6)
+                        .map((m) => m.thigh_circumference || 0)
+                        .filter((v) => v > 0).length > 0
+                        ? measurements
+                            .slice(-6)
+                            .map((m) => m.thigh_circumference || 0)
+                        : [0],
+                    color: () => "#6BCB77",
+                    strokeWidth: 3,
+                  },
+                ],
+              };
+
+              const bodyWeightData = {
+                labels: measurements.slice(-6).map((m) => {
+                  const date = new Date(m.measurement_date);
+                  return `${date.getDate()}/${date.getMonth() + 1}`;
+                }),
+                datasets: [
+                  {
+                    data:
+                      measurements
+                        .slice(-6)
+                        .map((m) => m.body_weight || 0)
+                        .filter((v) => v > 0).length > 0
+                        ? measurements
+                            .slice(-6)
+                            .map((m) => m.body_weight || 0)
+                        : [0],
+                    color: () => colors.primary,
+                    strokeWidth: 3,
+                  },
+                ],
+              };
+
+              const bodyFatData = {
+                labels: measurements.slice(-6).map((m) => {
+                  const date = new Date(m.measurement_date);
+                  return `${date.getDate()}/${date.getMonth() + 1}`;
+                }),
+                datasets: [
+                  {
+                    data:
+                      measurements
+                        .slice(-6)
+                        .map((m) => m.body_fat_percentage || 0)
+                        .filter((v) => v > 0).length > 0
+                        ? measurements
+                            .slice(-6)
+                            .map((m) => m.body_fat_percentage || 0)
+                        : [0],
+                    color: () => colors.primary,
+                    strokeWidth: 3,
+                  },
+                ],
+              };
+
+              const weightChange = latestMeasurement && firstMeasurement && latestMeasurement.body_weight && firstMeasurement.body_weight
+                ? latestMeasurement.body_weight - firstMeasurement.body_weight
+                : 0;
+              const bodyFatChange = latestMeasurement && firstMeasurement && latestMeasurement.body_fat_percentage && firstMeasurement.body_fat_percentage
+                ? latestMeasurement.body_fat_percentage - firstMeasurement.body_fat_percentage
+                : 0;
+
+              const renderCustomPieChart = (measurement: BodyMeasurement) => {
+                const leanMass = measurement.body_fat_mass || 0;
+                const fatMass = measurement.lean_mass || 0;
+                const total = leanMass + fatMass;
+
+                if (total === 0) {
+                  return (
+                    <View style={styles.noDataContainer}>
+                      <Text style={styles.noDataText}>אין נתונים להצגה</Text>
+                    </View>
+                  );
+                }
+
+                const leanPercent = (leanMass / total) * 100;
+                const leanAngle = (leanPercent / 100) * 360;
+
+                const leanColor = "#70eeff";
+                const fatColor = "#091e27";
+
+                const centerX = 150;
+                const centerY = 150;
+                const radius = 120;
+
+                const endX = centerX + radius * Math.cos(((leanAngle - 90) * Math.PI) / 180);
+                const endY = centerY + radius * Math.sin(((leanAngle - 90) * Math.PI) / 180);
+
+                const largeArcFlag = leanAngle > 180 ? 1 : 0;
+
+                return (
+                  <View style={styles.customPieWrapper}>
+                    <Svg width="300" height="300" viewBox="0 0 300 300">
+                      <Circle
+                        cx="150"
+                        cy="150"
+                        r="120"
+                        fill={fatColor}
+                      />
+                      {leanPercent > 0 && (
+                        <Path
+                          d={`M 150 150 L 150 30 A 120 120 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
+                          fill={leanColor}
+                        />
+                      )}
+                    </Svg>
+                    <View style={styles.legendContainer}>
+                      <View style={styles.legendRow}>
+                        <View style={[styles.legendColorBox, { backgroundColor: leanColor }]} />
+                        <Text style={styles.legendLabel}>מסת הגוף הרזה: {leanMass.toFixed(1)} ק״ג</Text>
+                      </View>
+                      <View style={styles.legendRow}>
+                        <View style={[styles.legendColorBox, { backgroundColor: fatColor }]} />
+                        <Text style={styles.legendLabel}>מסת שומן: {fatMass.toFixed(1)} ק״ג</Text>
+                      </View>
+                    </View>
+                  </View>
+                );
+              };
+
+              const chartConfig = {
+                backgroundColor: "#ffffff",
+                backgroundGradientFrom: "#ffffff",
+                backgroundGradientTo: "#ffffff",
+                decimalPlaces: 1,
+                color: (opacity = 1) => `rgba(63, 205, 209, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(51, 51, 51, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+                propsForDots: {
+                  r: "4",
+                  strokeWidth: "2",
+                  stroke: colors.primary,
+                },
+              };
+
+              return (
+                <>
+                  <View style={styles.summaryRow}>
+                    <View style={styles.summaryCard}>
+                      <Percent color={colors.primary} size={32} style={styles.summaryIcon} />
+                      <Text style={styles.summaryLabel}>אחוז שומן נוכחי</Text>
+                      <Text style={styles.summaryValue}>
+                        {latestMeasurement?.body_fat_percentage?.toFixed(1) || "0.0"}%
+                      </Text>
+                    </View>
+                    <View style={styles.summaryCard}>
+                      <Weight color={colors.primary} size={32} style={styles.summaryIcon} />
+                      <Text style={styles.summaryLabel}>משקל נוכחי</Text>
+                      <Text style={styles.summaryValue}>
+                        {latestMeasurement?.body_weight?.toFixed(1) || "0.0"} ק״ג
+                      </Text>
+                    </View>
+                  </View>
+
+                  {latestMeasurement && latestMeasurement.body_weight && (
+                    <View style={styles.card}>
+                      <View style={styles.cardHeader}>
+                        <Scale color={colors.primary} size={24} />
+                        <Text style={styles.cardTitle}>הרכב משקל הגוף</Text>
+                      </View>
+                      <View style={styles.customPieChartContainer}>
+                        {renderCustomPieChart(latestMeasurement)}
+                      </View>
+                    </View>
+                  )}
+
+                  <View style={styles.card}>
+                    <View style={styles.cardHeader}>
+                      <Weight color={colors.primary} size={24} />
+                      <Text style={styles.cardTitle}>משקל הגוף (ק״ג)</Text>
+                    </View>
+                    {measurements.some((m) => m.body_weight) && (
+                      <View style={styles.individualChartContainer}>
+                        {bodyWeightData.labels.length > 0 && (
+                          <LineChart
+                            data={bodyWeightData}
+                            width={screenWidth - 64}
+                            height={220}
+                            chartConfig={chartConfig}
+                            bezier
+                            style={styles.chart}
+                            withInnerLines={false}
+                            withOuterLines={true}
+                            withVerticalLines={false}
+                            withHorizontalLines={true}
+                          />
+                        )}
+                        {weightChange !== 0 && (
+                          <View style={styles.progressText}>
+                            <Text style={styles.progressLabel}>
+                              עד כה {weightChange > 0 ? "עלית" : "ירדת"} {Math.abs(weightChange).toFixed(1)} ק״ג
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.card}>
+                    <View style={styles.cardHeader}>
+                      <Percent color={colors.primary} size={24} />
+                      <Text style={styles.cardTitle}>אחוז שומן בגוף (%)</Text>
+                    </View>
+                    {measurements.some((m) => m.body_fat_percentage) && (
+                      <View style={styles.individualChartContainer}>
+                        {bodyFatData.labels.length > 0 && (
+                          <LineChart
+                            data={bodyFatData}
+                            width={screenWidth - 64}
+                            height={220}
+                            chartConfig={chartConfig}
+                            bezier
+                            style={styles.chart}
+                            withInnerLines={false}
+                            withOuterLines={true}
+                            withVerticalLines={false}
+                            withHorizontalLines={true}
+                          />
+                        )}
+                        {bodyFatChange !== 0 && (
+                          <View style={styles.progressText}>
+                            <Text style={styles.progressLabel}>
+                              עד כה {bodyFatChange > 0 ? "עלית" : "ירדת"} ב-{Math.abs(bodyFatChange).toFixed(1)} אחוז שומן
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.card}>
+                    <View style={styles.cardHeader}>
+                      <TrendingUp color={colors.primary} size={24} />
+                      <Text style={styles.cardTitle}>היקפים (ס״מ)</Text>
+                    </View>
+                    
+                    {measurements.some((m) => m.waist_circumference) && (
+                      <View style={styles.individualChartContainer}>
+                        <Text style={styles.individualChartTitle}>מותניים</Text>
+                        {waistData.labels.length > 0 && (
+                          <LineChart
+                            data={waistData}
+                            width={screenWidth - 64}
+                            height={180}
+                            chartConfig={chartConfig}
+                            bezier
+                            style={styles.chart}
+                            withInnerLines={false}
+                            withOuterLines={true}
+                            withVerticalLines={false}
+                            withHorizontalLines={true}
+                          />
+                        )}
+                      </View>
+                    )}
+
+                    {measurements.some((m) => m.arm_circumference) && (
+                      <View style={styles.individualChartContainer}>
+                        <Text style={styles.individualChartTitle}>יד</Text>
+                        {armData.labels.length > 0 && (
+                          <LineChart
+                            data={armData}
+                            width={screenWidth - 64}
+                            height={180}
+                            chartConfig={chartConfig}
+                            bezier
+                            style={styles.chart}
+                            withInnerLines={false}
+                            withOuterLines={true}
+                            withVerticalLines={false}
+                            withHorizontalLines={true}
+                          />
+                        )}
+                      </View>
+                    )}
+
+                    {measurements.some((m) => m.thigh_circumference) && (
+                      <View style={styles.individualChartContainer}>
+                        <Text style={styles.individualChartTitle}>ירך</Text>
+                        {thighData.labels.length > 0 && (
+                          <LineChart
+                            data={thighData}
+                            width={screenWidth - 64}
+                            height={180}
+                            chartConfig={chartConfig}
+                            bezier
+                            style={styles.chart}
+                            withInnerLines={false}
+                            withOuterLines={true}
+                            withVerticalLines={false}
+                            withHorizontalLines={true}
+                          />
+                        )}
+                      </View>
+                    )}
+                  </View>
+                </>
+              );
+            })()}
+          </>
+        )}
+      </ScrollView>
+    </LinearGradient>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 150,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  titleSection: {
+    marginBottom: 24,
+    marginTop: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "right",
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#718096",
+    textAlign: "right",
+  },
+  chartCard: {
+    backgroundColor: "#212121",
+    borderRadius: 43,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  chartContainer: {
+    flexDirection: "row" as any,
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    height: 220,
+    marginBottom: 16,
+  },
+  barContainer: {
+    flex: 1,
+    alignItems: "center",
+    gap: 8,
+  },
+  barWrapper: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  barOuterLayer3: {
+    width: "85%",
+    height: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "rgba(38, 33, 53, 0.03)",
+    borderRadius: 16,
+  },
+  barOuterLayer2: {
+    width: "90%",
+    height: "90%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "rgba(38, 33, 53, 0.19)",
+    borderRadius: 16,
+  },
+  barOuterLayer1: {
+    width: "88%",
+    height: "94%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "#262135",
+    borderRadius: 16,
+  },
+  barBackground: {
+    width: "45%",
+    height: "100%",
+    justifyContent: "flex-end",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  barFill: {
+    width: "100%",
+    borderRadius: 16,
+  },
+  dayLabel: {
+    fontSize: 10,
+    fontWeight: "400" as const,
+    color: "rgba(255, 255, 255, 0.71)",
+    textAlign: "center",
+  },
+  legend: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "center",
+    gap: 20,
+    marginBottom: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(42, 36, 57, 0.15)",
+  },
+  legendItem: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    gap: 6,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  legendText: {
+    fontSize: 12,
+    color: "rgba(255, 255, 255, 0.71)",
+    fontWeight: "500" as const,
+  },
+  statsRow: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    borderRadius: 16,
+    padding: 16,
+    alignItems: "center",
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: "rgba(255, 255, 255, 0.71)",
+    fontWeight: "500" as const,
+  },
+  buttonsRow: {
+    flexDirection: "row-reverse" as any,
+    gap: 12,
+    marginTop: 24,
+  },
+  updateButton: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    flexDirection: "row" as any,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  editButton: {
+    backgroundColor: "#FFD700",
+  },
+  updateButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700" as const,
+  },
+  measurementsTitleSection: {
+    marginBottom: 24,
+    marginTop: 32,
+  },
+  summaryRow: {
+    flexDirection: "row-reverse" as any,
+    gap: 12,
+    marginBottom: 16,
+  },
+  summaryCard: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.43)",
+    borderRadius: 24,
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+    ...Platform.select({
+      web: {
+        backdropFilter: "blur(6.95px)",
+      } as any,
+    }),
+  },
+  summaryIcon: {
+    marginBottom: 8,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: colors.gray,
+    marginBottom: 4,
+    textAlign: "center",
+  },
+  summaryValue: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: colors.text,
+  },
+  card: {
+    backgroundColor: "rgba(255, 255, 255, 0.43)",
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+    ...Platform.select({
+      web: {
+        backdropFilter: "blur(6.95px)",
+      } as any,
+    }),
+  },
+  cardHeader: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: colors.text,
+  },
+  customPieChartContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 16,
+  },
+  customPieWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  legendContainer: {
+    marginTop: 24,
+    gap: 12,
+    alignItems: "flex-start",
+    alignSelf: "center",
+  },
+  legendRow: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    gap: 10,
+  },
+  legendColorBox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+  },
+  legendLabel: {
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: "600" as const,
+  },
+  noDataContainer: {
+    paddingVertical: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noDataText: {
+    fontSize: 16,
+    color: colors.gray,
+    textAlign: "center",
+  },
+  chart: {
+    marginVertical: 8,
+    borderRadius: 16,
+  },
+  individualChartContainer: {
+    marginBottom: 24,
+  },
+  individualChartTitle: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: colors.text,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  workoutProgressSection: {
+    marginTop: 32,
+    marginBottom: 24,
+  },
+  workoutCardsRow: {
+    flexDirection: "row-reverse" as any,
+    gap: 12,
+    marginTop: 16,
+  },
+  workoutCard: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.43)",
+    borderRadius: 24,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+    ...Platform.select({
+      web: {
+        backdropFilter: "blur(6.95px)",
+      } as any,
+    }),
+  },
+  workoutCardHeader: {
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  workoutCardTitle: {
+    fontSize: 14,
+    fontWeight: "700" as const,
+    color: colors.text,
+    textAlign: "center",
+  },
+  circularProgressContainer: {
+    position: "relative" as any,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  progressTextContainer: {
+    position: "absolute" as any,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  progressValue: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: colors.text,
+  },
+  progressGoal: {
+    fontSize: 14,
+    color: colors.gray,
+    marginTop: 2,
+  },
+  progressText: {
+    marginTop: 12,
+    alignItems: "center" as any,
+  },
+  progressLabel: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: colors.primary,
+    textAlign: "center" as any,
+  },
+});
