@@ -1516,7 +1516,7 @@ const styles = StyleSheet.create({
   },
   logText: {
     fontSize: 11,
-    color: "#000",
+    color: "#FFFFFF",
     fontWeight: "600" as const,
     flex: 1,
     textAlign: "right",
