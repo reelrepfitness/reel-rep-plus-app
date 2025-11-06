@@ -112,7 +112,8 @@ export default function FoodBankScreen() {
   }, [foodItems, selectedMainCategory]);
 
   const filteredItems = useMemo(() => {
-    let filtered = foodItems;
+    // Filter out restaurant items - they should only be accessed through the restaurants flow
+    let filtered = foodItems.filter(item => item.category !== "מסעדות");
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
