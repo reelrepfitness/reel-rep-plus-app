@@ -232,11 +232,11 @@ export default function AIPhotoAnalysisScreen() {
   const getMacroColor = (type: 'protein' | 'carbs' | 'fats') => {
     switch (type) {
       case 'protein':
-        return colors.protein;
+        return '#FFE5E5';
       case 'carbs':
-        return colors.carb;
+        return '#FFF4E5';
       case 'fats':
-        return colors.fat;
+        return '#E5F4FF';
       default:
         return '#F7FAFC';
     }
@@ -385,65 +385,68 @@ export default function AIPhotoAnalysisScreen() {
                           { opacity: isChecked ? 1 : 0.1 },
                         ]}
                       >
-                        <View style={styles.foodItemHeader}>
-                          <View style={styles.foodNameWithCheckbox}>
-                            <TouchableOpacity
-                              style={[styles.checkboxContainer, { opacity: 1 }]}
-                              onPress={() => toggleItemCheck(index)}
-                              activeOpacity={0.7}
-                            >
-                              <View style={[
-                                styles.checkboxBox,
-                                isChecked && styles.checkboxBoxChecked
-                              ]}>
-                                {isChecked && (
-                                  <Check
-                                    size={16}
-                                    color="#000000"
-                                    strokeWidth={3}
-                                  />
-                                )}
-                              </View>
-                            </TouchableOpacity>
-                            <Text style={styles.foodItemName}>{item.name}</Text>
-                          </View>
-                          <Text style={styles.foodItemQuantity}>{item.quantity}</Text>
+                        <View style={styles.foodItemCheckboxRow}>
+                          <TouchableOpacity
+                            style={[styles.checkboxContainer, { opacity: 1 }]}
+                            onPress={() => toggleItemCheck(index)}
+                            activeOpacity={0.7}
+                          >
+                            <View style={[
+                              styles.checkboxBox,
+                              isChecked && styles.checkboxBoxChecked
+                            ]}>
+                              {isChecked && (
+                                <Check
+                                  size={16}
+                                  color="#000000"
+                                  strokeWidth={3}
+                                />
+                              )}
+                            </View>
+                          </TouchableOpacity>
                         </View>
                         
-                        <View style={styles.foodItemMacros}>
-                          <View style={styles.macroItem}>
-                            <Text style={styles.calorieText}>{item.calories} קק&quot;ל</Text>
+                        <View style={styles.foodItemContent}>
+                          <View style={styles.foodItemHeader}>
+                            <Text style={styles.foodItemName}>{item.name}</Text>
+                            <Text style={styles.foodItemQuantity}>{item.quantity}</Text>
                           </View>
-                          {item.protein > 0 && (
-                            <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('protein') }]}>
-                              <Image
-                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
-                                style={styles.macroIconSmall}
-                                resizeMode="contain"
-                              />
-                              <Text style={styles.macroTextBlack}>{formatUnit(item.protein)}</Text>
+                          
+                          <View style={styles.foodItemMacros}>
+                            <View style={styles.macroItem}>
+                              <Text style={styles.calorieText}>{item.calories} קק&quot;ל</Text>
                             </View>
-                          )}
-                          {item.carbs > 0 && (
-                            <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('carbs') }]}>
-                              <Image
-                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
-                                style={styles.macroIconSmall}
-                                resizeMode="contain"
-                              />
-                              <Text style={styles.macroTextBlack}>{formatUnit(item.carbs)}</Text>
-                            </View>
-                          )}
-                          {item.fats > 0 && (
-                            <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('fats') }]}>
-                              <Image
-                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
-                                style={styles.macroIconSmall}
-                                resizeMode="contain"
-                              />
-                              <Text style={styles.macroTextBlack}>{formatUnit(item.fats)}</Text>
-                            </View>
-                          )}
+                            {item.protein > 0 && (
+                              <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('protein') }]}>
+                                <Image
+                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
+                                  style={styles.macroIconSmall}
+                                  resizeMode="contain"
+                                />
+                                <Text style={styles.macroTextBlack}>{formatUnit(item.protein)}</Text>
+                              </View>
+                            )}
+                            {item.carbs > 0 && (
+                              <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('carbs') }]}>
+                                <Image
+                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
+                                  style={styles.macroIconSmall}
+                                  resizeMode="contain"
+                                />
+                                <Text style={styles.macroTextBlack}>{formatUnit(item.carbs)}</Text>
+                              </View>
+                            )}
+                            {item.fats > 0 && (
+                              <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('fats') }]}>
+                                <Image
+                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
+                                  style={styles.macroIconSmall}
+                                  resizeMode="contain"
+                                />
+                                <Text style={styles.macroTextBlack}>{formatUnit(item.fats)}</Text>
+                              </View>
+                            )}
+                          </View>
                         </View>
                       </View>
                     );
@@ -462,6 +465,44 @@ export default function AIPhotoAnalysisScreen() {
                   const carbProgress = goals?.carb ? Math.min(totalCarbs / goals.carb, 1) : 0;
                   const fatProgress = goals?.fat ? Math.min(totalFats / goals.fat, 1) : 0;
 
+                  const macroData = [
+                    { 
+                      type: 'protein', 
+                      value: totalProtein, 
+                      progress: proteinProgress,
+                      icon: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984876/steak_6_ahllay.webp",
+                      name: 'חלבון'
+                    },
+                    { 
+                      type: 'carbs', 
+                      value: totalCarbs, 
+                      progress: carbProgress,
+                      icon: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/bread-slice_3_pvs0tu.webp",
+                      name: 'פחמימה'
+                    },
+                    { 
+                      type: 'fats', 
+                      value: totalFats, 
+                      progress: fatProgress,
+                      icon: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_5_joifcx.webp",
+                      name: 'שומן'
+                    },
+                    { 
+                      type: 'veg', 
+                      value: 0, 
+                      progress: 0,
+                      icon: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/broccoli_3_qptkyx.webp",
+                      name: 'ירק'
+                    },
+                    { 
+                      type: 'fruit', 
+                      value: 0, 
+                      progress: 0,
+                      icon: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/apple_5_hmhtvz.webp",
+                      name: 'פרי'
+                    },
+                  ];
+
                   return (
                     <View style={styles.summaryCard}>
                       <Text style={styles.summaryTitle}>סיכום</Text>
@@ -469,63 +510,29 @@ export default function AIPhotoAnalysisScreen() {
                         <Text style={styles.summaryCaloriesText}>{Math.round(totalCalories)} קק״ל</Text>
                       </View>
                       <View style={styles.summaryMacros}>
-                        {totalProtein > 0 && (
-                          <View style={styles.summaryMacroItem}>
-                            <Text style={styles.summaryMacroValue}>{formatUnit(totalProtein)}</Text>
+                        {macroData.map((macro, index) => (
+                          <View key={index} style={styles.summaryMacroItem}>
+                            <Text style={styles.summaryMacroValue}>
+                              {macro.value > 0 ? `${formatUnit(macro.value)} מנות ${macro.name}` : '0'}
+                            </Text>
                             <View style={styles.summaryIconContainer}>
                               <Image
-                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984876/steak_6_ahllay.webp" }}
+                                source={{ uri: macro.icon }}
                                 style={styles.summaryMacroIconBase}
                                 resizeMode="contain"
                               />
-                              <View style={[styles.summaryIconProgressWrapper, { height: `${proteinProgress * 100}%` }]}>
-                                <Image
-                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984876/steak_6_ahllay.webp" }}
-                                  style={styles.summaryMacroIconProgress}
-                                  resizeMode="contain"
-                                />
-                              </View>
+                              {macro.value > 0 && (
+                                <View style={[styles.summaryIconProgressWrapper, { height: `${macro.progress * 100}%` }]}>
+                                  <Image
+                                    source={{ uri: macro.icon }}
+                                    style={styles.summaryMacroIconProgress}
+                                    resizeMode="contain"
+                                  />
+                                </View>
+                              )}
                             </View>
                           </View>
-                        )}
-                        {totalCarbs > 0 && (
-                          <View style={styles.summaryMacroItem}>
-                            <Text style={styles.summaryMacroValue}>{formatUnit(totalCarbs)}</Text>
-                            <View style={styles.summaryIconContainer}>
-                              <Image
-                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/bread-slice_3_pvs0tu.webp" }}
-                                style={styles.summaryMacroIconBase}
-                                resizeMode="contain"
-                              />
-                              <View style={[styles.summaryIconProgressWrapper, { height: `${carbProgress * 100}%` }]}>
-                                <Image
-                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/bread-slice_3_pvs0tu.webp" }}
-                                  style={styles.summaryMacroIconProgress}
-                                  resizeMode="contain"
-                                />
-                              </View>
-                            </View>
-                          </View>
-                        )}
-                        {totalFats > 0 && (
-                          <View style={styles.summaryMacroItem}>
-                            <Text style={styles.summaryMacroValue}>{formatUnit(totalFats)}</Text>
-                            <View style={styles.summaryIconContainer}>
-                              <Image
-                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_5_joifcx.webp" }}
-                                style={styles.summaryMacroIconBase}
-                                resizeMode="contain"
-                              />
-                              <View style={[styles.summaryIconProgressWrapper, { height: `${fatProgress * 100}%` }]}>
-                                <Image
-                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_5_joifcx.webp" }}
-                                  style={styles.summaryMacroIconProgress}
-                                  resizeMode="contain"
-                                />
-                              </View>
-                            </View>
-                          </View>
-                        )}
+                        ))}
                       </View>
                     </View>
                   );
@@ -744,8 +751,8 @@ const styles = StyleSheet.create({
   foodItemCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
-    padding: 16,
-    gap: 12,
+    padding: 12,
+    gap: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -753,6 +760,15 @@ const styles = StyleSheet.create({
     elevation: 3,
     width: "48%" as any,
     position: "relative" as const,
+  },
+  foodItemCheckboxRow: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  foodItemContent: {
+    flex: 1,
+    gap: 8,
   },
   checkboxContainer: {
     padding: 4,
@@ -774,14 +790,8 @@ const styles = StyleSheet.create({
   foodItemHeader: {
     flexDirection: "row-reverse" as any,
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 8,
-  },
-  foodNameWithCheckbox: {
-    flexDirection: "row-reverse" as any,
     alignItems: "center",
     gap: 8,
-    flex: 1,
   },
   foodItemName: {
     fontSize: 18,
@@ -937,16 +947,18 @@ const styles = StyleSheet.create({
   summaryMacros: {
     flexDirection: "row-reverse" as any,
     justifyContent: "center",
-    gap: 24,
+    gap: 16,
   },
   summaryMacroItem: {
     alignItems: "center",
     gap: 8,
+    minWidth: 50,
   },
   summaryMacroValue: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "700" as const,
     color: "#2d3748",
+    textAlign: "center",
   },
   summaryIconContainer: {
     position: "relative" as const,
