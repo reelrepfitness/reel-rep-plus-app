@@ -319,15 +319,11 @@ export default function EditMealScreen() {
                   <View style={styles.nutritionInfo}>
                     <View style={styles.nutritionRow}>
                       <Text style={styles.nutritionValue}>{formatUnit(item.kcal)}</Text>
-                      <Image
-                        source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1759009803/plate-eating_1_d4pvta.webp" }}
-                        style={styles.nutritionIcon}
-                        resizeMode="contain"
-                      />
+                      <Text style={styles.calorieText}>קק״ל</Text>
                     </View>
 
                     {item.protein_units > 0 && (
-                      <View style={styles.nutritionRow}>
+                      <View style={[styles.nutritionRow, styles.proteinCard]}>
                         <Text style={styles.nutritionValue}>{formatUnit(item.protein_units)}</Text>
                         <Image
                           source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
@@ -338,7 +334,7 @@ export default function EditMealScreen() {
                     )}
 
                     {item.carb_units > 0 && (
-                      <View style={styles.nutritionRow}>
+                      <View style={[styles.nutritionRow, styles.carbCard]}>
                         <Text style={styles.nutritionValue}>{formatUnit(item.carb_units)}</Text>
                         <Image
                           source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
@@ -349,7 +345,7 @@ export default function EditMealScreen() {
                     )}
 
                     {item.fat_units > 0 && (
-                      <View style={styles.nutritionRow}>
+                      <View style={[styles.nutritionRow, styles.fatCard]}>
                         <Text style={styles.nutritionValue}>{formatUnit(item.fat_units)}</Text>
                         <Image
                           source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
@@ -360,7 +356,7 @@ export default function EditMealScreen() {
                     )}
 
                     {item.veg_units > 0 && (
-                      <View style={styles.nutritionRow}>
+                      <View style={[styles.nutritionRow, styles.vegCard]}>
                         <Text style={styles.nutritionValue}>{formatUnit(item.veg_units)}</Text>
                         <Image
                           source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984894/broccoli_2_lk8kty.webp" }}
@@ -371,7 +367,7 @@ export default function EditMealScreen() {
                     )}
 
                     {item.fruit_units > 0 && (
-                      <View style={styles.nutritionRow}>
+                      <View style={[styles.nutritionRow, styles.fruitCard]}>
                         <Text style={styles.nutritionValue}>{formatUnit(item.fruit_units)}</Text>
                         <Image
                           source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984881/apple-whole_qd32pt.webp" }}
@@ -575,5 +571,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700" as const,
     color: "#FFFFFF",
+  },
+  calorieText: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#2d3748",
+  },
+  proteinCard: {
+    backgroundColor: "#FF6B6B",
+  },
+  carbCard: {
+    backgroundColor: "#FFE66D",
+  },
+  fatCard: {
+    backgroundColor: "#4ECDC4",
+  },
+  vegCard: {
+    backgroundColor: "#95E1D3",
+  },
+  fruitCard: {
+    backgroundColor: "#FFA07A",
   },
 });
