@@ -49,7 +49,7 @@ export default function AIPhotoAnalysisScreen() {
   const params = useLocalSearchParams();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
-  const { dailyLog } = useHomeData();
+  const { dailyLog, goals } = useHomeData();
   
   const mealType = params.mealType as string | undefined;
   
@@ -385,27 +385,28 @@ export default function AIPhotoAnalysisScreen() {
                           { opacity: isChecked ? 1 : 0.1 },
                         ]}
                       >
-                        <TouchableOpacity
-                          style={styles.checkboxContainer}
-                          onPress={() => toggleItemCheck(index)}
-                          activeOpacity={1}
-                        >
-                          <View style={[
-                            styles.checkboxBox,
-                            isChecked && styles.checkboxBoxChecked
-                          ]}>
-                            {isChecked && (
-                              <Check
-                                size={16}
-                                color="#000000"
-                                strokeWidth={3}
-                              />
-                            )}
-                          </View>
-                        </TouchableOpacity>
-
                         <View style={styles.foodItemHeader}>
-                          <Text style={styles.foodItemName}>{item.name}</Text>
+                          <View style={styles.foodNameWithCheckbox}>
+                            <TouchableOpacity
+                              style={[styles.checkboxContainer, { opacity: 1 }]}
+                              onPress={() => toggleItemCheck(index)}
+                              activeOpacity={0.7}
+                            >
+                              <View style={[
+                                styles.checkboxBox,
+                                isChecked && styles.checkboxBoxChecked
+                              ]}>
+                                {isChecked && (
+                                  <Check
+                                    size={16}
+                                    color="#000000"
+                                    strokeWidth={3}
+                                  />
+                                )}
+                              </View>
+                            </TouchableOpacity>
+                            <Text style={styles.foodItemName}>{item.name}</Text>
+                          </View>
                           <Text style={styles.foodItemQuantity}>{item.quantity}</Text>
                         </View>
                         
@@ -448,6 +449,87 @@ export default function AIPhotoAnalysisScreen() {
                     );
                   })}
                 </View>
+
+                {/* Summary Card */}
+                {(() => {
+                  const checkedIndexes = Object.keys(checkedItems).filter(k => checkedItems[parseInt(k)]);
+                  const totalCalories = checkedIndexes.reduce((sum, idx) => sum + analyzedItems[parseInt(idx)].calories, 0);
+                  const totalProtein = checkedIndexes.reduce((sum, idx) => sum + analyzedItems[parseInt(idx)].protein, 0);
+                  const totalCarbs = checkedIndexes.reduce((sum, idx) => sum + analyzedItems[parseInt(idx)].carbs, 0);
+                  const totalFats = checkedIndexes.reduce((sum, idx) => sum + analyzedItems[parseInt(idx)].fats, 0);
+
+                  const proteinProgress = goals?.protein ? Math.min(totalProtein / goals.protein, 1) : 0;
+                  const carbProgress = goals?.carb ? Math.min(totalCarbs / goals.carb, 1) : 0;
+                  const fatProgress = goals?.fat ? Math.min(totalFats / goals.fat, 1) : 0;
+
+                  return (
+                    <View style={styles.summaryCard}>
+                      <Text style={styles.summaryTitle}>סיכום</Text>
+                      <View style={styles.summaryCalories}>
+                        <Text style={styles.summaryCaloriesText}>{Math.round(totalCalories)} קק״ל</Text>
+                      </View>
+                      <View style={styles.summaryMacros}>
+                        {totalProtein > 0 && (
+                          <View style={styles.summaryMacroItem}>
+                            <Text style={styles.summaryMacroValue}>{formatUnit(totalProtein)}</Text>
+                            <View style={styles.summaryIconContainer}>
+                              <Image
+                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984876/steak_6_ahllay.webp" }}
+                                style={styles.summaryMacroIconBase}
+                                resizeMode="contain"
+                              />
+                              <View style={[styles.summaryIconProgressWrapper, { height: `${proteinProgress * 100}%` }]}>
+                                <Image
+                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984876/steak_6_ahllay.webp" }}
+                                  style={styles.summaryMacroIconProgress}
+                                  resizeMode="contain"
+                                />
+                              </View>
+                            </View>
+                          </View>
+                        )}
+                        {totalCarbs > 0 && (
+                          <View style={styles.summaryMacroItem}>
+                            <Text style={styles.summaryMacroValue}>{formatUnit(totalCarbs)}</Text>
+                            <View style={styles.summaryIconContainer}>
+                              <Image
+                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/bread-slice_3_pvs0tu.webp" }}
+                                style={styles.summaryMacroIconBase}
+                                resizeMode="contain"
+                              />
+                              <View style={[styles.summaryIconProgressWrapper, { height: `${carbProgress * 100}%` }]}>
+                                <Image
+                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/bread-slice_3_pvs0tu.webp" }}
+                                  style={styles.summaryMacroIconProgress}
+                                  resizeMode="contain"
+                                />
+                              </View>
+                            </View>
+                          </View>
+                        )}
+                        {totalFats > 0 && (
+                          <View style={styles.summaryMacroItem}>
+                            <Text style={styles.summaryMacroValue}>{formatUnit(totalFats)}</Text>
+                            <View style={styles.summaryIconContainer}>
+                              <Image
+                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_5_joifcx.webp" }}
+                                style={styles.summaryMacroIconBase}
+                                resizeMode="contain"
+                              />
+                              <View style={[styles.summaryIconProgressWrapper, { height: `${fatProgress * 100}%` }]}>
+                                <Image
+                                  source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_5_joifcx.webp" }}
+                                  style={styles.summaryMacroIconProgress}
+                                  resizeMode="contain"
+                                />
+                              </View>
+                            </View>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  );
+                })()}
 
                 <View style={styles.actionsContainer}>
                   <TouchableOpacity
@@ -673,11 +755,7 @@ const styles = StyleSheet.create({
     position: "relative" as const,
   },
   checkboxContainer: {
-    position: "absolute" as const,
-    top: 16,
-    right: 16,
-    zIndex: 10,
-    opacity: 1,
+    padding: 4,
   },
   checkboxBox: {
     width: 24,
@@ -696,13 +774,20 @@ const styles = StyleSheet.create({
   foodItemHeader: {
     flexDirection: "row-reverse" as any,
     justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  foodNameWithCheckbox: {
+    flexDirection: "row-reverse" as any,
     alignItems: "center",
-    marginTop: 4,
+    gap: 8,
+    flex: 1,
   },
   foodItemName: {
     fontSize: 18,
     fontWeight: "700" as const,
     color: "#2d3748",
+    flex: 1,
   },
   foodItemQuantity: {
     fontSize: 14,
@@ -728,9 +813,9 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse" as any,
     alignItems: "center",
     gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 10,
   },
   macroIconSmall: {
     width: 20,
@@ -815,5 +900,76 @@ const styles = StyleSheet.create({
     color: "#718096",
     lineHeight: 16,
     textAlign: "center",
+  },
+  summaryCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 16,
+    gap: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  summaryTitle: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "center",
+  },
+  summaryCalories: {
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: "#F7FAFC",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#E2E8F0",
+  },
+  summaryCaloriesText: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: colors.primary,
+  },
+  summaryMacros: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "center",
+    gap: 24,
+  },
+  summaryMacroItem: {
+    alignItems: "center",
+    gap: 8,
+  },
+  summaryMacroValue: {
+    fontSize: 14,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+  },
+  summaryIconContainer: {
+    position: "relative" as const,
+    width: 40,
+    height: 40,
+  },
+  summaryMacroIconBase: {
+    position: "absolute" as const,
+    width: 40,
+    height: 40,
+    tintColor: "#3d3d3d",
+  },
+  summaryIconProgressWrapper: {
+    position: "absolute" as const,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    overflow: "hidden",
+  },
+  summaryMacroIconProgress: {
+    position: "absolute" as const,
+    bottom: 0,
+    left: 0,
+    width: 40,
+    height: 40,
   },
 });
