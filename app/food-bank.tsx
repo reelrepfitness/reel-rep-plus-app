@@ -160,6 +160,10 @@ export default function FoodBankScreen() {
   }, [foodItems, selectedMainCategory]);
 
   const filteredItems = useMemo(() => {
+    if (selectedMainCategory === "מסעדות") {
+      return [];
+    }
+
     let filtered = foodItems.filter(item => item.category !== "מסעדות");
 
     if (searchQuery.trim()) {
@@ -168,7 +172,7 @@ export default function FoodBankScreen() {
         item.name.toLowerCase().includes(query)
       );
     } else {
-      if (selectedMainCategory && selectedMainCategory !== "מסעדות") {
+      if (selectedMainCategory) {
         filtered = filtered.filter(item => item.category === selectedMainCategory);
       }
 
@@ -192,7 +196,7 @@ export default function FoodBankScreen() {
     return restaurants;
   }, [restaurants, selectedMainCategory, searchQuery]);
 
-  const showRestaurantsList = selectedMainCategory === "מסעדות" && !searchQuery.trim();
+  const showRestaurantsList = selectedMainCategory === "מסעדות";
 
   const formatUnit = (value: number) => {
     return value % 1 === 0 ? value.toString() : value.toFixed(1);
