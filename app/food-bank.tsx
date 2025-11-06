@@ -641,6 +641,21 @@ export default function FoodBankScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.controlsSection}>
+            {selectedMainCategory && (() => {
+              const categoryNotes: { [key: string]: string } = {
+                "חלבון": "מנה חלבון אחת שווה ל200 קק״ל",
+                "פחמימה": "מנת פחמימה שווה ל120 קק״ל",
+                "שומן": "מנת שומן אחת שווה ל120 קק״ל",
+                "ירק": "מנת ירק שווה ל35 קק״ל",
+                "פרי": "מנת פרי שווה ל80 קק״ל",
+              };
+              const note = categoryNotes[selectedMainCategory];
+              return note ? (
+                <View style={styles.categoryNoteContainer}>
+                  <Text style={styles.categoryNoteText}>{note}</Text>
+                </View>
+              ) : null;
+            })()}
             <View style={styles.categoriesCard}>
               <ScrollView
                 ref={categoryScrollRef}
@@ -780,24 +795,13 @@ export default function FoodBankScreen() {
                     )}
 
                     <View style={styles.foodInfo}>
-                      {showCategoryIcon && categoryIcon && (
-                        <View style={styles.categoryIconTopContainer}>
-                          <Image
-                            source={{ uri: categoryIcon }}
-                            style={styles.categoryIconTop}
-                            resizeMode="contain"
-                          />
-                        </View>
-                      )}
-                      
                       <Text style={styles.foodName} numberOfLines={2}>
                         {item.name}
                       </Text>
                       
                       {getServingText(item) && (
                         <Text style={styles.servingText} numberOfLines={2}>
-                          מנה אחת של {item.category}:
-                          {"\n"}{getServingText(item)}
+                          {getServingText(item)}
                         </Text>
                       )}
                       
@@ -865,8 +869,6 @@ export default function FoodBankScreen() {
                           </>
                         )}
                       </View>
-
-                      <Text style={styles.foodCalories}>{item.caloreis_per_unit} קל׳</Text>
                     </View>
                   </TouchableOpacity>
                 );
@@ -2018,5 +2020,19 @@ const styles = StyleSheet.create({
   measurementButtonTextActive: {
     color: "#FFFFFF",
     fontWeight: "700" as const,
+  },
+  categoryNoteContainer: {
+    backgroundColor: "#FFF9E6",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: "#FFE082",
+  },
+  categoryNoteText: {
+    fontSize: 13,
+    fontWeight: "600" as const,
+    color: "#2d3748",
+    textAlign: "center",
   },
 });
