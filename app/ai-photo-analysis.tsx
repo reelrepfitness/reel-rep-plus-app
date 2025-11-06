@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Camera, Image as ImageIcon } from "lucide-react-native";
+import { ChevronLeft, Camera, Image as ImageIcon, RefreshCw, Utensils, Lightbulb } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { colors } from "@/constants/colors";
@@ -268,6 +268,40 @@ export default function AIPhotoAnalysisScreen() {
                 <ImageIcon size={24} color={colors.primary} strokeWidth={2} />
                 <Text style={styles.galleryButtonText}>בחר מהגלריה</Text>
               </TouchableOpacity>
+            </View>
+
+            <View style={styles.instructionsContainer}>
+              <View style={styles.instructionItem}>
+                <RefreshCw size={20} color="#718096" strokeWidth={2} />
+                <Text style={styles.instructionText}>
+                  לא קיבלתם ערכים? הכל טוב - קורה, פשוט תנסו שוב.
+                </Text>
+              </View>
+              <View style={styles.instructionDivider} />
+              
+              <View style={styles.instructionItem}>
+                <Utensils size={20} color="#718096" strokeWidth={2} />
+                <Text style={styles.instructionText}>
+                  הפרידו בין המאכלים על הצלחת, לצורך העלאת רמת הדיוק
+                </Text>
+              </View>
+              <View style={styles.instructionDivider} />
+              
+              <View style={styles.instructionItem}>
+                <Lightbulb size={20} color="#718096" strokeWidth={2} />
+                <Text style={styles.instructionText}>
+                  תאורה טובה - על מנת שהכלי יוכל לזהות כמה שיותר פרטים
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.disclaimerContainer}>
+              <Text style={styles.disclaimerText}>
+                האפליקציה עושה שימוש במערכות בינה מלאכותית (AI) לצורך ניתוח נתונים, מתן הערכות והצגת מידע.
+                המידע המוצג הוא בגדר המלצה בלבד ואינו מהווה ייעוץ רפואי, תזונתי או מקצועי מחייב.
+                השימוש בתכנים המוצגים הוא על אחריות המשתמש בלבד.
+                בכל שאלה או צורך מותאם אישית יש לפנות לאיש מקצוע מוסמך.
+              </Text>
             </View>
           </View>
         ) : (
@@ -612,5 +646,45 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700" as const,
     color: "#FFFFFF",
+  },
+  instructionsContainer: {
+    marginTop: 32,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    gap: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  instructionItem: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  instructionText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#2d3748",
+    lineHeight: 20,
+    textAlign: "right",
+  },
+  instructionDivider: {
+    height: 1,
+    backgroundColor: "#E2E8F0",
+  },
+  disclaimerContainer: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: 12,
+  },
+  disclaimerText: {
+    fontSize: 11,
+    color: "#718096",
+    lineHeight: 16,
+    textAlign: "center",
   },
 });
