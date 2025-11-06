@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative" as const,
-    pointerEvents: "none" as const,
   },
   activeBackground: {
     position: "absolute" as const,
@@ -184,6 +183,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative" as const,
-    pointerEvents: "none" as const,
   },
 });
