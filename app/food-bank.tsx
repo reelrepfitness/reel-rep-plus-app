@@ -19,7 +19,7 @@ import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { FoodBankItem } from "@/lib/types";
+import { FoodBankItem, Restaurant, RestaurantMenuItem } from "@/lib/types";
 import { useState, useMemo, useRef, useEffect } from "react";
 
 const categoryIcons = {
@@ -43,9 +43,13 @@ export default function FoodBankScreen() {
   const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>("חלבון");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
   const [selectedFood, setSelectedFood] = useState<FoodBankItem | null>(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  const [selectedRestaurantItem, setSelectedRestaurantItem] = useState<RestaurantMenuItem | null>(null);
   const [quantity, setQuantity] = useState<string>("1");
   const [selectedMeasurement, setSelectedMeasurement] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [showRestaurantSheet, setShowRestaurantSheet] = useState<boolean>(false);
+  const [restaurantSheetAnimation] = useState(new Animated.Value(0));
   const [sheetAnimation] = useState(new Animated.Value(0));
   const [macroFlashAnimations] = useState<{ [key: string]: Animated.Value }>({
     calories: new Animated.Value(0),
@@ -90,6 +94,50 @@ export default function FoodBankScreen() {
     },
   });
 
+  const { data: restaurants = [] } = useQuery({
+    queryKey: ["restaurants"],
+    queryFn: async () => {
+      console.log("[FoodBank] Fetching restaurants");
+      
+      const { data, error } = await supabase
+        .from("restaurants")
+        .select("*")
+        .order("name", { ascending: true });
+
+      if (error) {
+        console.error("[FoodBank] Error fetching restaurants:", error);
+        throw error;
+      }
+
+      console.log(`[FoodBank] Loaded ${data?.length || 0} restaurants`);
+      return data as Restaurant[];
+    },
+  });
+
+  const { data: restaurantMenuItems = [] } = useQuery({
+    queryKey: ["restaurantMenuItems", selectedRestaurant?.id],
+    queryFn: async () => {
+      if (!selectedRestaurant) return [];
+      
+      console.log("[FoodBank] Fetching menu items for restaurant:", selectedRestaurant.name);
+      
+      const { data, error } = await supabase
+        .from("restaurant_menu_items")
+        .select("*")
+        .eq("restaurant_id", selectedRestaurant.id)
+        .order("name", { ascending: true });
+
+      if (error) {
+        console.error("[FoodBank] Error fetching menu items:", error);
+        throw error;
+      }
+
+      console.log(`[FoodBank] Loaded ${data?.length || 0} menu items`);
+      return data as RestaurantMenuItem[];
+    },
+    enabled: !!selectedRestaurant,
+  });
+
   const mainCategories = useMemo(() => {
     const categoryOrder = ["חלבון", "פחמימה", "שומן", "ירק", "פרי", "ממרחים", "מכולת", "מסעדות"];
     const categories = new Set(foodItems.map(item => item.category));
@@ -112,7 +160,6 @@ export default function FoodBankScreen() {
   }, [foodItems, selectedMainCategory]);
 
   const filteredItems = useMemo(() => {
-    // Filter out restaurant items - they should only be accessed through the restaurants flow
     let filtered = foodItems.filter(item => item.category !== "מסעדות");
 
     if (searchQuery.trim()) {
@@ -121,7 +168,7 @@ export default function FoodBankScreen() {
         item.name.toLowerCase().includes(query)
       );
     } else {
-      if (selectedMainCategory) {
+      if (selectedMainCategory && selectedMainCategory !== "מסעדות") {
         filtered = filtered.filter(item => item.category === selectedMainCategory);
       }
 
@@ -133,6 +180,19 @@ export default function FoodBankScreen() {
     console.log(`[FoodBank] Filtered ${filtered.length} items (total: ${foodItems.length}, search: "${searchQuery}", category: ${selectedMainCategory}, sub: ${selectedSubCategory})`);
     return filtered;
   }, [foodItems, searchQuery, selectedMainCategory, selectedSubCategory]);
+
+  const filteredRestaurants = useMemo(() => {
+    if (selectedMainCategory !== "מסעדות") return [];
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      return restaurants.filter(r => r.name.toLowerCase().includes(query));
+    }
+    
+    return restaurants;
+  }, [restaurants, selectedMainCategory, searchQuery]);
+
+  const showRestaurantsList = selectedMainCategory === "מסעדות" && !searchQuery.trim();
 
   const formatUnit = (value: number) => {
     return value % 1 === 0 ? value.toString() : value.toFixed(1);
@@ -284,16 +344,6 @@ export default function FoodBankScreen() {
   };
 
   const handleCategoryPress = (category: string) => {
-    if (category === "מסעדות") {
-      router.push({
-        pathname: "/restaurants",
-        params: {
-          mealType: mealType || "",
-        },
-      });
-      return;
-    }
-    
     if (selectedMainCategory === category) {
       setSelectedMainCategory(null);
       setSelectedSubCategory(null);
@@ -337,6 +387,37 @@ export default function FoodBankScreen() {
         stiffness: 90,
       }).start();
     }
+  };
+
+  const handleRestaurantPress = (restaurant: Restaurant) => {
+    console.log("[FoodBank] Selected restaurant:", restaurant.name);
+    setSelectedRestaurant(restaurant);
+    setShowRestaurantSheet(true);
+    Animated.spring(restaurantSheetAnimation, {
+      toValue: 1,
+      useNativeDriver: true,
+      damping: 20,
+      stiffness: 90,
+    }).start();
+  };
+
+  const handleRestaurantItemPress = (item: RestaurantMenuItem) => {
+    console.log("[FoodBank] Selected restaurant item:", item.name);
+    setSelectedRestaurantItem(item);
+    setQuantity("1");
+  };
+
+  const closeRestaurantSheet = () => {
+    Animated.timing(restaurantSheetAnimation, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start(() => {
+      setSelectedRestaurant(null);
+      setSelectedRestaurantItem(null);
+      setShowRestaurantSheet(false);
+      setQuantity("1");
+    });
   };
 
   const incrementQuantity = () => {
@@ -767,6 +848,41 @@ export default function FoodBankScreen() {
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+          ) : showRestaurantsList && filteredRestaurants.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>אין מסעדות זמינות</Text>
+            </View>
+          ) : showRestaurantsList ? (
+            <View style={styles.foodGrid}>
+              {filteredRestaurants.map((restaurant) => (
+                <TouchableOpacity
+                  key={restaurant.id}
+                  style={styles.foodCard}
+                  onPress={() => handleRestaurantPress(restaurant)}
+                  activeOpacity={0.8}
+                >
+                  {restaurant.img_url ? (
+                    <Image
+                      source={{ uri: restaurant.img_url }}
+                      style={styles.foodImage}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={styles.foodImagePlaceholder}>
+                      <Text style={styles.foodImagePlaceholderText}>
+                        {restaurant.name.charAt(0)}
+                      </Text>
+                    </View>
+                  )}
+
+                  <View style={styles.foodInfo}>
+                    <Text style={styles.foodName} numberOfLines={2}>
+                      {restaurant.name}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
           ) : filteredItems.length === 0 ? (
             <View style={styles.emptyContainer}>
@@ -1235,6 +1351,178 @@ export default function FoodBankScreen() {
             </Animated.View>
           </TouchableOpacity>
         )}
+
+        {showRestaurantSheet && selectedRestaurant && (
+          <TouchableOpacity
+            style={styles.overlay}
+            activeOpacity={1}
+            onPress={closeRestaurantSheet}
+          >
+            <Animated.View
+              style={[
+                styles.bottomSheet,
+                {
+                  transform: [{
+                    translateY: restaurantSheetAnimation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [500, 0],
+                    }),
+                  }],
+                },
+              ]}
+            >
+              <ScrollView
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+              >
+                <View>
+                  <View style={styles.sheetHandle} />
+                  
+                  <View style={styles.restaurantSheetHeader}>
+                    {selectedRestaurant.img_url && (
+                      <Image
+                        source={{ uri: selectedRestaurant.img_url }}
+                        style={styles.restaurantSheetLogo}
+                        resizeMode="contain"
+                      />
+                    )}
+                    <Text style={styles.restaurantSheetTitle}>{selectedRestaurant.name}</Text>
+                  </View>
+
+                  <View style={styles.restaurantMenuList}>
+                    {restaurantMenuItems.length === 0 ? (
+                      <View style={styles.emptyMenuContainer}>
+                        <Text style={styles.emptyMenuText}>אין פריטים זמינים בתפריט</Text>
+                      </View>
+                    ) : (
+                      restaurantMenuItems.map((item) => {
+                        const isSelected = selectedRestaurantItem?.id === item.id;
+                        const currentQuantity = isSelected ? parseFloat(quantity) || 1 : 1;
+                        
+                        return (
+                          <TouchableOpacity
+                            key={item.id}
+                            style={[
+                              styles.restaurantMenuItem,
+                              isSelected && styles.restaurantMenuItemSelected,
+                            ]}
+                            onPress={() => handleRestaurantItemPress(item)}
+                            activeOpacity={0.7}
+                          >
+                            <View style={styles.restaurantMenuItemContent}>
+                              <View style={styles.restaurantMenuItemInfo}>
+                                <Text style={styles.restaurantMenuItemName}>{item.name}</Text>
+                                <View style={styles.restaurantMenuItemMacros}>
+                                  {item.protein_units > 0 && (
+                                    <View style={[styles.nutritionBadge, { backgroundColor: `${colors.protein}30` }]}>
+                                      <Image
+                                        source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
+                                        style={styles.nutritionIcon}
+                                        resizeMode="contain"
+                                      />
+                                      <Text style={styles.nutritionText}>{formatUnit(item.protein_units * currentQuantity)}</Text>
+                                    </View>
+                                  )}
+                                  {item.carb_units > 0 && (
+                                    <View style={[styles.nutritionBadge, { backgroundColor: `${colors.carb}30` }]}>
+                                      <Image
+                                        source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
+                                        style={styles.nutritionIcon}
+                                        resizeMode="contain"
+                                      />
+                                      <Text style={styles.nutritionText}>{formatUnit(item.carb_units * currentQuantity)}</Text>
+                                    </View>
+                                  )}
+                                  {item.fat_units > 0 && (
+                                    <View style={[styles.nutritionBadge, { backgroundColor: `${colors.fat}30` }]}>
+                                      <Image
+                                        source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
+                                        style={styles.nutritionIcon}
+                                        resizeMode="contain"
+                                      />
+                                      <Text style={styles.nutritionText}>{formatUnit(item.fat_units * currentQuantity)}</Text>
+                                    </View>
+                                  )}
+                                </View>
+                              </View>
+                              <View style={styles.restaurantMenuItemCalories}>
+                                <Text style={styles.restaurantMenuItemCaloriesText}>
+                                  {formatUnit(item.calories_per_unit * currentQuantity)}
+                                </Text>
+                                <Text style={styles.restaurantMenuItemCaloriesLabel}>קק״ל</Text>
+                              </View>
+                            </View>
+                            {isSelected && (
+                              <View style={styles.restaurantItemQuantitySection}>
+                                <View style={styles.counterSection}>
+                                  <TouchableOpacity
+                                    style={styles.counterButtonSmall}
+                                    onPress={decrementQuantity}
+                                    activeOpacity={0.7}
+                                  >
+                                    <Text style={styles.counterButtonTextSmall}>-</Text>
+                                  </TouchableOpacity>
+
+                                  <TextInput
+                                    style={styles.counterValueSmall}
+                                    value={quantity}
+                                    onChangeText={(text) => {
+                                      const cleaned = text.replace(/[^0-9.]/g, '');
+                                      const parts = cleaned.split('.');
+                                      if (parts.length > 2) {
+                                        setQuantity(parts[0] + '.' + parts.slice(1).join(''));
+                                      } else {
+                                        setQuantity(cleaned);
+                                      }
+                                    }}
+                                    keyboardType="decimal-pad"
+                                    selectTextOnFocus
+                                    returnKeyType="done"
+                                    onSubmitEditing={() => Keyboard.dismiss()}
+                                    blurOnSubmit={true}
+                                  />
+
+                                  <TouchableOpacity
+                                    style={styles.counterButtonSmall}
+                                    onPress={incrementQuantity}
+                                    activeOpacity={0.7}
+                                  >
+                                    <Text style={styles.counterButtonTextSmall}>+</Text>
+                                  </TouchableOpacity>
+                                </View>
+                              </View>
+                            )}
+                          </TouchableOpacity>
+                        );
+                      })
+                    )}
+                  </View>
+
+                  {selectedRestaurantItem && (
+                    <View style={styles.sheetActions}>
+                      <TouchableOpacity
+                        style={styles.confirmButton}
+                        onPress={handleConfirmRestaurantItem}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={styles.confirmButtonText}>אישור</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.cancelButton}
+                        onPress={closeRestaurantSheet}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={styles.cancelButtonText}>ביטול</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              </ScrollView>
+            </Animated.View>
+          </TouchableOpacity>
+        )}
       </View>
     </>
   );
@@ -1289,6 +1577,66 @@ export default function FoodBankScreen() {
         return selectedFood.fats_units * servings;
       default:
         return 0;
+    }
+  }
+
+  async function handleConfirmRestaurantItem() {
+    if (!selectedRestaurantItem || !dailyLog?.id || !mealType) return;
+
+    try {
+      const quantityNum = parseFloat(quantity) || 1;
+      console.log("[FoodBank] Adding restaurant item:", selectedRestaurantItem.name, "x", quantityNum, "to", mealType);
+
+      const proteinUnits = selectedRestaurantItem.protein_units * quantityNum;
+      const carbUnits = selectedRestaurantItem.carb_units * quantityNum;
+      const fatUnits = selectedRestaurantItem.fat_units * quantityNum;
+      const totalCalories = selectedRestaurantItem.calories_per_unit * quantityNum;
+
+      const { error: itemError } = await supabase
+        .from("daily_items")
+        .insert([{
+          daily_log_id: dailyLog.id,
+          food_id: null,
+          meal_category: mealType,
+          measure_type: "unit",
+          quantity: quantityNum,
+          grams: 0,
+          kcal: totalCalories,
+          protein_units: proteinUnits,
+          carb_units: carbUnits,
+          fat_units: fatUnits,
+          veg_units: 0,
+          fruit_units: 0,
+        }]);
+
+      if (itemError) {
+        console.error("[FoodBank] Error inserting restaurant item:", itemError);
+        throw itemError;
+      }
+
+      console.log("[FoodBank] Restaurant item inserted successfully");
+
+      queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
+      queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
+
+      const newCalories = caloriesIntake + totalCalories;
+      const newProtein = proteinIntake + proteinUnits;
+      const newCarb = carbIntake + carbUnits;
+      const newFat = fatIntake + fatUnits;
+
+      if (totalCalories > 0) triggerMacroAnimation('calories', newCalories, goals.calories);
+      if (proteinUnits > 0) triggerMacroAnimation('protein', newProtein, goals.protein);
+      if (carbUnits > 0) triggerMacroAnimation('carb', newCarb, goals.carb);
+      if (fatUnits > 0) triggerMacroAnimation('fat', newFat, goals.fat);
+
+      setShowSuccess(true);
+      closeRestaurantSheet();
+      setTimeout(() => {
+        setShowSuccess(false);
+        setQuantity("1");
+      }, 2000);
+    } catch (error) {
+      console.error("[FoodBank] Failed to add restaurant item:", error);
     }
   }
 
@@ -2029,6 +2377,118 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600" as const,
     color: "#2d3748",
+    textAlign: "center",
+  },
+  restaurantSheetHeader: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+  },
+  restaurantSheetLogo: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 12,
+  },
+  restaurantSheetTitle: {
+    fontSize: 22,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "center",
+  },
+  restaurantMenuList: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
+    gap: 12,
+  },
+  emptyMenuContainer: {
+    paddingVertical: 40,
+    alignItems: "center",
+  },
+  emptyMenuText: {
+    fontSize: 16,
+    color: "#999",
+    textAlign: "center",
+  },
+  restaurantMenuItem: {
+    backgroundColor: "#F7FAFC",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: "#E2E8F0",
+  },
+  restaurantMenuItemSelected: {
+    borderColor: colors.primary,
+    backgroundColor: "#FFFFFF",
+  },
+  restaurantMenuItemContent: {
+    flexDirection: "row-reverse" as const,
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  restaurantMenuItemInfo: {
+    flex: 1,
+    gap: 8,
+  },
+  restaurantMenuItemName: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#2d3748",
+    textAlign: "right",
+  },
+  restaurantMenuItemMacros: {
+    flexDirection: "row-reverse" as const,
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  restaurantMenuItemCalories: {
+    alignItems: "center",
+    gap: 2,
+  },
+  restaurantMenuItemCaloriesText: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: colors.primary,
+  },
+  restaurantMenuItemCaloriesLabel: {
+    fontSize: 11,
+    fontWeight: "600" as const,
+    color: "#718096",
+  },
+  restaurantItemQuantitySection: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
+  },
+  counterButtonSmall: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  counterButtonTextSmall: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+    lineHeight: 24,
+  },
+  counterValueSmall: {
+    fontSize: 28,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    minWidth: 50,
     textAlign: "center",
   },
 });
