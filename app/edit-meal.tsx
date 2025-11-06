@@ -30,6 +30,7 @@ interface DailyItem {
   fruit_units: number;
   measure_type: string;
   food_name?: string;
+  food_image?: string;
 }
 
 export default function EditMealScreen() {
@@ -42,6 +43,7 @@ export default function EditMealScreen() {
   const mealType = params.mealType as string;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingQuantity, setEditingQuantity] = useState<string>("");
+  const [modifiedItems, setModifiedItems] = useState<Record<string, number>>({});
 
   console.log("[EditMeal] Meal type:", mealType);
 
@@ -80,24 +82,25 @@ export default function EditMealScreen() {
 
       console.log(`[EditMeal] Found ${data?.length || 0} items`);
 
-      // Fetch food names
+      // Fetch food names and images
       const itemsWithNames = await Promise.all(
         (data || []).map(async (item) => {
           const { data: foodData } = await supabase
             .from("food_bank")
-            .select("name")
+            .select("name, image_url")
             .eq("id", item.food_id)
             .single();
 
           const { data: restaurantData } = await supabase
             .from("restaurant_menu_items")
-            .select("name")
+            .select("name, image_url")
             .eq("id", item.food_id)
             .single();
 
           return {
             ...item,
             food_name: foodData?.name || restaurantData?.name || "מוצר לא ידוע",
+            food_image: foodData?.image_url || restaurantData?.image_url,
           } as DailyItem;
         })
       );
@@ -165,25 +168,38 @@ export default function EditMealScreen() {
   };
 
   const handleIncrease = (item: DailyItem) => {
-    const newQuantity = item.quantity + 1;
-    updateMutation.mutate({ itemId: item.id, newQuantity });
+    const newQuantity = (modifiedItems[item.id] ?? item.quantity) + 1;
+    setModifiedItems(prev => ({ ...prev, [item.id]: newQuantity }));
   };
 
   const handleDecrease = (item: DailyItem) => {
-    if (item.quantity > 1) {
-      const newQuantity = item.quantity - 1;
-      updateMutation.mutate({ itemId: item.id, newQuantity });
+    const currentQuantity = modifiedItems[item.id] ?? item.quantity;
+    if (currentQuantity > 1) {
+      const newQuantity = currentQuantity - 1;
+      setModifiedItems(prev => ({ ...prev, [item.id]: newQuantity }));
     }
   };
 
   const handleQuantitySubmit = (itemId: string) => {
     const quantity = parseFloat(editingQuantity);
     if (quantity && quantity > 0) {
-      updateMutation.mutate({ itemId, newQuantity: quantity });
+      setModifiedItems(prev => ({ ...prev, [itemId]: quantity }));
     }
     setEditingId(null);
     setEditingQuantity("");
     Keyboard.dismiss();
+  };
+
+  const handleConfirmChange = (item: DailyItem) => {
+    const newQuantity = modifiedItems[item.id];
+    if (newQuantity !== undefined) {
+      updateMutation.mutate({ itemId: item.id, newQuantity });
+      setModifiedItems(prev => {
+        const updated = { ...prev };
+        delete updated[item.id];
+        return updated;
+      });
+    }
   };
 
   const formatUnit = (value: number) => {
@@ -222,7 +238,11 @@ export default function EditMealScreen() {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            {mealItems.map((item) => (
+            {mealItems.map((item) => {
+              const hasChanges = modifiedItems[item.id] !== undefined;
+              const displayQuantity = modifiedItems[item.id] ?? item.quantity;
+              
+              return (
               <View key={item.id} style={styles.itemCard}>
                 <View style={styles.itemHeader}>
                   <TouchableOpacity
@@ -233,7 +253,16 @@ export default function EditMealScreen() {
                     <Trash2 color="#FF3B30" size={20} />
                   </TouchableOpacity>
 
-                  <Text style={styles.itemName}>{item.food_name}</Text>
+                  <View style={styles.itemHeaderRight}>
+                    {item.food_image && (
+                      <Image
+                        source={{ uri: item.food_image }}
+                        style={styles.foodImage}
+                        resizeMode="cover"
+                      />
+                    )}
+                    <Text style={styles.itemName}>{item.food_name}</Text>
+                  </View>
                 </View>
 
                 <View style={styles.itemContent}>
@@ -268,11 +297,13 @@ export default function EditMealScreen() {
                       <TouchableOpacity
                         onPress={() => {
                           setEditingId(item.id);
-                          setEditingQuantity(item.quantity.toString());
+                          setEditingQuantity(displayQuantity.toString());
                         }}
                         activeOpacity={0.7}
                       >
-                        <Text style={styles.quantityText}>{formatUnit(item.quantity)}</Text>
+                        <Text style={[styles.quantityText, hasChanges && styles.quantityTextModified]}>
+                          {formatUnit(displayQuantity)}
+                        </Text>
                       </TouchableOpacity>
                     )}
 
@@ -350,9 +381,19 @@ export default function EditMealScreen() {
                       </View>
                     )}
                   </View>
+                  
+                  {hasChanges && (
+                    <TouchableOpacity
+                      style={styles.confirmButton}
+                      onPress={() => handleConfirmChange(item)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.confirmButtonText}>אישור שינויים</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
-            ))}
+            )})}
           </ScrollView>
         )}
       </View>
@@ -506,5 +547,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#2d3748",
+  },
+  itemHeaderRight: {
+    flexDirection: "row-reverse" as const,
+    alignItems: "center",
+    flex: 1,
+    gap: 12,
+  },
+  foodImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    backgroundColor: "#F7FAFC",
+  },
+  quantityTextModified: {
+    color: colors.primary,
+  },
+  confirmButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
   },
 });
