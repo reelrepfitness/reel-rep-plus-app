@@ -30,6 +30,7 @@ export default function AdminDashboardScreen() {
   const drawerAnim = useRef(new Animated.Value(width)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
   const [selectedMenu, setSelectedMenu] = useState("dashboard");
+  const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
 
   const today = useMemo(() => {
     const now = new Date();
@@ -171,6 +172,14 @@ export default function AdminDashboardScreen() {
 
     return issues;
   }, [clients, dailyLogs, measurements, startOfDay]);
+
+  const filteredAlerts = useMemo(() => {
+    return {
+      critical: alerts.critical.filter((_, idx) => !dismissedAlerts.includes(`critical-${idx}`)),
+      warning: alerts.warning.filter((_, idx) => !dismissedAlerts.includes(`warning-${idx}`)),
+      info: alerts.info,
+    };
+  }, [alerts, dismissedAlerts]);
 
   const stats = useMemo(() => {
     return {
@@ -356,46 +365,104 @@ export default function AdminDashboardScreen() {
         </View>
 
         <View style={styles.notificationsSection}>
-          <Text style={styles.sectionTitle}>התראות קריטיות</Text>
+          <View style={styles.notificationHeader}>
+            <Text style={styles.sectionTitle}>התראות קריטיות</Text>
+            <View style={styles.notificationHeaderActions}>
+              {(filteredAlerts.critical.length > 0 || filteredAlerts.warning.length > 0) && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationBadgeText}>
+                    {filteredAlerts.critical.length + filteredAlerts.warning.length}
+                  </Text>
+                </View>
+              )}
+              {(filteredAlerts.critical.length > 0 || filteredAlerts.warning.length > 0) && (
+                <TouchableOpacity
+                  style={styles.clearAllButton}
+                  onPress={() => {
+                    const allAlertIds = [
+                      ...alerts.critical.map((_, idx) => `critical-${idx}`),
+                      ...alerts.warning.map((_, idx) => `warning-${idx}`),
+                    ];
+                    setDismissedAlerts(allAlertIds);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.clearAllText}>נקה הכל</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
           
-          {alerts.critical.length === 0 && alerts.warning.length === 0 ? (
+          {filteredAlerts.critical.length === 0 && filteredAlerts.warning.length === 0 ? (
             <View style={styles.noAlertsCard}>
               <Text style={styles.noAlertsText}>🎉 אין התראות פתוחות</Text>
               <Text style={styles.noAlertsSubtext}>כל הלקוחות בטווח היעד</Text>
             </View>
           ) : (
             <>
-              {alerts.critical.map((alert, idx) => (
-                <TouchableOpacity key={`critical-${idx}`} style={[styles.alertCard, styles.alertCardCritical]} activeOpacity={0.8}>
-                  <View style={styles.alertIconContainer}>
-                    <AlertTriangle color="#EF4444" size={24} />
-                  </View>
-                  <View style={styles.alertContent}>
-                    <Text style={styles.alertTitle}>{alert.title}</Text>
-                    <Text style={styles.alertName}>{alert.name}</Text>
-                    <Text style={styles.alertDetails}>{alert.details}</Text>
-                  </View>
-                  <View style={[styles.alertBadge, { backgroundColor: "#EF4444" }]}>
-                    <Text style={styles.alertBadgeText}>דחוף</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+              {filteredAlerts.critical.map((alert, idx) => {
+                const originalIdx = alerts.critical.findIndex(a => 
+                  a.title === alert.title && a.name === alert.name && a.details === alert.details
+                );
+                return (
+                  <TouchableOpacity key={`critical-${originalIdx}`} style={[styles.alertCard, styles.alertCardCritical]} activeOpacity={0.8}>
+                    <View style={styles.alertIconContainer}>
+                      <AlertTriangle color="#EF4444" size={24} />
+                    </View>
+                    <View style={styles.alertContent}>
+                      <Text style={styles.alertTitle}>{alert.title}</Text>
+                      <Text style={styles.alertName}>{alert.name}</Text>
+                      <Text style={styles.alertDetails}>{alert.details}</Text>
+                    </View>
+                    <View style={styles.alertActions}>
+                      <View style={[styles.alertBadge, { backgroundColor: "#EF4444" }]}>
+                        <Text style={styles.alertBadgeText}>דחוף</Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.handleButton}
+                        onPress={() => {
+                          setDismissedAlerts([...dismissedAlerts, `critical-${originalIdx}`]);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.handleButtonText}>טופל</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
 
-              {alerts.warning.map((alert, idx) => (
-                <TouchableOpacity key={`warning-${idx}`} style={[styles.alertCard, styles.alertCardWarning]} activeOpacity={0.8}>
-                  <View style={styles.alertIconContainer}>
-                    <Clock color="#F59E0B" size={24} />
-                  </View>
-                  <View style={styles.alertContent}>
-                    <Text style={styles.alertTitle}>{alert.title}</Text>
-                    <Text style={styles.alertName}>{alert.name}</Text>
-                    <Text style={styles.alertDetails}>{alert.details}</Text>
-                  </View>
-                  <View style={[styles.alertBadge, { backgroundColor: "#F59E0B" }]}>
-                    <Text style={styles.alertBadgeText}>אזהרה</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+              {filteredAlerts.warning.map((alert, idx) => {
+                const originalIdx = alerts.warning.findIndex(a => 
+                  a.title === alert.title && a.name === alert.name && a.details === alert.details
+                );
+                return (
+                  <TouchableOpacity key={`warning-${originalIdx}`} style={[styles.alertCard, styles.alertCardWarning]} activeOpacity={0.8}>
+                    <View style={styles.alertIconContainer}>
+                      <Clock color="#F59E0B" size={24} />
+                    </View>
+                    <View style={styles.alertContent}>
+                      <Text style={styles.alertTitle}>{alert.title}</Text>
+                      <Text style={styles.alertName}>{alert.name}</Text>
+                      <Text style={styles.alertDetails}>{alert.details}</Text>
+                    </View>
+                    <View style={styles.alertActions}>
+                      <View style={[styles.alertBadge, { backgroundColor: "#F59E0B" }]}>
+                        <Text style={styles.alertBadgeText}>אזהרה</Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.handleButton}
+                        onPress={() => {
+                          setDismissedAlerts([...dismissedAlerts, `warning-${originalIdx}`]);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.handleButtonText}>טופל</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </>
           )}
         </View>
@@ -620,12 +687,46 @@ const styles = StyleSheet.create({
   notificationsSection: {
     marginBottom: 24,
   },
+  notificationHeader: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  notificationHeaderActions: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    gap: 12,
+  },
+  notificationBadge: {
+    backgroundColor: "#EF4444",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    minWidth: 28,
+    alignItems: "center",
+  },
+  notificationBadgeText: {
+    fontSize: 14,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+  },
+  clearAllButton: {
+    backgroundColor: "#F3F4F6",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  clearAllText: {
+    fontSize: 13,
+    fontWeight: "600" as const,
+    color: "#4B5563",
+  },
   sectionTitle: {
     fontSize: 24,
     fontWeight: "700" as const,
     color: "#2d3748",
     textAlign: "right",
-    marginBottom: 16,
   },
   noAlertsCard: {
     backgroundColor: "#FFFFFF",
@@ -682,6 +783,11 @@ const styles = StyleSheet.create({
   alertContent: {
     flex: 1,
     alignItems: "flex-end",
+    marginRight: 12,
+  },
+  alertActions: {
+    alignItems: "flex-start",
+    gap: 8,
   },
   alertTitle: {
     fontSize: 16,
@@ -703,8 +809,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
-    alignSelf: "flex-start",
-    marginTop: 4,
+  },
+  handleButton: {
+    backgroundColor: "#10B981",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  handleButtonText: {
+    fontSize: 12,
+    fontWeight: "600" as const,
+    color: "#FFFFFF",
   },
   alertBadgeText: {
     fontSize: 11,

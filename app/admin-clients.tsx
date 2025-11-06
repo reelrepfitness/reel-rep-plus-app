@@ -7,7 +7,8 @@ import { User } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
 import { useMemo, useState, useRef, useEffect } from "react";
-import { Droplet, UserPlus, Menu, X, Users, Utensils, BookOpen, Settings, Bell, BarChart3, MessageCircle, LayoutDashboard, MessageSquare } from "lucide-react-native";
+import { Droplet, UserPlus, Menu, X, Users, Utensils, BookOpen, Settings, Bell, BarChart3, MessageCircle, LayoutDashboard, MessageSquare, Image as LucideImage } from "lucide-react-native";
+import { Image } from "expo-image";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH = width * 0.75;
@@ -256,6 +257,23 @@ export default function AdminClientsScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.clientHeader}>
+                    {client.whatsapp_link && (
+                      <TouchableOpacity
+                        style={styles.whatsappButton}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          setSelectedClient(client);
+                          setWhatsappSheetVisible(true);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Image
+                          source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1760615137/whatsapp_2_qkcamm.png" }}
+                          style={styles.whatsappIcon}
+                          contentFit="contain"
+                        />
+                      </TouchableOpacity>
+                    )}
                     <View style={styles.clientInfo}>
                       <View style={styles.clientAvatar}>
                         <Text style={styles.clientAvatarText}>
@@ -267,19 +285,6 @@ export default function AdminClientsScreen() {
                         <Text style={styles.clientEmail}>{client.email}</Text>
                       </View>
                     </View>
-                    {client.whatsapp_link && (
-                      <TouchableOpacity
-                        style={styles.whatsappButton}
-                        onPress={(e) => {
-                          e.stopPropagation();
-                          setSelectedClient(client);
-                          setWhatsappSheetVisible(true);
-                        }}
-                        activeOpacity={0.7}
-                      >
-                        <MessageSquare size={20} color="#25D366" />
-                      </TouchableOpacity>
-                    )}
                   </View>
 
                   <View style={styles.progressBars}>
@@ -459,6 +464,8 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   clientHeader: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "flex-start",
     marginBottom: 16,
   },
   clientInfo: {
@@ -579,19 +586,15 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
   },
   whatsappButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#FFFFFF",
+    width: 36,
+    height: 36,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 2,
-    borderColor: "#25D366",
+    marginLeft: 8,
+  },
+  whatsappIcon: {
+    width: 36,
+    height: 36,
   },
   modalOverlay: {
     flex: 1,

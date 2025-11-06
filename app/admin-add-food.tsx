@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/auth";
 import { colors } from "@/constants/colors";
 import { useState } from "react";
 import { Plus, Search, Edit, Database } from "lucide-react-native";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 type FoodManagementTab = "food_bank" | "restaurants" | "barcodes";
 
@@ -13,6 +15,42 @@ export default function AdminAddFoodScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<FoodManagementTab>("food_bank");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { data: foodBankStats, isLoading: statsLoading } = useQuery({
+    queryKey: ["foodBankStats"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("food_bank")
+        .select("id, category");
+
+      if (error) throw error;
+
+      const categories = new Set(data.map(item => item.category));
+      return {
+        totalItems: data.length,
+        categories: categories.size,
+        recentUpdates: 0,
+      };
+    },
+    enabled: user?.role === "admin",
+  });
+
+  const { data: restaurantStats } = useQuery({
+    queryKey: ["restaurantStats"],
+    queryFn: async () => {
+      const [restaurantsRes, menuItemsRes] = await Promise.all([
+        supabase.from("restaurants").select("id"),
+        supabase.from("restaurant_menu_items").select("id"),
+      ]);
+
+      return {
+        restaurants: restaurantsRes.data?.length || 0,
+        menuItems: menuItemsRes.data?.length || 0,
+        newThisMonth: 0,
+      };
+    },
+    enabled: user?.role === "admin",
+  });
 
   const handleNavigate = (path: string) => {
     router.push(path as any);
@@ -134,15 +172,15 @@ export default function AdminAddFoodScreen() {
                 </Text>
                 <View style={styles.statsRow}>
                   <View style={styles.statBox}>
-                    <Text style={styles.statValue}>234</Text>
+                    <Text style={styles.statValue}>{statsLoading ? "..." : foodBankStats?.totalItems || 0}</Text>
                     <Text style={styles.statLabel}>פריטים</Text>
                   </View>
                   <View style={styles.statBox}>
-                    <Text style={styles.statValue}>12</Text>
+                    <Text style={styles.statValue}>{statsLoading ? "..." : foodBankStats?.categories || 0}</Text>
                     <Text style={styles.statLabel}>קטגוריות</Text>
                   </View>
                   <View style={styles.statBox}>
-                    <Text style={styles.statValue}>8</Text>
+                    <Text style={styles.statValue}>{statsLoading ? "..." : foodBankStats?.recentUpdates || 0}</Text>
                     <Text style={styles.statLabel}>עדכונים השבוע</Text>
                   </View>
                 </View>
@@ -151,21 +189,21 @@ export default function AdminAddFoodScreen() {
               <View style={styles.actionsList}>
                 <TouchableOpacity
                   style={styles.actionCard}
-                  onPress={() => handleNavigate("/food-bank")}
+                  onPress={() => handleNavigate("/admin-add-food-new")}
                   activeOpacity={0.8}
                 >
                   <View style={styles.actionIcon}>
                     <Plus size={24} color={colors.primary} />
                   </View>
                   <View style={styles.actionContent}>
-                    <Text style={styles.actionTitle}>הוסף מזון חדש</Text>
+                    <Text style={styles.actionTitle}>מזון חדש</Text>
                     <Text style={styles.actionDescription}>צור פריט מזון חדש בבנק המזון</Text>
                   </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.actionCard}
-                  onPress={() => handleNavigate("/food-bank")}
+                  onPress={() => handleNavigate("/admin-edit-food")}
                   activeOpacity={0.8}
                 >
                   <View style={styles.actionIcon}>
@@ -201,15 +239,15 @@ export default function AdminAddFoodScreen() {
                 </Text>
                 <View style={styles.statsRow}>
                   <View style={styles.statBox}>
-                    <Text style={styles.statValue}>45</Text>
+                    <Text style={styles.statValue}>{restaurantStats?.restaurants || 0}</Text>
                     <Text style={styles.statLabel}>מסעדות</Text>
                   </View>
                   <View style={styles.statBox}>
-                    <Text style={styles.statValue}>892</Text>
+                    <Text style={styles.statValue}>{restaurantStats?.menuItems || 0}</Text>
                     <Text style={styles.statLabel}>מנות</Text>
                   </View>
                   <View style={styles.statBox}>
-                    <Text style={styles.statValue}>15</Text>
+                    <Text style={styles.statValue}>{restaurantStats?.newThisMonth || 0}</Text>
                     <Text style={styles.statLabel}>חדשות החודש</Text>
                   </View>
                 </View>
