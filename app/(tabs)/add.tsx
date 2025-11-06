@@ -421,7 +421,10 @@ export default function MealsScreen() {
                 style={styles.editFoodButton}
                 onPress={() => {
                   console.log('[Meal Card] Edit button pressed for:', mealNames[mealType]);
-                  openEditSheet(mealNames[mealType]);
+                  router.push({
+                    pathname: '/edit-meal',
+                    params: { mealType: mealNames[mealType] },
+                  });
                 }}
                 activeOpacity={0.7}
               >
