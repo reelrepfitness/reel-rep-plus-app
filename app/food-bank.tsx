@@ -1089,41 +1089,36 @@ export default function FoodBankScreen() {
 
                       <View style={styles.calculationSection}>
                         <View style={styles.calcCard}>
-                          <Image
-                            source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1759009803/plate-eating_1_d4pvta.webp" }}
-                            style={styles.calcIcon}
-                            resizeMode="contain"
-                          />
-                          <Text style={styles.calcValue}>{formatUnit(calculateCalories())} קל׳</Text>
+                          <Text style={styles.calcValue}>{formatUnit(calculateCalories())} קק״ל</Text>
                         </View>
                         {selectedFood.protien_units > 0 && (
-                          <View style={styles.calcCard}>
+                          <View style={[styles.calcCard, { backgroundColor: colors.protein }]}>
                             <Image
                               source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
                               style={styles.calcIcon}
                               resizeMode="contain"
                             />
-                            <Text style={styles.calcValue}>{formatUnit(calculateMacro('protein'))}</Text>
+                            <Text style={[styles.calcValue, { color: "#000000" }]}>{formatUnit(calculateMacro('protein'))}</Text>
                           </View>
                         )}
                         {selectedFood.carb_units > 0 && (
-                          <View style={styles.calcCard}>
+                          <View style={[styles.calcCard, { backgroundColor: colors.carb }]}>
                             <Image
                               source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
                               style={styles.calcIcon}
                               resizeMode="contain"
                             />
-                            <Text style={styles.calcValue}>{formatUnit(calculateMacro('carb'))}</Text>
+                            <Text style={[styles.calcValue, { color: "#000000" }]}>{formatUnit(calculateMacro('carb'))}</Text>
                           </View>
                         )}
                         {selectedFood.fats_units > 0 && (
-                          <View style={styles.calcCard}>
+                          <View style={[styles.calcCard, { backgroundColor: colors.fat }]}>
                             <Image
                               source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
                               style={styles.calcIcon}
                               resizeMode="contain"
                             />
-                            <Text style={styles.calcValue}>{formatUnit(calculateMacro('fat'))}</Text>
+                            <Text style={[styles.calcValue, { color: "#000000" }]}>{formatUnit(calculateMacro('fat'))}</Text>
                           </View>
                         )}
                       </View>
@@ -1191,31 +1186,26 @@ export default function FoodBankScreen() {
 
                 <View style={styles.calculationSection}>
                   <View style={styles.calcCard}>
-                    <Image
-                      source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1759009838/plate-eating_2_qqulpo.webp" }}
-                      style={styles.calcIcon}
-                      resizeMode="contain"
-                    />
-                    <Text style={styles.calcValue}>{formatUnit(selectedFood.caloreis_per_unit * (parseFloat(quantity) || 1))} קל׳</Text>
+                    <Text style={styles.calcValue}>{formatUnit(selectedFood.caloreis_per_unit * (parseFloat(quantity) || 1))} קק״ל</Text>
                   </View>
                   {selectedFood.category === "פרי" && selectedFood.fruit_units > 0 && (
-                    <View style={styles.calcCard}>
+                    <View style={[styles.calcCard, { backgroundColor: colors.fruit }]}>
                       <Image
                         source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984881/apple-whole_qd32pt.webp" }}
                         style={styles.calcIcon}
                         resizeMode="contain"
                       />
-                      <Text style={styles.calcValue}>{formatUnit(selectedFood.fruit_units * (parseFloat(quantity) || 1))} {selectedFood.fruit_unit || 'יח׳'}</Text>
+                      <Text style={[styles.calcValue, { color: "#000000" }]}>{formatUnit(selectedFood.fruit_units * (parseFloat(quantity) || 1))}</Text>
                     </View>
                   )}
                   {selectedFood.category === "ירק" && selectedFood.veg_units > 0 && (
-                    <View style={styles.calcCard}>
+                    <View style={[styles.calcCard, { backgroundColor: colors.vegetable }]}>
                       <Image
                         source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984894/broccoli_2_lk8kty.webp" }}
                         style={styles.calcIcon}
                         resizeMode="contain"
                       />
-                      <Text style={styles.calcValue}>{formatUnit(selectedFood.veg_units * (parseFloat(quantity) || 1))} {selectedFood.veg_unit || 'יח׳'}</Text>
+                      <Text style={[styles.calcValue, { color: "#000000" }]}>{formatUnit(selectedFood.veg_units * (parseFloat(quantity) || 1))}</Text>
                     </View>
                   )}
                 </View>
