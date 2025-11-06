@@ -698,12 +698,11 @@ export default function MealsScreen() {
             animationType="none"
             onRequestClose={closeEditSheet}
           >
-            <View style={styles.modalOverlay}>
-              <TouchableOpacity
-                style={styles.modalBackdrop}
-                activeOpacity={1}
-                onPress={closeEditSheet}
-              />
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              activeOpacity={1}
+              onPress={closeEditSheet}
+            >
               <Animated.View
                 style={[
                   styles.editSheet,
@@ -717,6 +716,11 @@ export default function MealsScreen() {
                   },
                 ]}
               >
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={(e) => e.stopPropagation()}
+                  style={{ flex: 1 }}
+                >
                 <View style={styles.sheetContentWrapper}>
                   <View style={styles.sheetHandle} />
                   <View style={styles.editSheetHeader}>
@@ -824,8 +828,9 @@ export default function MealsScreen() {
                     </InputAccessoryView>
                   )}
                 </View>
+                </TouchableOpacity>
               </Animated.View>
-            </View>
+            </TouchableOpacity>
           </Modal>
         )}
       </View>
