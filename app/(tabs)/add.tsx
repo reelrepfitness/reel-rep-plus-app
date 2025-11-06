@@ -13,7 +13,7 @@ import {
   InputAccessoryView,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2 } from "lucide-react-native";
+import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2, UtensilsCrossed } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -616,9 +616,10 @@ export default function MealsScreen() {
           showsVerticalScrollIndicator={false}
         >
           {hasMealPlan && (
-            <View style={styles.mealPlanCard}>
+            <TouchableOpacity style={styles.mealPlanCard} activeOpacity={0.7}>
+              <UtensilsCrossed size={24} color="#000000" strokeWidth={2.5} />
               <Text style={styles.mealPlanText}>התפריט שלי</Text>
-            </View>
+            </TouchableOpacity>
           )}
 
           {renderMealCard("breakfast")}
@@ -985,11 +986,15 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   mealPlanCard: {
-    backgroundColor: colors.primary,
+    backgroundColor: "#FFFFFF",
     borderRadius: 20,
-    padding: 20,
+    paddingVertical: 28,
+    paddingHorizontal: 20,
     marginBottom: 16,
+    flexDirection: "row-reverse" as any,
     alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
@@ -999,7 +1004,7 @@ const styles = StyleSheet.create({
   mealPlanText: {
     fontSize: 20,
     fontWeight: "700" as const,
-    color: "#FFFFFF",
+    color: "#000000",
   },
   mealCard: {
     backgroundColor: "#0A0A0A",
