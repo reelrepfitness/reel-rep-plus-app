@@ -641,21 +641,6 @@ export default function FoodBankScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.controlsSection}>
-            {selectedMainCategory && (() => {
-              const categoryNotes: { [key: string]: string } = {
-                "חלבון": "מנה חלבון אחת שווה ל200 קק״ל",
-                "פחמימה": "מנת פחמימה שווה ל120 קק״ל",
-                "שומן": "מנת שומן אחת שווה ל120 קק״ל",
-                "ירק": "מנת ירק שווה ל35 קק״ל",
-                "פרי": "מנת פרי שווה ל80 קק״ל",
-              };
-              const note = categoryNotes[selectedMainCategory];
-              return note ? (
-                <View style={styles.categoryNoteContainer}>
-                  <Text style={styles.categoryNoteText}>{note}</Text>
-                </View>
-              ) : null;
-            })()}
             <View style={styles.categoriesCard}>
               <ScrollView
                 ref={categoryScrollRef}
@@ -757,6 +742,25 @@ export default function FoodBankScreen() {
                 )}
               </View>
             </View>
+
+            {selectedMainCategory && (() => {
+              const categoryNotes: { [key: string]: string } = {
+                "חלבון": "מנה חלבון אחת שווה ל200 קק״ל",
+                "פחמימה": "מנת פחמימה שווה ל120 קק״ל",
+                "שומן": "מנת שומן אחת שווה ל120 קק״ל",
+                "ירק": "מנת ירק שווה ל35 קק״ל",
+                "פרי": "מנת פרי שווה ל80 קק״ל",
+              };
+              const note = categoryNotes[selectedMainCategory];
+              const categoryColor = getCategoryColor(selectedMainCategory);
+              return note ? (
+                <View style={[styles.categoryNoteContainer, categoryColor && { backgroundColor: `${categoryColor}20`, borderColor: `${categoryColor}80` }]}>
+                  <Text style={[styles.categoryNoteText, categoryColor && { color: categoryColor }]}>
+                    {note}
+                  </Text>
+                </View>
+              ) : null;
+            })()}
           </View>
 
           {isLoading ? (
@@ -2028,6 +2032,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: "#FFE082",
+    marginTop: 12,
   },
   categoryNoteText: {
     fontSize: 13,
