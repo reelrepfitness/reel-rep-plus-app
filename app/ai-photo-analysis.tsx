@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Camera, Image as ImageIcon, RefreshCw, Utensils, Lightbulb, CheckCircle2 } from "lucide-react-native";
+import { ChevronLeft, Camera, Image as ImageIcon, RefreshCw, Utensils, Lightbulb, Check } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { colors } from "@/constants/colors";
@@ -227,11 +227,11 @@ export default function AIPhotoAnalysisScreen() {
   const getMacroColor = (type: 'protein' | 'carbs' | 'fats') => {
     switch (type) {
       case 'protein':
-        return '#DC2626';
+        return colors.protein;
       case 'carbs':
-        return '#D97706';
+        return colors.carb;
       case 'fats':
-        return '#0891B2';
+        return colors.fat;
       default:
         return '#F7FAFC';
     }
@@ -286,7 +286,9 @@ export default function AIPhotoAnalysisScreen() {
 
             <View style={styles.instructionsContainer}>
               <View style={styles.instructionItem}>
-                <RefreshCw size={20} color="#718096" strokeWidth={2} />
+                <View style={styles.instructionIconContainer}>
+                  <RefreshCw size={20} color="#718096" strokeWidth={2} />
+                </View>
                 <Text style={styles.instructionText}>
                   לא קיבלתם ערכים? הכל טוב - קורה, פשוט תנסו שוב.
                 </Text>
@@ -294,7 +296,9 @@ export default function AIPhotoAnalysisScreen() {
               <View style={styles.instructionDivider} />
               
               <View style={styles.instructionItem}>
-                <Utensils size={20} color="#718096" strokeWidth={2} />
+                <View style={styles.instructionIconContainer}>
+                  <Utensils size={20} color="#718096" strokeWidth={2} />
+                </View>
                 <Text style={styles.instructionText}>
                   הפרידו בין המאכלים על הצלחת, לצורך העלאת רמת הדיוק
                 </Text>
@@ -302,7 +306,9 @@ export default function AIPhotoAnalysisScreen() {
               <View style={styles.instructionDivider} />
               
               <View style={styles.instructionItem}>
-                <Lightbulb size={20} color="#718096" strokeWidth={2} />
+                <View style={styles.instructionIconContainer}>
+                  <Lightbulb size={20} color="#718096" strokeWidth={2} />
+                </View>
                 <Text style={styles.instructionText}>
                   תאורה טובה - על מנת שהכלי יוכל לזהות כמה שיותר פרטים
                 </Text>
@@ -371,14 +377,20 @@ export default function AIPhotoAnalysisScreen() {
                         <TouchableOpacity
                           style={styles.checkboxContainer}
                           onPress={() => toggleItemCheck(index)}
-                          activeOpacity={0.7}
+                          activeOpacity={1}
                         >
-                          <CheckCircle2
-                            size={24}
-                            color={isChecked ? colors.primary : "#CBD5E0"}
-                            strokeWidth={2}
-                            fill={isChecked ? colors.primary : "transparent"}
-                          />
+                          <View style={[
+                            styles.checkboxBox,
+                            isChecked && styles.checkboxBoxChecked
+                          ]}>
+                            {isChecked && (
+                              <Check
+                                size={16}
+                                color="#000000"
+                                strokeWidth={3}
+                              />
+                            )}
+                          </View>
                         </TouchableOpacity>
 
                         <View style={styles.foodItemHeader}>
@@ -632,15 +644,30 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     position: "absolute" as const,
-    top: 12,
-    left: 12,
+    top: 16,
+    right: 16,
     zIndex: 10,
     opacity: 1,
+  },
+  checkboxBox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#CBD5E0",
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxBoxChecked: {
+    borderColor: "#000000",
+    backgroundColor: "#FFFFFF",
   },
   foodItemHeader: {
     flexDirection: "row-reverse" as any,
     justifyContent: "space-between",
     alignItems: "center",
+    marginTop: 4,
   },
   foodItemName: {
     fontSize: 18,
@@ -727,8 +754,14 @@ const styles = StyleSheet.create({
   },
   instructionItem: {
     flexDirection: "row-reverse" as any,
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 12,
+  },
+  instructionIconContainer: {
+    width: 32,
+    height: 32,
+    justifyContent: "center",
+    alignItems: "center",
   },
   instructionText: {
     flex: 1,
