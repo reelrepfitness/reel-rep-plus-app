@@ -232,11 +232,11 @@ export default function AIPhotoAnalysisScreen() {
   const getMacroColor = (type: 'protein' | 'carbs' | 'fats') => {
     switch (type) {
       case 'protein':
-        return '#FFE5E5';
+        return '#FFE8E8';
       case 'carbs':
-        return '#FFF4E5';
+        return '#FFF9E5';
       case 'fats':
-        return '#E5F4FF';
+        return '#E8F6FF';
       default:
         return '#F7FAFC';
     }
@@ -294,9 +294,11 @@ export default function AIPhotoAnalysisScreen() {
                 <View style={styles.instructionIconContainer}>
                   <RefreshCw size={20} color="#718096" strokeWidth={2} />
                 </View>
-                <Text style={styles.instructionText}>
-                  לא קיבלתם ערכים? הכל טוב - קורה, פשוט תנסו שוב.
-                </Text>
+                <View style={styles.instructionTextContainer}>
+                  <Text style={styles.instructionText}>
+                    לא קיבלתם ערכים? הכל טוב - קורה, פשוט תנסו שוב.
+                  </Text>
+                </View>
               </View>
               <View style={styles.instructionDivider} />
               
@@ -304,9 +306,11 @@ export default function AIPhotoAnalysisScreen() {
                 <View style={styles.instructionIconContainer}>
                   <Utensils size={20} color="#718096" strokeWidth={2} />
                 </View>
-                <Text style={styles.instructionText}>
-                  הפרידו בין המאכלים על הצלחת, לצורך העלאת רמת הדיוק
-                </Text>
+                <View style={styles.instructionTextContainer}>
+                  <Text style={styles.instructionText}>
+                    הפרידו בין המאכלים על הצלחת, לצורך העלאת רמת הדיוק
+                  </Text>
+                </View>
               </View>
               <View style={styles.instructionDivider} />
               
@@ -314,9 +318,11 @@ export default function AIPhotoAnalysisScreen() {
                 <View style={styles.instructionIconContainer}>
                   <Lightbulb size={20} color="#718096" strokeWidth={2} />
                 </View>
-                <Text style={styles.instructionText}>
-                  תאורה טובה - על מנת שהכלי יוכל לזהות כמה שיותר פרטים
-                </Text>
+                <View style={styles.instructionTextContainer}>
+                  <Text style={styles.instructionText}>
+                    תאורה טובה - על מנת שהכלי יוכל לזהות כמה שיותר פרטים
+                  </Text>
+                </View>
               </View>
             </View>
 
@@ -385,7 +391,8 @@ export default function AIPhotoAnalysisScreen() {
                           { opacity: isChecked ? 1 : 0.1 },
                         ]}
                       >
-                        <View style={styles.foodItemCheckboxRow}>
+                        <View style={styles.foodItemTopRow}>
+                          <Text style={styles.foodItemQuantity}>{item.quantity}</Text>
                           <TouchableOpacity
                             style={[styles.checkboxContainer, { opacity: 1 }]}
                             onPress={() => toggleItemCheck(index)}
@@ -407,10 +414,7 @@ export default function AIPhotoAnalysisScreen() {
                         </View>
                         
                         <View style={styles.foodItemContent}>
-                          <View style={styles.foodItemHeader}>
-                            <Text style={styles.foodItemName}>{item.name}</Text>
-                            <Text style={styles.foodItemQuantity}>{item.quantity}</Text>
-                          </View>
+                          <Text style={styles.foodItemName}>{item.name}</Text>
                           
                           <View style={styles.foodItemMacros}>
                             <View style={styles.macroItem}>
@@ -513,7 +517,7 @@ export default function AIPhotoAnalysisScreen() {
                         {macroData.map((macro, index) => (
                           <View key={index} style={styles.summaryMacroItem}>
                             <Text style={styles.summaryMacroValue}>
-                              {macro.value > 0 ? `${formatUnit(macro.value)} מנות ${macro.name}` : '0'}
+                              {formatUnit(macro.value)} מנות
                             </Text>
                             <View style={styles.summaryIconContainer}>
                               <Image
@@ -761,9 +765,9 @@ const styles = StyleSheet.create({
     width: "48%" as any,
     position: "relative" as const,
   },
-  foodItemCheckboxRow: {
+  foodItemTopRow: {
     flexDirection: "row-reverse" as any,
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   foodItemContent: {
@@ -787,17 +791,12 @@ const styles = StyleSheet.create({
     borderColor: "#000000",
     backgroundColor: "#FFFFFF",
   },
-  foodItemHeader: {
-    flexDirection: "row-reverse" as any,
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-  },
   foodItemName: {
     fontSize: 18,
     fontWeight: "700" as const,
     color: "#2d3748",
-    flex: 1,
+    textAlign: "right",
+    marginBottom: 8,
   },
   foodItemQuantity: {
     fontSize: 14,
@@ -879,7 +878,7 @@ const styles = StyleSheet.create({
   },
   instructionItem: {
     flexDirection: "row-reverse" as any,
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 12,
   },
   instructionIconContainer: {
@@ -887,9 +886,12 @@ const styles = StyleSheet.create({
     height: 32,
     justifyContent: "center",
     alignItems: "center",
+    flexShrink: 0,
+  },
+  instructionTextContainer: {
+    flex: 1,
   },
   instructionText: {
-    flex: 1,
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#2d3748",
