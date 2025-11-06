@@ -296,37 +296,29 @@ export default function AIPhotoAnalysisScreen() {
             <View style={styles.instructionsContainer}>
               <View style={styles.instructionItem}>
                 <View style={styles.instructionIconContainer}>
-                  <RefreshCw size={20} color="#718096" strokeWidth={2} />
+                  <RefreshCw size={24} color={colors.primary} strokeWidth={2} />
                 </View>
-                <View style={styles.instructionTextContainer}>
-                  <Text style={styles.instructionText}>
-                    לא קיבלתם ערכים? הכל טוב - קורה, פשוט תנסו שוב.
-                  </Text>
-                </View>
+                <Text style={styles.instructionText}>
+                  לא קיבלתם ערכים? הכל טוב - קורה, פשוט תנסו שוב.
+                </Text>
               </View>
-              <View style={styles.instructionDivider} />
               
               <View style={styles.instructionItem}>
                 <View style={styles.instructionIconContainer}>
-                  <Utensils size={20} color="#718096" strokeWidth={2} />
+                  <Utensils size={24} color={colors.primary} strokeWidth={2} />
                 </View>
-                <View style={styles.instructionTextContainer}>
-                  <Text style={styles.instructionText}>
-                    הפרידו בין המאכלים על הצלחת, לצורך העלאת רמת הדיוק
-                  </Text>
-                </View>
+                <Text style={styles.instructionText}>
+                  הפרידו בין המאכלים על הצלחת, לצורך העלאת רמת הדיוק
+                </Text>
               </View>
-              <View style={styles.instructionDivider} />
               
               <View style={styles.instructionItem}>
                 <View style={styles.instructionIconContainer}>
-                  <Lightbulb size={20} color="#718096" strokeWidth={2} />
+                  <Lightbulb size={24} color={colors.primary} strokeWidth={2} />
                 </View>
-                <View style={styles.instructionTextContainer}>
-                  <Text style={styles.instructionText}>
-                    תאורה טובה - על מנת שהכלי יוכל לזהות כמה שיותר פרטים
-                  </Text>
-                </View>
+                <Text style={styles.instructionText}>
+                  תאורה טובה - על מנת שהכלי יוכל לזהות כמה שיותר פרטים
+                </Text>
               </View>
             </View>
 
@@ -859,7 +851,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 20,
-    gap: 16,
+    gap: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -867,30 +859,24 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   instructionItem: {
-    flexDirection: "row-reverse" as any,
-    alignItems: "flex-start",
+    flexDirection: "column" as any,
+    alignItems: "center",
     gap: 12,
   },
   instructionIconContainer: {
-    width: 32,
-    height: 32,
+    width: 48,
+    height: 48,
     justifyContent: "center",
     alignItems: "center",
-    flexShrink: 0,
-  },
-  instructionTextContainer: {
-    flex: 1,
+    backgroundColor: "rgba(0, 150, 136, 0.1)",
+    borderRadius: 24,
   },
   instructionText: {
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#2d3748",
     lineHeight: 20,
-    textAlign: "right",
-  },
-  instructionDivider: {
-    height: 1,
-    backgroundColor: "#E2E8F0",
+    textAlign: "center",
   },
   disclaimerContainer: {
     marginTop: 24,
