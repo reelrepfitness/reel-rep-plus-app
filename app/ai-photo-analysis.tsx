@@ -229,14 +229,18 @@ export default function AIPhotoAnalysisScreen() {
     }));
   };
 
-  const getMacroColor = (type: 'protein' | 'carbs' | 'fats') => {
+  const getMacroColor = (type: 'protein' | 'carbs' | 'fats' | 'veg' | 'fruit') => {
     switch (type) {
       case 'protein':
-        return '#FFE8E8';
+        return '#FFD6D6';
       case 'carbs':
-        return '#FFF9E5';
+        return '#FFF9CC';
       case 'fats':
-        return '#E8F6FF';
+        return '#D6F5D6';
+      case 'veg':
+        return '#FFE4CC';
+      case 'fruit':
+        return '#FFD6F0';
       default:
         return '#F7FAFC';
     }
