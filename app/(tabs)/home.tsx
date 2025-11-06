@@ -1528,6 +1528,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 1000,
   },
   modalBackdrop: {
     position: "absolute" as const,
@@ -1548,6 +1549,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 5,
+    zIndex: 1001,
   },
   sheetHandle: {
     width: 40,

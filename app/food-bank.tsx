@@ -2122,7 +2122,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
-    zIndex: 10000,
+    zIndex: 1000,
+    pointerEvents: "box-none" as const,
   },
   bottomSheet: {
     backgroundColor: "#FFFFFF",
@@ -2134,6 +2135,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 20,
+    pointerEvents: "auto" as const,
   },
   keyboardAvoid: {
     flex: 1,
