@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions, Platform } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions, Platform, Image } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { supabase } from "@/lib/supabase";
@@ -211,7 +211,7 @@ export default function UserDashboardScreen() {
                                 styles.barFill, 
                                 { 
                                   height: `${heightPercent}%`,
-                                  backgroundColor: isToday ? "#262135" : "rgba(41, 45, 48, 0.29)",
+                                  backgroundColor: isToday ? "#70eeff" : "rgba(112, 238, 255, 0.4)",
                                 }
                               ]} 
                             />
@@ -228,11 +228,11 @@ export default function UserDashboardScreen() {
 
           <View style={styles.legend}>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: "#262135" }]} />
+              <View style={[styles.legendDot, { backgroundColor: "#70eeff" }]} />
               <Text style={styles.legendText}>היום</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: "rgba(41, 45, 48, 0.29)" }]} />
+              <View style={[styles.legendDot, { backgroundColor: "rgba(112, 238, 255, 0.4)" }]} />
               <Text style={styles.legendText}>ימים קודמים</Text>
             </View>
           </View>
@@ -293,10 +293,14 @@ export default function UserDashboardScreen() {
                         origin={`${size / 2}, ${size / 2}`}
                       />
                       <View style={styles.progressTextContainer}>
-                        <Text style={styles.progressValue}>
-                          {data?.workoutData?.totalStrengthWorkouts || 0}
+                        <Image
+                          source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1762354881/dumbbell-weightlifting_1_e7zyth.webp" }}
+                          style={styles.workoutProgressIcon}
+                          resizeMode="contain"
+                        />
+                        <Text style={styles.progressValueText}>
+                          {data?.workoutData?.totalStrengthWorkouts || 0}/{data?.workoutData?.weeklyStrengthGoal || 0}
                         </Text>
-                        <Text style={styles.progressGoal}>/{data?.workoutData?.weeklyStrengthGoal || 0}</Text>
                       </View>
                     </Svg>
                   );
@@ -343,10 +347,14 @@ export default function UserDashboardScreen() {
                         origin={`${size / 2}, ${size / 2}`}
                       />
                       <View style={styles.progressTextContainer}>
-                        <Text style={styles.progressValue}>
-                          {data?.workoutData?.totalCardioMinutes || 0}
+                        <Image
+                          source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1762355479/treadmill_8_ikxtks.webp" }}
+                          style={styles.workoutProgressIcon}
+                          resizeMode="contain"
+                        />
+                        <Text style={styles.progressValueText}>
+                          {data?.workoutData?.totalCardioMinutes || 0}/{data?.workoutData?.weeklyCardioGoal || 0}
                         </Text>
-                        <Text style={styles.progressGoal}>/{data?.workoutData?.weeklyCardioGoal || 0}</Text>
                       </View>
                     </Svg>
                   );
@@ -880,7 +888,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 12,
-    color: "rgba(255, 255, 255, 0.71)",
+    color: "rgba(255, 255, 255, 0.9)",
     fontWeight: "500" as const,
   },
   statsRow: {
@@ -1116,6 +1124,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.gray,
     marginTop: 2,
+  },
+  workoutProgressIcon: {
+    width: 30,
+    height: 30,
+    marginBottom: 4,
+  },
+  progressValueText: {
+    fontSize: 12,
+    fontWeight: "700" as const,
+    color: colors.text,
   },
   progressText: {
     marginTop: 12,
