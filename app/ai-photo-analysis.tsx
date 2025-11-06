@@ -58,6 +58,7 @@ export default function AIPhotoAnalysisScreen() {
   const [analyzedItems, setAnalyzedItems] = useState<FoodItem[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
+  const [plateDescription, setPlateDescription] = useState<string>("");
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -135,6 +136,10 @@ export default function AIPhotoAnalysisScreen() {
 
       const data = await apiResponse.json();
       console.log("[AI] Received API response:", data);
+
+      if (data.description) {
+        setPlateDescription(data.description);
+      }
 
       const items: FoodItem[] = [];
       for (let i = 0; i < 6; i++) {
@@ -351,6 +356,12 @@ export default function AIPhotoAnalysisScreen() {
                 </TouchableOpacity>
               </View>
             </View>
+
+            {plateDescription && showResults && !isAnalyzing && (
+              <View style={styles.descriptionContainer}>
+                <Text style={styles.descriptionText}>{plateDescription}</Text>
+              </View>
+            )}
 
             {isAnalyzing && (
               <View style={styles.analyzingContainer}>
@@ -574,13 +585,32 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   imageContainer: {
-    marginBottom: 24,
+    marginBottom: 16,
+    marginTop: 20,
   },
   selectedImage: {
     width: "100%",
     aspectRatio: 16 / 9,
     borderRadius: 16,
     backgroundColor: "#F0F0F0",
+  },
+  descriptionContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  descriptionText: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#2d3748",
+    textAlign: "center",
+    lineHeight: 24,
   },
   retakeButtonsContainer: {
     position: "absolute" as const,
