@@ -317,7 +317,7 @@ export default function AdminDashboardScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerSection}>
-          <Text style={styles.welcomeText}>שלום, {user?.email?.split("@")[0]}</Text>
+          <Text style={styles.welcomeText}>שלום, איוון</Text>
           <Text style={styles.dateText}>{new Date().toLocaleDateString("he-IL", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</Text>
         </View>
 
@@ -501,7 +501,7 @@ export default function AdminDashboardScreen() {
               <Text style={styles.adminAvatarText}>{user?.email?.charAt(0).toUpperCase() || "A"}</Text>
             </View>
             <View style={styles.adminDetails}>
-              <Text style={styles.adminName}>{user?.email?.split("@")[0] || "מנהל"}</Text>
+              <Text style={styles.adminName}>איוון</Text>
               <Text style={styles.adminRole}>מנהל מערכת</Text>
             </View>
           </View>

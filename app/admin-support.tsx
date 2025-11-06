@@ -22,35 +22,7 @@ export default function AdminSupportScreen() {
   const [replyText, setReplyText] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
   
-  const [tickets] = useState<SupportTicket[]>([
-    {
-      id: "1",
-      type: "feedback",
-      title: "האפליקציה מעולה!",
-      description: "תודה רבה על האפליקציה, עוזרת לי מאוד לעקוב אחרי התזונה שלי",
-      userName: "יוסי כהן",
-      status: "resolved",
-      date: "2025-01-12",
-    },
-    {
-      id: "2",
-      type: "bug",
-      title: "בעיה בסריקת ברקוד",
-      description: "כשאני מנסה לסרוק ברקוד, האפליקציה קורסת",
-      userName: "שרה לוי",
-      status: "pending",
-      date: "2025-01-15",
-    },
-    {
-      id: "3",
-      type: "feature",
-      title: "בקשה להוספת תכונה",
-      description: "אשמח לאפשרות לייצא דוח תזונה שבועי",
-      userName: "דוד אברהם",
-      status: "pending",
-      date: "2025-01-14",
-    },
-  ]);
+  const [tickets] = useState<SupportTicket[]>([]);
 
   const getTypeIcon = (type: SupportTicket["type"]) => {
     switch (type) {

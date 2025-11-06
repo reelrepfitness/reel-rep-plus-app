@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Animated, Dimensions, Pressable } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Animated, Dimensions, Pressable, Linking, TextInput, Modal } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/contexts/auth";
@@ -7,7 +7,7 @@ import { User } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
 import { useMemo, useState, useRef, useEffect } from "react";
-import { Droplet, UserPlus, Menu, X, Users, Utensils, BookOpen, Settings, Bell, BarChart3, MessageCircle, LayoutDashboard } from "lucide-react-native";
+import { Droplet, UserPlus, Menu, X, Users, Utensils, BookOpen, Settings, Bell, BarChart3, MessageCircle, LayoutDashboard, MessageSquare } from "lucide-react-native";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH = width * 0.75;
@@ -30,6 +30,9 @@ export default function AdminClientsScreen() {
   const drawerAnim = useRef(new Animated.Value(width)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
   const [selectedMenu, setSelectedMenu] = useState("clients");
+  const [whatsappSheetVisible, setWhatsappSheetVisible] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<User | null>(null);
+  const [whatsappMessage, setWhatsappMessage] = useState("");
 
   const today = useMemo(() => {
     const now = new Date();
@@ -264,6 +267,19 @@ export default function AdminClientsScreen() {
                         <Text style={styles.clientEmail}>{client.email}</Text>
                       </View>
                     </View>
+                    {client.whatsapp_link && (
+                      <TouchableOpacity
+                        style={styles.whatsappButton}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          setSelectedClient(client);
+                          setWhatsappSheetVisible(true);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <MessageSquare size={20} color="#25D366" />
+                      </TouchableOpacity>
+                    )}
                   </View>
 
                   <View style={styles.progressBars}>
@@ -335,6 +351,59 @@ export default function AdminClientsScreen() {
           )}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={whatsappSheetVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setWhatsappSheetVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setWhatsappSheetVisible(false)}
+        >
+          <Pressable style={styles.whatsappSheet} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>שלח הודעת וואטסאפ</Text>
+              <TouchableOpacity onPress={() => setWhatsappSheetVisible(false)}>
+                <X size={24} color="#2d3748" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.sheetSubtitle}>אל: {selectedClient?.name}</Text>
+
+            <TextInput
+              style={styles.messageInput}
+              placeholder="כתוב הודעה..."
+              placeholderTextColor="#9CA3AF"
+              value={whatsappMessage}
+              onChangeText={setWhatsappMessage}
+              multiline
+              numberOfLines={6}
+              textAlignVertical="top"
+            />
+
+            <TouchableOpacity
+              style={styles.sendWhatsappButton}
+              onPress={() => {
+                if (selectedClient?.whatsapp_link) {
+                  const message = encodeURIComponent(whatsappMessage);
+                  const url = selectedClient.whatsapp_link.includes('?')
+                    ? `${selectedClient.whatsapp_link}&text=${message}`
+                    : `${selectedClient.whatsapp_link}?text=${message}`;
+                  Linking.openURL(url);
+                  setWhatsappSheetVisible(false);
+                  setWhatsappMessage("");
+                }
+              }}
+              activeOpacity={0.8}
+            >
+              <MessageSquare size={20} color="#FFFFFF" />
+              <Text style={styles.sendWhatsappButtonText}>שלח בוואטסאפ</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -508,5 +577,83 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "700" as const,
+  },
+  whatsappButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 2,
+    borderColor: "#25D366",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  whatsappSheet: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 40,
+    minHeight: 400,
+  },
+  sheetHeader: {
+    flexDirection: "row-reverse" as any,
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  sheetTitle: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+  },
+  sheetSubtitle: {
+    fontSize: 14,
+    color: "#718096",
+    textAlign: "right",
+    marginBottom: 16,
+  },
+  messageInput: {
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#2d3748",
+    textAlign: "right",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    minHeight: 120,
+    marginBottom: 16,
+  },
+  sendWhatsappButton: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#25D366",
+    borderRadius: 12,
+    paddingVertical: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  sendWhatsappButtonText: {
+    fontSize: 16,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
   },
 });
