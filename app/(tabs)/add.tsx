@@ -39,6 +39,7 @@ export default function MealsScreen() {
   const [editingMealType, setEditingMealType] = useState<string | null>(null);
   const [editingItems, setEditingItems] = useState<DailyItem[]>([]);
   const [itemQuantities, setItemQuantities] = useState<Record<string, string>>({});
+  const [originalQuantities, setOriginalQuantities] = useState<Record<string, number>>({});
   const queryClient = useQueryClient();
   
   const [macroFlashAnimations] = useState<{ [key: string]: Animated.Value }>({
@@ -164,10 +165,13 @@ export default function MealsScreen() {
     setEditingItems(mealData.items);
     
     const initialQuantities: Record<string, string> = {};
+    const origQuantities: Record<string, number> = {};
     mealData.items.forEach(item => {
       initialQuantities[item.id] = item.quantity.toString();
+      origQuantities[item.id] = item.quantity;
     });
     setItemQuantities(initialQuantities);
+    setOriginalQuantities(origQuantities);
     
     console.log('[Edit] Showing edit sheet');
     setShowEditSheet(true);
@@ -190,6 +194,7 @@ export default function MealsScreen() {
       setEditingMealType(null);
       setEditingItems([]);
       setItemQuantities({});
+      setOriginalQuantities({});
     });
   };
   
@@ -214,25 +219,44 @@ export default function MealsScreen() {
     const newQuantity = parseFloat(itemQuantities[itemId]);
     if (!newQuantity || newQuantity <= 0) return;
     
+    const originalQuantity = originalQuantities[itemId];
+    if (!originalQuantity) return;
+    
     const item = editingItems.find(i => i.id === itemId);
     if (!item) return;
     
     try {
-      const ratio = newQuantity / item.quantity;
       const { error } = await supabase
         .from('daily_items')
         .update({
           quantity: newQuantity,
-          kcal: item.kcal * ratio,
-          protein_units: item.protein_units * ratio,
-          carb_units: item.carb_units * ratio,
-          fat_units: item.fat_units * ratio,
-          veg_units: item.veg_units * ratio,
-          fruit_units: item.fruit_units * ratio,
+          kcal: (item.kcal / item.quantity) * newQuantity,
+          protein_units: (item.protein_units / item.quantity) * newQuantity,
+          carb_units: (item.carb_units / item.quantity) * newQuantity,
+          fat_units: (item.fat_units / item.quantity) * newQuantity,
+          veg_units: (item.veg_units / item.quantity) * newQuantity,
+          fruit_units: (item.fruit_units / item.quantity) * newQuantity,
         })
         .eq('id', itemId);
       
       if (error) throw error;
+      
+      setEditingItems(prev => prev.map(i => {
+        if (i.id === itemId) {
+          return {
+            ...i,
+            quantity: newQuantity,
+            kcal: (i.kcal / i.quantity) * newQuantity,
+            protein_units: (i.protein_units / i.quantity) * newQuantity,
+            carb_units: (i.carb_units / i.quantity) * newQuantity,
+            fat_units: (i.fat_units / i.quantity) * newQuantity,
+            veg_units: (i.veg_units / i.quantity) * newQuantity,
+            fruit_units: (i.fruit_units / i.quantity) * newQuantity,
+          };
+        }
+        return i;
+      }));
+      setOriginalQuantities(prev => ({ ...prev, [itemId]: newQuantity }));
       
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
@@ -475,7 +499,6 @@ export default function MealsScreen() {
           <View style={styles.macroCardsContainer}>
             {macroCards.map((macro, index) => {
               const progress = macro.goal > 0 ? Math.min(macro.value / macro.goal, 1) : 0;
-              const isOverGoal = macro.value >= macro.goal && macro.goal > 0;
 
               if (macro.isCalories) {
                 return (
@@ -675,11 +698,12 @@ export default function MealsScreen() {
             animationType="none"
             onRequestClose={closeEditSheet}
           >
-            <TouchableOpacity
-              style={styles.modalOverlay}
-              activeOpacity={1}
-              onPress={closeEditSheet}
-            >
+            <View style={styles.modalOverlay}>
+              <TouchableOpacity
+                style={styles.modalBackdrop}
+                activeOpacity={1}
+                onPress={closeEditSheet}
+              />
               <Animated.View
                 style={[
                   styles.editSheet,
@@ -693,11 +717,7 @@ export default function MealsScreen() {
                   },
                 ]}
               >
-                <TouchableOpacity
-                  activeOpacity={1}
-                  onPress={(e) => e.stopPropagation()}
-                  style={styles.sheetContentWrapper}
-                >
+                <View style={styles.sheetContentWrapper}>
                   <View style={styles.sheetHandle} />
                   <View style={styles.editSheetHeader}>
                     <TouchableOpacity onPress={closeEditSheet} activeOpacity={0.7}>
@@ -738,10 +758,9 @@ export default function MealsScreen() {
                                 style={styles.quantityChangeButton}
                                 onPress={() => {
                                   const current = parseFloat(itemQuantities[item.id]) || 1;
-                                  if (current > 1) {
-                                    const newVal = (current - 1).toString();
+                                  if (current > 0.5) {
+                                    const newVal = (current - 0.5).toString();
                                     setItemQuantities(prev => ({ ...prev, [item.id]: newVal }));
-                                    handleUpdateQuantity(item.id);
                                   }
                                 }}
                                 activeOpacity={0.7}
@@ -756,7 +775,6 @@ export default function MealsScreen() {
                                   const cleaned = text.replace(/[^0-9.]/g, '');
                                   setItemQuantities(prev => ({ ...prev, [item.id]: cleaned }));
                                 }}
-                                onBlur={() => handleUpdateQuantity(item.id)}
                                 keyboardType="decimal-pad"
                                 selectTextOnFocus
                                 returnKeyType="done"
@@ -769,16 +787,24 @@ export default function MealsScreen() {
                                 style={styles.quantityChangeButton}
                                 onPress={() => {
                                   const current = parseFloat(itemQuantities[item.id]) || 1;
-                                  const newVal = (current + 1).toString();
+                                  const newVal = (current + 0.5).toString();
                                   setItemQuantities(prev => ({ ...prev, [item.id]: newVal }));
-                                  handleUpdateQuantity(item.id);
                                 }}
                                 activeOpacity={0.7}
                               >
                                 <Text style={styles.quantityChangeText}>+</Text>
                               </TouchableOpacity>
                             </View>
-                            <Text style={styles.editItemCalories}>{Math.round(item.kcal)} קל'</Text>
+                            <View style={styles.itemActionsRow}>
+                              <TouchableOpacity
+                                style={styles.confirmButton}
+                                onPress={() => handleUpdateQuantity(item.id)}
+                                activeOpacity={0.7}
+                              >
+                                <Text style={styles.confirmButtonText}>אישור</Text>
+                              </TouchableOpacity>
+                              <Text style={styles.editItemCalories}>{Math.round(item.kcal)} קל&apos;</Text>
+                            </View>
                           </View>
                         </View>
                       </View>
@@ -797,9 +823,9 @@ export default function MealsScreen() {
                       </View>
                     </InputAccessoryView>
                   )}
-                </TouchableOpacity>
+                </View>
               </Animated.View>
-            </TouchableOpacity>
+            </View>
           </Modal>
         )}
       </View>
@@ -1307,11 +1333,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   editItemQuantityInput: {
-    flex: 1,
+    minWidth: 60,
+    maxWidth: 80,
     borderWidth: 1,
     borderColor: "#E2E8F0",
     borderRadius: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
     fontWeight: "600" as const,
@@ -1332,11 +1359,34 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
     color: "#FFFFFF",
   },
+  itemActionsRow: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  confirmButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  confirmButtonText: {
+    fontSize: 14,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+  },
   editItemCalories: {
     fontSize: 14,
     fontWeight: "600" as const,
     color: colors.primary,
     textAlign: "right",
+  },
+  modalBackdrop: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   keyboardAccessory: {
     backgroundColor: "#F7F7F7",
