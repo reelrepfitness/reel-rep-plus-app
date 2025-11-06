@@ -26,6 +26,24 @@ interface FoodItem {
   fats: number;
 }
 
+interface APIFoodItem {
+  name: string;
+  grams: number;
+  calories: number;
+  protein_grams: number;
+  carb_grams: number;
+  fat_grams: number;
+  protein_portions: number;
+  carb_portions: number;
+  fat_portions: number;
+  veg_portions: number;
+  fruit_portions: number;
+  category: string;
+  category_image_url: string;
+  food_image_url: string;
+  found_in_db: boolean;
+}
+
 export default function AIPhotoAnalysisScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -82,99 +100,67 @@ export default function AIPhotoAnalysisScreen() {
     }
   };
 
-  const calculatePortions = (calories: number, proteinG: number, carbsG: number, fatsG: number) => {
-    const proteinCal = proteinG * 4;
-    const carbsCal = carbsG * 4;
-    const fatsCal = fatsG * 9;
-    
-    const totalMacroCal = proteinCal + carbsCal + fatsCal;
-    
-    if (totalMacroCal === 0) {
-      return { protein: 0, carbs: 0, fats: 0 };
-    }
-    
-    const proteinRatio = proteinCal / totalMacroCal;
-    const carbsRatio = carbsCal / totalMacroCal;
-    const fatsRatio = fatsCal / totalMacroCal;
-    
-    let proteinPortions = 0;
-    let carbsPortions = 0;
-    let fatsPortions = 0;
-    
-    if (proteinRatio > 0.5) {
-      proteinPortions = calories / 200;
-    } else if (carbsRatio > 0.5) {
-      carbsPortions = calories / 120;
-    } else if (fatsRatio > 0.5) {
-      fatsPortions = calories / 120;
-    } else {
-      const maxRatio = Math.max(proteinRatio, carbsRatio, fatsRatio);
-      
-      if (maxRatio === proteinRatio) {
-        proteinPortions = (calories * proteinRatio) / 200;
-        if (carbsRatio > 0.2) {
-          carbsPortions = (calories * carbsRatio) / 120;
-        }
-        if (fatsRatio > 0.2) {
-          fatsPortions = (calories * fatsRatio) / 120;
-        }
-      } else if (maxRatio === carbsRatio) {
-        carbsPortions = (calories * carbsRatio) / 120;
-        if (proteinRatio > 0.2) {
-          proteinPortions = (calories * proteinRatio) / 200;
-        }
-        if (fatsRatio > 0.2) {
-          fatsPortions = (calories * fatsRatio) / 120;
-        }
-      } else {
-        fatsPortions = (calories * fatsRatio) / 120;
-        if (proteinRatio > 0.2) {
-          proteinPortions = (calories * proteinRatio) / 200;
-        }
-        if (carbsRatio > 0.2) {
-          carbsPortions = (calories * carbsRatio) / 120;
-        }
-      }
-    }
-    
-    return {
-      protein: Math.round(proteinPortions * 10) / 10,
-      carbs: Math.round(carbsPortions * 10) / 10,
-      fats: Math.round(fatsPortions * 10) / 10,
-    };
-  };
-
   const analyzeImage = async (imageUri: string) => {
     setIsAnalyzing(true);
     
     try {
       console.log("[AI] Analyzing image...");
       
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockRawData = [
-        { name: "חזה עוף צלוי", quantity: "150 גרם", calories: 250, proteinG: 45, carbsG: 0, fatsG: 5 },
-        { name: "אורז מלא", quantity: "1 כוס", calories: 180, proteinG: 5, carbsG: 38, fatsG: 1 },
-        { name: "סלט ירקות", quantity: "1 מנה", calories: 50, proteinG: 2, carbsG: 8, fatsG: 2 },
-      ];
-      
-      const mockItems: FoodItem[] = mockRawData.map(item => {
-        const portions = calculatePortions(item.calories, item.proteinG, item.carbsG, item.fatsG);
-        return {
-          name: item.name,
-          quantity: item.quantity,
-          calories: item.calories,
-          protein: portions.protein,
-          carbs: portions.carbs,
-          fats: portions.fats,
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          resolve(result);
         };
+        reader.readAsDataURL(blob);
       });
+
+      console.log("[AI] Sending image to API...");
+      const apiResponse = await fetch("https://reelrep-ai-food.ivan-5c4.workers.dev", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image_url: base64,
+        }),
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error("API request failed");
+      }
+
+      const data = await apiResponse.json();
+      console.log("[AI] Received API response:", data);
+
+      const items: FoodItem[] = [];
+      for (let i = 0; i < 6; i++) {
+        const item: APIFoodItem | null = data[`item${i}`];
+        if (item) {
+          items.push({
+            name: item.name,
+            quantity: `${Math.round(item.grams)} גרם`,
+            calories: Math.round(item.calories),
+            protein: item.protein_portions,
+            carbs: item.carb_portions,
+            fats: item.fat_portions,
+          });
+        }
+      }
+
+      if (items.length === 0) {
+        alert("לא זוהו מזונות בתמונה. אנא נסה שוב עם תמונה ברורה יותר.");
+        setIsAnalyzing(false);
+        return;
+      }
       
-      setAnalyzedItems(mockItems);
+      setAnalyzedItems(items);
       setShowResults(true);
     } catch (error) {
       console.error("[AI] Error analyzing image:", error);
-      alert("שגיאה בניתוח התמונה");
+      alert("שגיאה בניתוח התמונה. אנא נסה שוב.");
     } finally {
       setIsAnalyzing(false);
     }
