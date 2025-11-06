@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "rork-app",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
@@ -34,8 +34,8 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "android.permission.RECEIVE_BOOT_COMPLETED",
-        "android.permission.SCHEDULE_EXACT_ALARM",
-        "android.permission.REQUEST_INSTALL_PACKAGES"
+        "android.permission/SCHEDULE_EXACT_ALARM",
+        "android.permission/REQUEST_INSTALL_PACKAGES"
       ]
     },
     "web": {
@@ -82,20 +82,21 @@
     },
     "updates": {
       "enabled": true,
-      "url": "<UNKNOWN>",
+      "url": "https://u.expo.dev/d008d4d4-399d-4a34-84c4-4402d18c5b75",
       "requestHeaders": {},
       "checkAutomatically": "ALWAYS",
       "fallbackToCacheTimeout": 0,
       "useEmbeddedUpdate": true,
-      "codeSigningCertificate": "<UNKNOWN>",
-      "codeSigningMetadata": "<UNKNOWN>",
       "assetPatternsToBeBundled": [],
       "disableAntiBrickingMeasures": false
     },
-    "runtimeVersion": "<UNKNOWN>",
+    "runtimeVersion": { "policy": "sdkVersion" },
     "extra": {
+      "router": {
+        "origin": "https://rork.com/"
+      },
       "eas": {
-        "projectId": "b22ezxscydzxy6y59xv7e"
+        "projectId": "d008d4d4-399d-4a34-84c4-4402d18c5b75"
       }
     }
   }
