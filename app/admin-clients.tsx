@@ -466,6 +466,7 @@ const styles = StyleSheet.create({
   clientHeader: {
     flexDirection: "row-reverse" as any,
     alignItems: "flex-start",
+    justifyContent: "space-between",
     marginBottom: 16,
   },
   clientInfo: {
@@ -590,7 +591,6 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 8,
   },
   whatsappIcon: {
     width: 36,
