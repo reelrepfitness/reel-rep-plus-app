@@ -495,20 +495,6 @@ export default function AIPhotoAnalysisScreen() {
                       icon: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_5_joifcx.webp",
                       name: 'שומן'
                     },
-                    { 
-                      type: 'veg', 
-                      value: 0, 
-                      progress: 0,
-                      icon: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/broccoli_3_qptkyx.webp",
-                      name: 'ירק'
-                    },
-                    { 
-                      type: 'fruit', 
-                      value: 0, 
-                      progress: 0,
-                      icon: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984847/apple_5_hmhtvz.webp",
-                      name: 'פרי'
-                    },
                   ];
 
                   return (
@@ -521,7 +507,7 @@ export default function AIPhotoAnalysisScreen() {
                         {macroData.map((macro, index) => (
                           <View key={index} style={styles.summaryMacroItem}>
                             <Text style={styles.summaryMacroValue}>
-                              {formatUnit(macro.value)} מנות
+                              מנות x{formatUnit(macro.value)}
                             </Text>
                             <View style={styles.summaryIconContainer}>
                               <Image
@@ -952,29 +938,29 @@ const styles = StyleSheet.create({
   },
   summaryMacros: {
     flexDirection: "row-reverse" as any,
-    justifyContent: "center",
-    gap: 16,
+    justifyContent: "space-evenly",
+    gap: 24,
   },
   summaryMacroItem: {
     alignItems: "center",
     gap: 8,
-    minWidth: 50,
+    flex: 1,
   },
   summaryMacroValue: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "700" as const,
     color: "#2d3748",
     textAlign: "center",
   },
   summaryIconContainer: {
     position: "relative" as const,
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
   },
   summaryMacroIconBase: {
     position: "absolute" as const,
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     tintColor: "#3d3d3d",
   },
   summaryIconProgressWrapper: {
@@ -988,7 +974,7 @@ const styles = StyleSheet.create({
     position: "absolute" as const,
     bottom: 0,
     left: 0,
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
   },
 });
