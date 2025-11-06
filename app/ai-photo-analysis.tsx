@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Camera, Image as ImageIcon, RefreshCw, Utensils, Lightbulb } from "lucide-react-native";
+import { ChevronLeft, Camera, Image as ImageIcon, RefreshCw, Utensils, Lightbulb, CheckCircle2 } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { colors } from "@/constants/colors";
@@ -57,6 +57,7 @@ export default function AIPhotoAnalysisScreen() {
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [analyzedItems, setAnalyzedItems] = useState<FoodItem[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -157,6 +158,11 @@ export default function AIPhotoAnalysisScreen() {
       }
       
       setAnalyzedItems(items);
+      const initialChecked: { [key: number]: boolean } = {};
+      items.forEach((_, index) => {
+        initialChecked[index] = true;
+      });
+      setCheckedItems(initialChecked);
       setShowResults(true);
     } catch (error) {
       console.error("[AI] Error analyzing image:", error);
@@ -172,7 +178,9 @@ export default function AIPhotoAnalysisScreen() {
     try {
       console.log("[AI] Adding analyzed items to daily log");
       
-      for (const item of analyzedItems) {
+      for (let i = 0; i < analyzedItems.length; i++) {
+        if (!checkedItems[i]) continue;
+        const item = analyzedItems[i];
         const { error } = await supabase
           .from("daily_items")
           .insert([{
@@ -207,6 +215,26 @@ export default function AIPhotoAnalysisScreen() {
 
   const formatUnit = (value: number) => {
     return value % 1 === 0 ? value.toString() : value.toFixed(1);
+  };
+
+  const toggleItemCheck = (index: number) => {
+    setCheckedItems((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const getMacroColor = (type: 'protein' | 'carbs' | 'fats') => {
+    switch (type) {
+      case 'protein':
+        return '#DC2626';
+      case 'carbs':
+        return '#D97706';
+      case 'fats':
+        return '#0891B2';
+      default:
+        return '#F7FAFC';
+    }
   };
 
   return (
@@ -327,57 +355,76 @@ export default function AIPhotoAnalysisScreen() {
 
             {showResults && !isAnalyzing && (
               <View style={styles.resultsContainer}>
-                <Text style={styles.resultsTitle}>תוצאות הניתוח</Text>
+                <Text style={styles.resultsTitle}>מה יש לנו בצלחת?</Text>
                 
-                {analyzedItems.map((item, index) => (
-                  <View key={index} style={styles.foodItemCard}>
-                    <View style={styles.foodItemHeader}>
-                      <Text style={styles.foodItemName}>{item.name}</Text>
-                      <Text style={styles.foodItemQuantity}>{item.quantity}</Text>
-                    </View>
-                    
-                    <View style={styles.foodItemMacros}>
-                      <View style={styles.macroItem}>
-                        <Image
-                          source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1759009803/plate-eating_1_d4pvta.webp" }}
-                          style={styles.macroIconSmall}
-                          resizeMode="contain"
-                        />
-                        <Text style={styles.macroText}>{item.calories} קל׳</Text>
+                <View style={styles.gridContainer}>
+                  {analyzedItems.map((item, index) => {
+                    const isChecked = checkedItems[index];
+                    return (
+                      <View
+                        key={index}
+                        style={[
+                          styles.foodItemCard,
+                          { opacity: isChecked ? 1 : 0.1 },
+                        ]}
+                      >
+                        <TouchableOpacity
+                          style={styles.checkboxContainer}
+                          onPress={() => toggleItemCheck(index)}
+                          activeOpacity={0.7}
+                        >
+                          <CheckCircle2
+                            size={24}
+                            color={isChecked ? colors.primary : "#CBD5E0"}
+                            strokeWidth={2}
+                            fill={isChecked ? colors.primary : "transparent"}
+                          />
+                        </TouchableOpacity>
+
+                        <View style={styles.foodItemHeader}>
+                          <Text style={styles.foodItemName}>{item.name}</Text>
+                          <Text style={styles.foodItemQuantity}>{item.quantity}</Text>
+                        </View>
+                        
+                        <View style={styles.foodItemMacros}>
+                          <View style={styles.macroItem}>
+                            <Text style={styles.calorieText}>{item.calories} קק&quot;ל</Text>
+                          </View>
+                          {item.protein > 0 && (
+                            <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('protein') }]}>
+                              <Image
+                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
+                                style={styles.macroIconSmall}
+                                resizeMode="contain"
+                              />
+                              <Text style={styles.macroTextBlack}>{formatUnit(item.protein)}</Text>
+                            </View>
+                          )}
+                          {item.carbs > 0 && (
+                            <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('carbs') }]}>
+                              <Image
+                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
+                                style={styles.macroIconSmall}
+                                resizeMode="contain"
+                              />
+                              <Text style={styles.macroTextBlack}>{formatUnit(item.carbs)}</Text>
+                            </View>
+                          )}
+                          {item.fats > 0 && (
+                            <View style={[styles.macroItemColored, { backgroundColor: getMacroColor('fats') }]}>
+                              <Image
+                                source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
+                                style={styles.macroIconSmall}
+                                resizeMode="contain"
+                              />
+                              <Text style={styles.macroTextBlack}>{formatUnit(item.fats)}</Text>
+                            </View>
+                          )}
+                        </View>
                       </View>
-                      {item.protein > 0 && (
-                        <View style={styles.macroItem}>
-                          <Image
-                            source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
-                            style={styles.macroIconSmall}
-                            resizeMode="contain"
-                          />
-                          <Text style={styles.macroText}>{formatUnit(item.protein)}</Text>
-                        </View>
-                      )}
-                      {item.carbs > 0 && (
-                        <View style={styles.macroItem}>
-                          <Image
-                            source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
-                            style={styles.macroIconSmall}
-                            resizeMode="contain"
-                          />
-                          <Text style={styles.macroText}>{formatUnit(item.carbs)}</Text>
-                        </View>
-                      )}
-                      {item.fats > 0 && (
-                        <View style={styles.macroItem}>
-                          <Image
-                            source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
-                            style={styles.macroIconSmall}
-                            resizeMode="contain"
-                          />
-                          <Text style={styles.macroText}>{formatUnit(item.fats)}</Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                ))}
+                    );
+                  })}
+                </View>
 
                 <View style={styles.actionsContainer}>
                   <TouchableOpacity
@@ -519,7 +566,7 @@ const styles = StyleSheet.create({
   },
   selectedImage: {
     width: "100%",
-    height: 300,
+    aspectRatio: 16 / 9,
     borderRadius: 16,
     backgroundColor: "#F0F0F0",
   },
@@ -562,7 +609,13 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
     color: "#2d3748",
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: 16,
+  },
+  gridContainer: {
+    flexDirection: "row-reverse" as any,
+    flexWrap: "wrap",
+    gap: 12,
+    justifyContent: "space-between",
   },
   foodItemCard: {
     backgroundColor: "#FFFFFF",
@@ -574,6 +627,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    width: "48%" as any,
+    position: "relative" as const,
+  },
+  checkboxContainer: {
+    position: "absolute" as const,
+    top: 12,
+    left: 12,
+    zIndex: 10,
+    opacity: 1,
   },
   foodItemHeader: {
     flexDirection: "row-reverse" as any,
@@ -605,6 +667,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
+  macroItemColored: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+  },
   macroIconSmall: {
     width: 20,
     height: 20,
@@ -613,6 +683,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600" as const,
     color: colors.primary,
+  },
+  macroTextBlack: {
+    fontSize: 14,
+    fontWeight: "700" as const,
+    color: "#000000",
+  },
+  calorieText: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#2d3748",
   },
   actionsContainer: {
     marginTop: 8,
