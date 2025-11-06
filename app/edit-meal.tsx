@@ -85,26 +85,50 @@ export default function EditMealScreen() {
       // Fetch food names and images
       const itemsWithNames = await Promise.all(
         (data || []).map(async (item) => {
-          const { data: foodData } = await supabase
+          console.log(`[EditMeal] Fetching food data for item ${item.id}, food_id: ${item.food_id}`);
+          
+          // Try food_bank first
+          const { data: foodData, error: foodError } = await supabase
             .from("food_bank")
-            .select("name, image_url")
+            .select("name, img_url")
             .eq("id", item.food_id)
-            .single();
+            .maybeSingle();
 
-          const { data: restaurantData } = await supabase
+          if (foodData) {
+            console.log(`[EditMeal] Found in food_bank:`, foodData.name);
+            return {
+              ...item,
+              food_name: foodData.name,
+              food_image: foodData.img_url,
+            } as DailyItem;
+          }
+
+          // If not in food_bank, try restaurant_menu_items
+          const { data: restaurantData, error: restaurantError } = await supabase
             .from("restaurant_menu_items")
             .select("name, image_url")
             .eq("id", item.food_id)
-            .single();
+            .maybeSingle();
 
+          if (restaurantData) {
+            console.log(`[EditMeal] Found in restaurant_menu_items:`, restaurantData.name);
+            return {
+              ...item,
+              food_name: restaurantData.name,
+              food_image: restaurantData.image_url,
+            } as DailyItem;
+          }
+
+          console.warn(`[EditMeal] Food not found in any table for id ${item.food_id}`);
           return {
             ...item,
-            food_name: foodData?.name || restaurantData?.name || "מוצר לא ידוע",
-            food_image: foodData?.image_url || restaurantData?.image_url,
+            food_name: "מוצר לא ידוע",
+            food_image: undefined,
           } as DailyItem;
         })
       );
 
+      console.log(`[EditMeal] Processed ${itemsWithNames.length} items with names`);
       return itemsWithNames;
     },
     enabled: !!dailyLog?.id && !!mealType,
