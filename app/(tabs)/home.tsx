@@ -253,7 +253,7 @@ export default function HomeScreen() {
         locations={[0, 0.8, 1]}
         style={StyleSheet.absoluteFill}
       />
-      <View style={styles.contentWrapper}>
+      <View style={styles.contentWrapper} pointerEvents="box-none">
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
         style={styles.scrollView}
@@ -1527,6 +1527,7 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalBackdrop: {
     position: "absolute" as const,
