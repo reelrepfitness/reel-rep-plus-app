@@ -881,6 +881,7 @@ const styles = StyleSheet.create({
   instructionText: {
     flex: 1,
     fontSize: 14,
+    fontWeight: "600" as const,
     color: "#2d3748",
     lineHeight: 20,
     textAlign: "right",
