@@ -17,7 +17,7 @@ import { useWorkoutLogs } from "@/lib/useWorkoutLogs";
 
 export default function HomeScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(formatDate(new Date()));
-  const { profile, dailyLog, isLoading, updateWater, goals, intake } = useHomeData(selectedDate);
+  const { profile, dailyLog, isLoading, isFetching, updateWater, goals, intake } = useHomeData(selectedDate);
   const { user } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -253,6 +253,13 @@ export default function HomeScreen() {
         locations={[0, 0.8, 1]}
         style={StyleSheet.absoluteFill}
       />
+      {isFetching && (
+        <View style={styles.fetchingOverlay}>
+          <View style={styles.fetchingIndicator}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        </View>
+      )}
       <View style={styles.contentWrapper} pointerEvents="box-none">
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
@@ -1722,5 +1729,26 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "400" as const,
+  },
+  fetchingOverlay: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+    justifyContent: "center",
+    alignItems: "center",
+    pointerEvents: "none",
+  },
+  fetchingIndicator: {
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
 });
