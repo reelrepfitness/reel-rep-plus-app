@@ -55,7 +55,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="profile"
+        name="home"
         options={{
           title: "",
           tabBarIcon: ({ focused, color }) => (
@@ -65,7 +65,7 @@ export default function TabLayout() {
                   <Svg width={iconSize} height={iconSize} viewBox="0 0 56 56" style={StyleSheet.absoluteFill}>
                     <Defs>
                       <RadialGradient
-                        id="activeGradient3"
+                        id="activeGradient"
                         cx="50%"
                         cy="50%"
                         r="50%"
@@ -74,11 +74,11 @@ export default function TabLayout() {
                         <Stop offset="100%" stopColor="#70eaff" stopOpacity="0" />
                       </RadialGradient>
                     </Defs>
-                    <Rect width="56" height="56" fill="url(#activeGradient3)" rx="28" />
+                    <Rect width="56" height="56" fill="url(#activeGradient)" rx="28" />
                   </Svg>
                 </View>
               )}
-              <User color={focused ? "#70eaff" : color} size={normalIconSize} />
+              <Home color={focused ? "#70eaff" : color} size={normalIconSize} fill={focused ? "#70eaff" : "none"} />
             </View>
           ),
         }}
@@ -113,7 +113,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="home"
+        name="profile"
         options={{
           title: "",
           tabBarIcon: ({ focused, color }) => (
@@ -123,7 +123,7 @@ export default function TabLayout() {
                   <Svg width={iconSize} height={iconSize} viewBox="0 0 56 56" style={StyleSheet.absoluteFill}>
                     <Defs>
                       <RadialGradient
-                        id="activeGradient"
+                        id="activeGradient3"
                         cx="50%"
                         cy="50%"
                         r="50%"
@@ -132,11 +132,11 @@ export default function TabLayout() {
                         <Stop offset="100%" stopColor="#70eaff" stopOpacity="0" />
                       </RadialGradient>
                     </Defs>
-                    <Rect width="56" height="56" fill="url(#activeGradient)" rx="28" />
+                    <Rect width="56" height="56" fill="url(#activeGradient3)" rx="28" />
                   </Svg>
                 </View>
               )}
-              <Home color={focused ? "#70eaff" : color} size={normalIconSize} fill={focused ? "#70eaff" : "none"} />
+              <User color={focused ? "#70eaff" : color} size={normalIconSize} />
             </View>
           ),
         }}
