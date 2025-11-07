@@ -9,10 +9,8 @@ import {
   Platform,
   ActivityIndicator,
   I18nManager,
-  ImageBackground,
   Image,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -24,7 +22,6 @@ I18nManager.forceRTL(true);
 I18nManager.allowRTL(true);
 
 export default function LoginScreen() {
-  const insets = useSafeAreaInsets();
   const { signIn } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -63,11 +60,11 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={{ uri: "https://images.unsplash.com/photo-1557683316-973673baf926" }}
-        style={styles.backgroundImage}
-        blurRadius={80}
-      >
+      <LinearGradient
+        colors={["#5ce1e6", "#5ce1e6", "#ffffff"]}
+        locations={[0, 0.8, 1]}
+        style={StyleSheet.absoluteFill}
+      />
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardView}
@@ -188,15 +185,11 @@ export default function LoginScreen() {
             </BlurView>
           </View>
         </KeyboardAvoidingView>
-      </ImageBackground>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-  },
   keyboardView: {
     flex: 1,
   },
@@ -419,6 +412,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#5ce1e6",
   },
 });
