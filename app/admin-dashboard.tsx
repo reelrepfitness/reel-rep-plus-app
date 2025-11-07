@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Animated, Dimensions, Pressable, Platform } from "react-native";
+import { BlurView } from "expo-blur";
 import { Stack, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/contexts/auth";
@@ -325,9 +326,22 @@ export default function AdminDashboardScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: 150 }]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerSection}>
-          <Text style={styles.welcomeText}>שלום, איוון</Text>
-          <Text style={styles.dateText}>{new Date().toLocaleDateString("he-IL", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</Text>
+        <View style={styles.headerSectionWrapper}>
+          <View style={styles.glassContainer}>
+            <View style={styles.glassOuter} />
+            <View style={styles.glassInner} />
+            <View style={styles.glassBlur} />
+            <View style={styles.glassHighlight} />
+            {Platform.OS !== 'web' ? (
+              <BlurView intensity={Platform.OS === 'ios' ? 20 : 10} style={styles.blurOverlay} />
+            ) : (
+              <View style={styles.webBlurFallback} />
+            )}
+            <View style={styles.headerSection}>
+              <Text style={styles.welcomeText}>שלום, איוון</Text>
+              <Text style={styles.dateText}>{new Date().toLocaleDateString("he-IL", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.statsGrid}>
@@ -630,20 +644,89 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
   },
-  headerSection: {
+  headerSectionWrapper: {
     marginBottom: 24,
+    alignItems: "center",
+  },
+  glassContainer: {
+    position: "relative" as const,
+    width: "100%",
+    minHeight: 84,
+    borderRadius: 42,
+    overflow: "hidden",
+  },
+  glassOuter: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(217, 217, 217, 0.5)",
+    borderRadius: 42,
+  },
+  glassInner: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(84, 84, 84, 0.1)",
+    borderRadius: 42,
+  },
+  glassBlur: {
+    position: "absolute" as const,
+    top: 6,
+    left: 5,
+    right: 5,
+    height: 72,
+    backgroundColor: "#D9D9D9",
+    borderRadius: 42,
+    opacity: 0.3,
+  },
+  glassHighlight: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 42,
+  },
+  blurOverlay: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 42,
+  },
+  webBlurFallback: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    borderRadius: 42,
+  },
+  headerSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    zIndex: 10,
   },
   welcomeText: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "700" as const,
-    color: "#2d3748",
+    color: "#1a202c",
     textAlign: "right",
     marginBottom: 4,
   },
   dateText: {
-    fontSize: 16,
-    color: "#718096",
+    fontSize: 14,
+    color: "#4a5568",
     textAlign: "right",
+    fontWeight: "500" as const,
   },
   statsGrid: {
     flexDirection: "row-reverse" as any,
