@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
@@ -16,6 +15,8 @@ import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import { useAuth } from "@/contexts/auth";
 import { Ionicons } from "@expo/vector-icons";
+import { Input } from "@/components/ui/input";
+import { Mail, Lock } from "lucide-react-native";
 
 // Enable RTL
 I18nManager.forceRTL(true);
@@ -28,7 +29,8 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const emailError = email && !email.includes('@') ? 'נא להזין כתובת אימייל תקינה' : '';
+  const passwordError = password && password.length < 6 ? 'הסיסמה חייבת להכיל לפחות 6 תווים' : '';
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -87,40 +89,23 @@ export default function LoginScreen() {
               </View>
 
               <View style={styles.fieldSection}>
-                <View style={styles.inputWrapper}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="yourname@gmail.com"
-                    placeholderTextColor="#ACB5BB"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    textAlign="right"
-                  />
-                </View>
+                <Input
+                  placeholder="yourname@gmail.com"
+                  icon={Mail}
+                  value={email}
+                  onChangeText={setEmail}
+                  error={emailError}
+                  keyboardType="email-address"
+                />
 
-                <View style={styles.inputWrapper}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="סיסמה"
-                    placeholderTextColor="#ACB5BB"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                    textAlign="right"
-                  />
-                  <TouchableOpacity 
-                    style={styles.eyeIcon}
-                    onPress={() => setShowPassword(!showPassword)}
-                  >
-                    <Ionicons 
-                      name={showPassword ? "eye" : "eye-off"} 
-                      size={16} 
-                      color="#ACB5BB" 
-                    />
-                  </TouchableOpacity>
-                </View>
+                <Input
+                  placeholder="סיסמה"
+                  icon={Lock}
+                  value={password}
+                  onChangeText={setPassword}
+                  error={passwordError}
+                  secureTextEntry
+                />
 
                 <View style={styles.forgotContainer}>
                   <TouchableOpacity>
@@ -178,7 +163,7 @@ export default function LoginScreen() {
 
               <View style={styles.signUpSection}>
                 <Text style={styles.signUpText}>אין לך חשבון?</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/register')}>
                   <Text style={styles.signUpLink}>הירשם</Text>
                 </TouchableOpacity>
               </View>
@@ -257,34 +242,7 @@ const styles = StyleSheet.create({
     gap: 16,
     zIndex: 3,
   },
-  inputWrapper: {
-    height: 46,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#EDF1F3",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    justifyContent: "center" as const,
-    shadowColor: "#E4E5E7",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.24,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  input: {
-    fontFamily: "Inter" as const,
-    fontWeight: "500" as const,
-    fontSize: 14,
-    lineHeight: 20,
-    letterSpacing: -0.14,
-    color: "#1A1C1E",
-    textAlign: "right" as const,
-  },
-  eyeIcon: {
-    position: "absolute" as const,
-    left: 14,
-    padding: 4,
-  },
+
   forgotContainer: {
     alignItems: "flex-start" as const,
   },
