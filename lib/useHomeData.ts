@@ -150,12 +150,25 @@ export function useHomeData(selectedDate?: string) {
 
       return waterGlasses;
     },
-    onSuccess: (waterGlasses) => {
-      queryClient.setQueryData(
+    onMutate: async (waterGlasses) => {
+      await queryClient.cancelQueries({ queryKey: ["dailyLog", user?.user_id, today] });
+      
+      const previousLog = queryClient.getQueryData<DailyLogData>(["dailyLog", user?.user_id, today]);
+      
+      queryClient.setQueryData<DailyLogData>(
         ["dailyLog", user?.user_id, today],
-        (old: DailyLogData | undefined) =>
-          old ? { ...old, water_glasses: waterGlasses } : undefined
+        (old) => old ? { ...old, water_glasses: waterGlasses } : old!
       );
+      
+      return { previousLog };
+    },
+    onError: (err, newWater, context) => {
+      if (context?.previousLog) {
+        queryClient.setQueryData(["dailyLog", user?.user_id, today], context.previousLog);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["dailyLog", user?.user_id, today] });
     },
   });
 
