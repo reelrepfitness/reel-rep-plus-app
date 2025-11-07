@@ -679,7 +679,7 @@ export default function MealsScreen() {
                     <View style={styles.optionIconContainer}>
                       <Barcode size={32} color={colors.primary} strokeWidth={2} />
                     </View>
-                    <Text style={styles.optionText}>סורק ברקוד</Text>
+                    <Text style={styles.optionText}>ברקוד</Text>
                   </TouchableOpacity>
                   
                   <TouchableOpacity
