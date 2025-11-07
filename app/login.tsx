@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   I18nManager,
   ImageBackground,
+  Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -29,7 +30,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [rememberMe, setRememberMe] = useState<boolean>(false);
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleLogin = async () => {
@@ -75,10 +76,13 @@ export default function LoginScreen() {
             <BlurView intensity={40} tint="light" style={styles.glassCard}>
               <View style={styles.whiteBlur} />
               
-              <LinearGradient
-                colors={["#6E8AFC", "#375DFB"]}
-                style={styles.logoGradient}
-              />
+              <View style={styles.logoContainer}>
+                <Image 
+                  source={{ uri: `https://rork.app/pa/b22ezxscydzxy6y59xv7e/logo` }}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
+              </View>
 
               <View style={styles.textSection}>
                 <Text style={styles.title}>התחברות</Text>
@@ -121,17 +125,7 @@ export default function LoginScreen() {
                   </TouchableOpacity>
                 </View>
 
-                <View style={styles.rememberForgotContainer}>
-                  <TouchableOpacity 
-                    style={styles.rememberMe}
-                    onPress={() => setRememberMe(!rememberMe)}
-                  >
-                    <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-                      {rememberMe && <View style={styles.checkboxInner} />}
-                    </View>
-                    <Text style={styles.rememberText}>זכור אותי</Text>
-                  </TouchableOpacity>
-
+                <View style={styles.forgotContainer}>
                   <TouchableOpacity>
                     <Text style={styles.forgotText}>שכחת סיסמה ?</Text>
                   </TouchableOpacity>
@@ -167,34 +161,20 @@ export default function LoginScreen() {
                   <View style={styles.orLine} />
                 </View>
 
-                <View style={styles.socialRow}>
-                  <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+                <View style={styles.socialColumn}>
+                  <TouchableOpacity style={styles.socialButtonFull} activeOpacity={0.7}>
                     <View style={styles.googleIcon}>
                       <View style={[styles.googlePart, { backgroundColor: "#4285F4", left: "50.9%", right: "6.25%", top: "42.03%", bottom: "16.85%" }]} />
                       <View style={[styles.googlePart, { backgroundColor: "#34A853", left: "11.01%", right: "19.54%", top: "58.65%", bottom: "6.25%" }]} />
                       <View style={[styles.googlePart, { backgroundColor: "#FBBC05", left: "6.25%", right: "74.5%", top: "30.15%", bottom: "30.36%" }]} />
                       <View style={[styles.googlePart, { backgroundColor: "#EB4335", left: "11.01%", right: "19.24%", top: "6.25%", bottom: "58.65%" }]} />
                     </View>
+                    <Text style={styles.socialButtonText}>התחבר עם Google</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-                    <View style={styles.facebookIcon}>
-                      <LinearGradient
-                        colors={["#0062E0", "#19AFFF"]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 0, y: 1 }}
-                        style={styles.facebookBackground}
-                      />
-                      <View style={styles.facebookF} />
-                    </View>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+                  <TouchableOpacity style={styles.socialButtonFull} activeOpacity={0.7}>
                     <Ionicons name="logo-apple" size={18} color="#000000" />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-                    <Ionicons name="phone-portrait-outline" size={18} color="#04070E" />
+                    <Text style={styles.socialButtonText}>התחבר עם Apple</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -246,12 +226,17 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     borderRadius: 160.25,
   },
-  logoGradient: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+  logoContainer: {
+    width: 60,
+    height: 60,
     alignSelf: "center" as const,
     zIndex: 1,
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+  },
+  logoImage: {
+    width: 60,
+    height: 60,
   },
   textSection: {
     gap: 12,
@@ -307,42 +292,8 @@ const styles = StyleSheet.create({
     left: 14,
     padding: 4,
   },
-  rememberForgotContainer: {
-    flexDirection: "row" as const,
-    justifyContent: "space-between" as const,
-    alignItems: "center" as const,
-  },
-  rememberMe: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    gap: 5,
-  },
-  checkbox: {
-    width: 19,
-    height: 19,
-    borderWidth: 1.5,
-    borderColor: "#6C7278",
-    borderRadius: 4,
-    justifyContent: "center" as const,
-    alignItems: "center" as const,
-  },
-  checkboxChecked: {
-    backgroundColor: "#4D81E7",
-    borderColor: "#4D81E7",
-  },
-  checkboxInner: {
-    width: 10,
-    height: 10,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 2,
-  },
-  rememberText: {
-    fontFamily: "Inter" as const,
-    fontWeight: "500" as const,
-    fontSize: 12,
-    lineHeight: 18,
-    letterSpacing: -0.12,
-    color: "#6C7278",
+  forgotContainer: {
+    alignItems: "flex-start" as const,
   },
   forgotText: {
     fontFamily: "Inter" as const,
@@ -407,12 +358,11 @@ const styles = StyleSheet.create({
     letterSpacing: -0.12,
     color: "#6C7278",
   },
-  socialRow: {
-    flexDirection: "row" as const,
+  socialColumn: {
     gap: 15,
   },
-  socialButton: {
-    flex: 1,
+  socialButtonFull: {
+    flexDirection: "row" as const,
     height: 48,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -420,11 +370,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center" as const,
     alignItems: "center" as const,
+    gap: 12,
     shadowColor: "#F4F5FA",
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
     elevation: 3,
+  },
+  socialButtonText: {
+    fontFamily: "Inter" as const,
+    fontWeight: "600" as const,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: -0.14,
+    color: "#1A1C1E",
   },
   googleIcon: {
     width: 18,
@@ -434,27 +393,7 @@ const styles = StyleSheet.create({
   googlePart: {
     position: "absolute" as const,
   },
-  facebookIcon: {
-    width: 18,
-    height: 18,
-    position: "relative" as const,
-  },
-  facebookBackground: {
-    position: "absolute" as const,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-  },
-  facebookF: {
-    position: "absolute" as const,
-    left: "29.5%",
-    right: "27.5%",
-    top: "19.5%",
-    bottom: 0,
-    backgroundColor: "#FFFFFF",
-    width: 8,
-    height: 14,
-  },
+
   signUpSection: {
     flexDirection: "row" as const,
     justifyContent: "center" as const,
