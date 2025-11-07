@@ -6,14 +6,14 @@ export default function TabLayout() {
   return (
     <NativeTabs>
       <Stack.Screen options={{ headerShown: false }} />
-      <NativeTabs.Trigger name="home">
-        <Icon sf="house.fill" />
+      <NativeTabs.Trigger name="profile">
+        <Icon sf="person.fill" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="add">
         <Icon sf="plus.app" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="profile">
-        <Icon sf="person.fill" />
+      <NativeTabs.Trigger name="home">
+        <Icon sf="house.fill" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );
