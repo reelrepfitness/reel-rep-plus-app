@@ -1,23 +1,43 @@
-import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
 import React from 'react';
+import { GlassTabBar } from '@/components/GlassTabBar';
+import { Home, PlusCircle, User } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
-    <NativeTabs>
-      <Stack.Screen options={{ headerShown: false }} />
-      <NativeTabs.Trigger name="profile">
-        <Icon sf="person.fill" />
-        <Label>פרופיל</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="add">
-        <Icon sf="plus.app" />
-        <Label>הוסף</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="home">
-        <Icon sf="house.fill" />
-        <Label>ראשי</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <Tabs
+      tabBar={(props) => <GlassTabBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: 'ראשי',
+          tabBarIcon: ({ focused, color }) => (
+            <Home size={24} color={color} strokeWidth={2.5} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="add"
+        options={{
+          title: 'הוסף',
+          tabBarIcon: ({ focused, color }) => (
+            <PlusCircle size={24} color={color} strokeWidth={2.5} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'פרופיל',
+          tabBarIcon: ({ focused, color }) => (
+            <User size={24} color={color} strokeWidth={2.5} />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }
