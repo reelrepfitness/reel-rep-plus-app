@@ -276,7 +276,7 @@ export default function MealsScreen() {
     });
   };
   
-  const handleOptionSelect = (option: 'food-bank' | 'barcode' | 'ai') => {
+  const handleOptionSelect = (option: 'food-bank' | 'barcode' | 'ai' | 'favorites') => {
     closeAddSheet();
     setTimeout(() => {
       if (option === 'food-bank') {
@@ -285,6 +285,9 @@ export default function MealsScreen() {
         router.push({ pathname: "/barcode-scanner", params: { mealType: selectedMealType || "" } });
       } else if (option === 'ai') {
         router.push({ pathname: "/ai-photo-analysis", params: { mealType: selectedMealType || "" } });
+      } else if (option === 'favorites') {
+        // TODO: Navigate to favorites screen
+        console.log('Favorites pressed');
       }
     }, 300);
   };
@@ -688,6 +691,17 @@ export default function MealsScreen() {
                       <Camera size={32} color={colors.primary} strokeWidth={2} />
                     </View>
                     <Text style={styles.optionText}>AI</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={styles.optionButton}
+                    onPress={() => handleOptionSelect('favorites')}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.optionIconContainer, styles.optionIconContainerFavorites]}>
+                      <Apple size={32} color="#FF6B6B" strokeWidth={2} />
+                    </View>
+                    <Text style={styles.optionText}>מועדפים</Text>
                   </TouchableOpacity>
                 </View>
               </Animated.View>
@@ -1242,8 +1256,8 @@ const styles = StyleSheet.create({
   },
   optionsContainer: {
     flexDirection: "row-reverse" as any,
-    justifyContent: "space-around",
-    gap: 16,
+    justifyContent: "space-between",
+    gap: 12,
   },
   optionButton: {
     flex: 1,
@@ -1259,6 +1273,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: colors.primary,
+  },
+  optionIconContainerFavorites: {
+    backgroundColor: "#FF6B6B15",
+    borderColor: "#FF6B6B",
   },
   optionText: {
     fontSize: 16,
