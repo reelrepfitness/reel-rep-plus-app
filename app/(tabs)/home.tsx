@@ -1079,7 +1079,7 @@ const styles = StyleSheet.create({
   greetingText: {
     fontSize: 24,
     fontWeight: "700" as const,
-    color: "#2d3748",
+    color: "#FFFFFF",
     marginBottom: 4,
     textAlign: "right",
   },
