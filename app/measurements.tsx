@@ -23,7 +23,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { BodyMeasurement } from "@/lib/types";
 import { LineChart } from "react-native-chart-kit";
-import Svg, { Circle, Path } from "react-native-svg";
+import { DoughnutChart } from '@/components/charts/doughnut-chart';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -224,9 +224,9 @@ export default function MeasurementsScreen() {
     ? latestMeasurement.body_fat_percentage - firstMeasurement.body_fat_percentage
     : 0;
 
-  const renderCustomPieChart = (measurement: BodyMeasurement) => {
-    const leanMass = measurement.body_fat_mass || 0;
-    const fatMass = measurement.lean_mass || 0;
+  const renderBodyCompositionChart = (measurement: BodyMeasurement) => {
+    const leanMass = measurement.lean_mass || 0;
+    const fatMass = measurement.body_fat_mass || 0;
     const total = leanMass + fatMass;
 
     if (total === 0) {
@@ -237,48 +237,25 @@ export default function MeasurementsScreen() {
       );
     }
 
-    const leanPercent = (leanMass / total) * 100;
-    const leanAngle = (leanPercent / 100) * 360;
-
     const leanColor = "#70eeff";
     const fatColor = "#091e27";
 
-    const centerX = 150;
-    const centerY = 150;
-    const radius = 120;
-
-    const endX = centerX + radius * Math.cos(((leanAngle - 90) * Math.PI) / 180);
-    const endY = centerY + radius * Math.sin(((leanAngle - 90) * Math.PI) / 180);
-
-    const largeArcFlag = leanAngle > 180 ? 1 : 0;
+    const chartData = [
+      { label: 'מסת הגוף הרזה', value: leanMass, color: leanColor },
+      { label: 'מסת שומן', value: fatMass, color: fatColor },
+    ];
 
     return (
-      <View style={styles.customPieWrapper}>
-        <Svg width="300" height="300" viewBox="0 0 300 300">
-          <Circle
-            cx="150"
-            cy="150"
-            r="120"
-            fill={fatColor}
-          />
-          {leanPercent > 0 && (
-            <Path
-              d={`M 150 150 L 150 30 A 120 120 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
-              fill={leanColor}
-            />
-          )}
-        </Svg>
-        <View style={styles.legendContainer}>
-          <View style={styles.legendRow}>
-            <View style={[styles.legendColorBox, { backgroundColor: leanColor }]} />
-            <Text style={styles.legendLabel}>מסת הגוף הרזה: {leanMass.toFixed(1)} ק״ג</Text>
-          </View>
-          <View style={styles.legendRow}>
-            <View style={[styles.legendColorBox, { backgroundColor: fatColor }]} />
-            <Text style={styles.legendLabel}>מסת שומן: {fatMass.toFixed(1)} ק״ג</Text>
-          </View>
-        </View>
-      </View>
+      <DoughnutChart
+        data={chartData}
+        config={{
+          height: 250,
+          showLabels: true,
+          animated: true,
+          duration: 1500,
+          innerRadius: 0.5,
+        }}
+      />
     );
   };
 
@@ -401,7 +378,7 @@ export default function MeasurementsScreen() {
                   <Text style={styles.cardTitle}>הרכב משקל הגוף</Text>
                 </View>
                 <View style={styles.customPieChartContainer}>
-                  {renderCustomPieChart(latestMeasurement)}
+                  {renderBodyCompositionChart(latestMeasurement)}
                 </View>
               </View>
             )}

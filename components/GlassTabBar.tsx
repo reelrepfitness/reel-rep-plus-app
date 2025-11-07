@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "500",
     textAlign: "center",
-    color: "#404040",
+    color: Platform.OS === 'ios' ? undefined : "#404040",
     zIndex: 2,
     letterSpacing: -0.1,
     ...Platform.select({
@@ -215,6 +215,6 @@ const styles = StyleSheet.create({
   },
   tabLabelActive: {
     fontWeight: "600",
-    color: "#0088FF",
+    color: Platform.OS === 'ios' ? undefined : "#0088FF",
   },
 });
