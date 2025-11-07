@@ -13,7 +13,7 @@ import {
   InputAccessoryView,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2, UtensilsCrossed, Sparkles } from "lucide-react-native";
+import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2, UtensilsCrossed, Sparkles, Heart } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -667,7 +667,7 @@ export default function MealsScreen() {
                       activeOpacity={0.7}
                     >
                       <View style={[styles.optionIconContainerLarge, styles.optionIconContainerFavorites]}>
-                        <Apple size={48} color="#FF6B6B" strokeWidth={2.5} />
+                        <Heart size={48} color="#FF6B6B" strokeWidth={2.5} />
                       </View>
                       <Text style={styles.optionTextLarge}>מועדפים</Text>
                     </TouchableOpacity>
