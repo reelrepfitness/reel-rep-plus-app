@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform, DynamicColorIOS, type ColorValue } from "react-native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -54,9 +54,17 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
               ? options.title
               : route.name;
 
+            const dynamicColor: ColorValue = Platform.OS === 'ios' 
+              ? DynamicColorIOS({ dark: 'white', light: 'black' })
+              : (isFocused ? "#0088FF" : "#404040");
+
+            const iconColor: ColorValue = Platform.OS === 'ios' 
+              ? dynamicColor
+              : (isFocused ? "#0088FF" : "#404040");
+
             const iconComponent = options.tabBarIcon?.({ 
               focused: isFocused, 
-              color: isFocused ? "#0088FF" : "#404040",
+              color: iconColor as any,
               size: 24
             });
 
@@ -81,6 +89,7 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
                 <Text 
                   style={[
                     styles.tabLabel,
+                    Platform.OS === 'ios' && { color: DynamicColorIOS({ dark: 'white', light: 'black' }) },
                     isFocused && styles.tabLabelActive
                   ]}
                   numberOfLines={1}
