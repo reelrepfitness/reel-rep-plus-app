@@ -14,14 +14,17 @@ export function GlassTabBar({ state, descriptors, navigation }: GlassTabBarProps
     <View style={styles.wrapper}>
       <View style={styles.backgroundContainer}>
         {Platform.OS !== 'web' ? (
-          <BlurView intensity={80} tint="light" style={styles.blurOuter} />
+          <BlurView intensity={100} tint="extraLight" style={styles.blurOuter} />
         ) : (
           <View style={styles.blurOuterWeb} />
         )}
         <View style={styles.mask} />
         <View style={styles.shape} />
         <View style={styles.blurInner} />
-        <LinearGradient colors={["#F7F7F7", "#F7F7F7"]} style={styles.fill} />
+        <LinearGradient 
+          colors={["rgba(255, 255, 255, 0.7)", "rgba(247, 247, 247, 0.5)"]} 
+          style={styles.fill} 
+        />
         <View style={styles.glassOverlay} />
       </View>
 
@@ -106,20 +109,20 @@ const styles = StyleSheet.create({
   },
   blurOuter: {
     position: "absolute",
-    left: -26,
-    right: -26,
-    top: -26,
-    bottom: -26,
-    opacity: 0.67,
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    borderRadius: 30,
   },
   blurOuterWeb: {
     position: "absolute",
-    left: -26,
-    right: -26,
-    top: -26,
-    bottom: -26,
-    opacity: 0.67,
-    backgroundColor: "rgba(247, 247, 247, 0.9)",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    borderRadius: 30,
   },
   mask: {
     position: "absolute",
@@ -164,10 +167,15 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.5)",
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   tabsRow: {
     flexDirection: "row",
