@@ -1043,12 +1043,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     overflow: "hidden",
     position: "relative" as const,
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(255, 255, 255, 0.43)",
     shadowColor: "rgba(13, 10, 44, 0.06)",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
     shadowRadius: 12,
     elevation: 8,
+    ...Platform.select({
+      web: {
+        backdropFilter: "blur(6.95px)",
+      } as any,
+    }),
   },
   greetingGlassEffect: {
     position: "absolute" as const,
@@ -1059,7 +1064,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     overflow: "hidden",
     zIndex: 0,
-    backgroundColor: Platform.OS === "web" ? "rgba(20, 20, 20, 0.7)" : "rgba(20, 20, 20, 0.65)",
+    backgroundColor: "rgba(255, 255, 255, 0.02)",
   },
 
   greetingHeader: {
@@ -1074,13 +1079,13 @@ const styles = StyleSheet.create({
   greetingText: {
     fontSize: 24,
     fontWeight: "700" as const,
-    color: "#FFFFFF",
+    color: "#2d3748",
     marginBottom: 4,
     textAlign: "right",
   },
   dateText: {
     fontSize: 14,
-    color: "rgba(255, 255, 255, 0.7)",
+    color: "#718096",
   },
   avatar: {
     width: 50,
@@ -1099,11 +1104,9 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   mainKpiCard: {
     borderRadius: 24,
