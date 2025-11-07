@@ -9,9 +9,11 @@ import {
   Platform,
   ActivityIndicator,
   I18nManager,
+  ImageBackground,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import { useAuth } from "@/contexts/auth";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,6 +29,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -57,372 +61,425 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <LinearGradient
-        colors={["#0D0D1B", "#1a1a2e", "#0D0D1B"]}
-        style={[styles.gradient, { paddingTop: insets.top }]}
+    <View style={styles.container}>
+      <ImageBackground
+        source={{ uri: "https://images.unsplash.com/photo-1557683316-973673baf926" }}
+        style={styles.backgroundImage}
+        blurRadius={80}
       >
-        {/* Decorative Background Elements */}
-        <View style={styles.decorativeElements}>
-          {[...Array(30)].map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.star,
-                {
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 60}%`,
-                  opacity: 0.3 + Math.random() * 0.4,
-                },
-              ]}
-            />
-          ))}
-        </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardView}
+        >
+          <View style={styles.centerContainer}>
+            <BlurView intensity={40} tint="light" style={styles.glassCard}>
+              <View style={styles.whiteBlur} />
+              
+              <LinearGradient
+                colors={["#6E8AFC", "#375DFB"]}
+                style={styles.logoGradient}
+              />
 
-        <View style={styles.contentContainer}>
-          {/* Logo/Title Section */}
-          <View style={styles.headerSection}>
-            <Text style={styles.title}>ברוך הבא</Text>
-            <Text style={styles.subtitle}>התחבר כדי להמשיך</Text>
-          </View>
-
-          {/* Form Section */}
-          <View style={styles.formSection}>
-            {/* Tabs */}
-            <View style={styles.tabContainer}>
-              <View style={styles.tabActive}>
-                <Text style={styles.tabTextActive}>כניסה</Text>
-              </View>
-              <View style={styles.tabInactive}>
-                <Text style={styles.tabTextInactive}>הרשמה</Text>
-              </View>
-            </View>
-
-            {/* Input Fields */}
-            <View style={styles.inputContainer}>
-              <View style={styles.inputWrapper}>
-                <Ionicons name="mail-outline" size={20} color="#7D7D91" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="אימייל"
-                  placeholderTextColor="#7D7D91"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  textAlign="right"
-                />
+              <View style={styles.textSection}>
+                <Text style={styles.title}>התחברות</Text>
+                <Text style={styles.subtitle}>הזן את האימייל והסיסמה שלך</Text>
               </View>
 
-              <View style={styles.inputWrapper}>
-                <Ionicons name="lock-closed-outline" size={20} color="#7D7D91" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="סיסמה"
-                  placeholderTextColor="#7D7D91"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  textAlign="right"
-                />
+              <View style={styles.fieldSection}>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="yourname@gmail.com"
+                    placeholderTextColor="#ACB5BB"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    textAlign="right"
+                  />
+                </View>
+
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="סיסמה"
+                    placeholderTextColor="#ACB5BB"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    textAlign="right"
+                  />
+                  <TouchableOpacity 
+                    style={styles.eyeIcon}
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <Ionicons 
+                      name={showPassword ? "eye" : "eye-off"} 
+                      size={16} 
+                      color="#ACB5BB" 
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.rememberForgotContainer}>
+                  <TouchableOpacity 
+                    style={styles.rememberMe}
+                    onPress={() => setRememberMe(!rememberMe)}
+                  >
+                    <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+                      {rememberMe && <View style={styles.checkboxInner} />}
+                    </View>
+                    <Text style={styles.rememberText}>זכור אותי</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <Text style={styles.forgotText}>שכחת סיסמה ?</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
               {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-              <TouchableOpacity style={styles.forgotPassword}>
-                <Text style={styles.forgotPasswordText}>שכחת סיסמה?</Text>
-              </TouchableOpacity>
-            </View>
+              <View style={styles.buttonsSection}>
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={handleLogin}
+                  disabled={loading}
+                  activeOpacity={0.8}
+                >
+                  <LinearGradient
+                    colors={["rgba(255, 255, 255, 0.12)", "rgba(255, 255, 255, 0)"]} 
+                    style={styles.loginButtonGradient}
+                  >
+                    <View style={styles.loginButtonInner}>
+                      {loading ? (
+                        <ActivityIndicator color="#FFFFFF" />
+                      ) : (
+                        <Text style={styles.loginButtonText}>התחבר</Text>
+                      )}
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
 
-            {/* Login Button */}
-            <TouchableOpacity
-              style={[styles.loginButton, loading && styles.buttonDisabled]}
-              onPress={handleLogin}
-              disabled={loading}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={["#1D61E7", "#2D6FF7"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.loginButtonGradient}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.loginButtonText}>כניסה</Text>
-                )}
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* Divider */}
-            <View style={styles.dividerContainer}>
-              <View style={styles.divider} />
-              <Text style={styles.dividerText}>או</Text>
-              <View style={styles.divider} />
-            </View>
-
-            {/* Social Login Buttons */}
-            <View style={styles.socialContainer}>
-              {/* Continue with Google */}
-              <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-                <View style={styles.socialContent}>
-                  <View style={styles.googleLogo}>
-                    <Text style={styles.googleLogoText}>G</Text>
-                  </View>
-                  <Text style={styles.socialButtonText}>המשך עם Google</Text>
+                <View style={styles.orContainer}>
+                  <View style={styles.orLine} />
+                  <Text style={styles.orText}>או התחבר עם</Text>
+                  <View style={styles.orLine} />
                 </View>
-              </TouchableOpacity>
 
-              {/* Continue with Apple */}
-              <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-                <View style={styles.socialContent}>
-                  <Ionicons name="logo-apple" size={24} color="#1A1C1E" style={styles.socialIcon} />
-                  <Text style={styles.socialButtonText}>המשך עם Apple</Text>
-                </View>
-              </TouchableOpacity>
+                <View style={styles.socialRow}>
+                  <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+                    <View style={styles.googleIcon}>
+                      <View style={[styles.googlePart, { backgroundColor: "#4285F4", left: "50.9%", right: "6.25%", top: "42.03%", bottom: "16.85%" }]} />
+                      <View style={[styles.googlePart, { backgroundColor: "#34A853", left: "11.01%", right: "19.54%", top: "58.65%", bottom: "6.25%" }]} />
+                      <View style={[styles.googlePart, { backgroundColor: "#FBBC05", left: "6.25%", right: "74.5%", top: "30.15%", bottom: "30.36%" }]} />
+                      <View style={[styles.googlePart, { backgroundColor: "#EB4335", left: "11.01%", right: "19.24%", top: "6.25%", bottom: "58.65%" }]} />
+                    </View>
+                  </TouchableOpacity>
 
-              {/* Continue with Facebook */}
-              <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-                <View style={styles.socialContent}>
-                  <View style={styles.facebookLogo}>
-                    <Text style={styles.facebookLogoText}>f</Text>
-                  </View>
-                  <Text style={styles.socialButtonText}>המשך עם Facebook</Text>
+                  <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+                    <View style={styles.facebookIcon}>
+                      <LinearGradient
+                        colors={["#0062E0", "#19AFFF"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                        style={styles.facebookBackground}
+                      />
+                      <View style={styles.facebookF} />
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+                    <Ionicons name="logo-apple" size={18} color="#000000" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
+                    <Ionicons name="phone-portrait-outline" size={18} color="#04070E" />
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
-            </View>
+              </View>
+
+              <View style={styles.signUpSection}>
+                <Text style={styles.signUpText}>אין לך חשבון?</Text>
+                <TouchableOpacity>
+                  <Text style={styles.signUpLink}>הירשם</Text>
+                </TouchableOpacity>
+              </View>
+            </BlurView>
           </View>
-        </View>
-
-        {/* Bottom Indicator */}
-        <View style={[styles.bottomIndicator, { paddingBottom: insets.bottom + 8 }]}>
-          <View style={styles.indicator} />
-        </View>
-      </LinearGradient>
-    </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0D0D1B",
-  },
-  gradient: {
+  backgroundImage: {
     flex: 1,
   },
-  decorativeElements: {
-    position: "absolute" as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  keyboardView: {
+    flex: 1,
   },
-  star: {
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+    paddingHorizontal: 16,
+  },
+  glassCard: {
+    width: 343,
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    borderWidth: 1,
+    borderColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 24,
+    gap: 24,
+    overflow: "hidden" as const,
+  },
+  whiteBlur: {
     position: "absolute" as const,
-    width: 2,
-    height: 2,
-    borderRadius: 1,
+    width: 320.5,
+    height: 320.5,
+    left: 192,
+    top: -170.5,
     backgroundColor: "#FFFFFF",
+    opacity: 0.5,
+    borderRadius: 160.25,
   },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: 24,
+  logoGradient: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignSelf: "center" as const,
+    zIndex: 1,
   },
-  headerSection: {
-    marginTop: 40,
-    marginBottom: 40,
-    alignItems: "center",
+  textSection: {
+    gap: 12,
+    alignItems: "center" as const,
+    zIndex: 2,
   },
   title: {
-    fontSize: 32,
+    fontFamily: "Inter" as const,
     fontWeight: "700" as const,
-    color: "#FFFFFF",
-    marginBottom: 8,
-    textAlign: "center",
+    fontSize: 32,
+    lineHeight: 42,
+    letterSpacing: -0.64,
+    color: "#111827",
   },
   subtitle: {
-    fontSize: 16,
-    color: "#EEEEEE",
-    opacity: 0.7,
-    textAlign: "center",
+    fontFamily: "Inter" as const,
+    fontWeight: "500" as const,
+    fontSize: 12,
+    lineHeight: 17,
+    letterSpacing: -0.12,
+    color: "#6C7278",
+    textAlign: "center" as const,
   },
-  formSection: {
-    flex: 1,
+  fieldSection: {
+    gap: 16,
+    zIndex: 3,
   },
-  tabContainer: {
-    flexDirection: "row" as const,
-    backgroundColor: "#F5F6F9",
-    borderRadius: 10,
-    padding: 4,
-    marginBottom: 24,
-  },
-  tabActive: {
-    flex: 1,
+  inputWrapper: {
+    height: 46,
     backgroundColor: "#FFFFFF",
-    borderRadius: 7,
-    paddingVertical: 12,
-    alignItems: "center",
-    shadowColor: "#000",
+    borderWidth: 1,
+    borderColor: "#EDF1F3",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    justifyContent: "center" as const,
+    shadowColor: "#E4E5E7",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.24,
     shadowRadius: 2,
     elevation: 2,
   },
-  tabInactive: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  tabTextActive: {
-    fontSize: 16,
-    fontWeight: "600" as const,
-    color: "#232447",
-  },
-  tabTextInactive: {
-    fontSize: 16,
-    fontWeight: "600" as const,
-    color: "#7D7D91",
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  inputWrapper: {
-    flexDirection: "row" as const,
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#EDF1F3",
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  inputIcon: {
-    marginLeft: 12,
-  },
   input: {
-    flex: 1,
-    paddingVertical: 16,
-    fontSize: 16,
+    fontFamily: "Inter" as const,
+    fontWeight: "500" as const,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: -0.14,
     color: "#1A1C1E",
+    textAlign: "right" as const,
+  },
+  eyeIcon: {
+    position: "absolute" as const,
+    left: 14,
+    padding: 4,
+  },
+  rememberForgotContainer: {
+    flexDirection: "row" as const,
+    justifyContent: "space-between" as const,
+    alignItems: "center" as const,
+  },
+  rememberMe: {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    gap: 5,
+  },
+  checkbox: {
+    width: 19,
+    height: 19,
+    borderWidth: 1.5,
+    borderColor: "#6C7278",
+    borderRadius: 4,
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+  },
+  checkboxChecked: {
+    backgroundColor: "#4D81E7",
+    borderColor: "#4D81E7",
+  },
+  checkboxInner: {
+    width: 10,
+    height: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 2,
+  },
+  rememberText: {
+    fontFamily: "Inter" as const,
+    fontWeight: "500" as const,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: -0.12,
+    color: "#6C7278",
+  },
+  forgotText: {
+    fontFamily: "Inter" as const,
+    fontWeight: "600" as const,
+    fontSize: 12,
+    lineHeight: 17,
+    letterSpacing: -0.12,
+    color: "#4D81E7",
   },
   errorText: {
     color: "#FF5252",
-    textAlign: "center",
-    marginBottom: 12,
-    fontSize: 14,
-  },
-  forgotPassword: {
-    alignItems: "flex-end",
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    color: "#4D81E7",
+    textAlign: "center" as const,
+    fontSize: 12,
     fontWeight: "500" as const,
   },
+  buttonsSection: {
+    gap: 24,
+    zIndex: 4,
+  },
   loginButton: {
+    height: 48,
     borderRadius: 10,
-    overflow: "hidden",
-    marginBottom: 24,
+    overflow: "hidden" as const,
   },
   loginButtonGradient: {
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
+    flex: 1,
   },
-  buttonDisabled: {
-    opacity: 0.6,
+  loginButtonInner: {
+    flex: 1,
+    backgroundColor: "#1D61E7",
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+    shadowColor: "#253EA7",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.48,
+    shadowRadius: 2,
+    elevation: 3,
   },
   loginButtonText: {
+    fontFamily: "Inter" as const,
+    fontWeight: "500" as const,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: -0.14,
     color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "700" as const,
   },
-  dividerContainer: {
+  orContainer: {
     flexDirection: "row" as const,
-    alignItems: "center",
-    marginBottom: 24,
+    alignItems: "center" as const,
+    gap: 16,
   },
-  divider: {
+  orLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#EDF1F3",
+    backgroundColor: "#FFFFFF",
   },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 14,
+  orText: {
+    fontFamily: "Inter" as const,
+    fontWeight: "400" as const,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: -0.12,
     color: "#6C7278",
   },
-  socialContainer: {
-    gap: 12,
+  socialRow: {
+    flexDirection: "row" as const,
+    gap: 15,
   },
   socialButton: {
+    flex: 1,
+    height: 48,
     backgroundColor: "#FFFFFF",
-    borderRadius: 10,
     borderWidth: 1,
     borderColor: "#EFF0F6",
-    overflow: "hidden",
-    shadowColor: "#F5F6F9",
+    borderRadius: 10,
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+    shadowColor: "#F4F5FA",
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
     elevation: 3,
   },
-  socialContent: {
+  googleIcon: {
+    width: 18,
+    height: 18,
+    position: "relative" as const,
+  },
+  googlePart: {
+    position: "absolute" as const,
+  },
+  facebookIcon: {
+    width: 18,
+    height: 18,
+    position: "relative" as const,
+  },
+  facebookBackground: {
+    position: "absolute" as const,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+  },
+  facebookF: {
+    position: "absolute" as const,
+    left: "29.5%",
+    right: "27.5%",
+    top: "19.5%",
+    bottom: 0,
+    backgroundColor: "#FFFFFF",
+    width: 8,
+    height: 14,
+  },
+  signUpSection: {
     flexDirection: "row" as const,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+    gap: 6,
+    zIndex: 5,
   },
-  socialIcon: {
-    marginLeft: 12,
+  signUpText: {
+    fontFamily: "Inter" as const,
+    fontWeight: "500" as const,
+    fontSize: 12,
+    lineHeight: 17,
+    letterSpacing: -0.12,
+    color: "#6C7278",
   },
-  googleLogo: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#4285F4",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
-  },
-  googleLogoText: {
-    fontSize: 16,
-    fontWeight: "700" as const,
-    color: "#FFFFFF",
-  },
-  facebookLogo: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#1877F2",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
-  },
-  facebookLogoText: {
-    fontSize: 18,
-    fontWeight: "700" as const,
-    color: "#FFFFFF",
-  },
-  socialButtonText: {
-    fontSize: 16,
+  signUpLink: {
+    fontFamily: "Inter" as const,
     fontWeight: "600" as const,
-    color: "#1A1C1E",
+    fontSize: 12,
+    lineHeight: 17,
+    letterSpacing: -0.12,
+    color: "#4D81E7",
   },
-  bottomIndicator: {
-    alignItems: "center",
-    paddingTop: 16,
-  },
-  indicator: {
-    width: 134,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: "#111827",
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
   },
 });
