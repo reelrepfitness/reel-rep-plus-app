@@ -13,7 +13,7 @@ import {
   InputAccessoryView,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2, UtensilsCrossed } from "lucide-react-native";
+import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2, UtensilsCrossed, Sparkles } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -659,50 +659,54 @@ export default function MealsScreen() {
                 <View style={styles.sheetHandle} />
                 <Text style={styles.sheetTitle}>הוסף מזון</Text>
                 
-                <View style={styles.optionsContainer}>
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('food-bank')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionIconContainer}>
-                      <Apple size={32} color={colors.primary} strokeWidth={2} />
-                    </View>
-                    <Text style={styles.optionText}>בנק מזון</Text>
-                  </TouchableOpacity>
+                <View style={styles.optionsGrid}>
+                  <View style={styles.optionsRow}>
+                    <TouchableOpacity
+                      style={styles.optionButtonLarge}
+                      onPress={() => handleOptionSelect('favorites')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={[styles.optionIconContainerLarge, styles.optionIconContainerFavorites]}>
+                        <Apple size={48} color="#FF6B6B" strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionTextLarge}>מועדפים</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity
+                      style={styles.optionButtonLarge}
+                      onPress={() => handleOptionSelect('food-bank')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.optionIconContainerLarge}>
+                        <Apple size={48} color={colors.primary} strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionTextLarge}>בנק מזון</Text>
+                    </TouchableOpacity>
+                  </View>
                   
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('barcode')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionIconContainer}>
-                      <Barcode size={32} color={colors.primary} strokeWidth={2} />
-                    </View>
-                    <Text style={styles.optionText}>ברקוד</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('ai')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionIconContainer}>
-                      <Camera size={32} color={colors.primary} strokeWidth={2} />
-                    </View>
-                    <Text style={styles.optionText}>AI</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('favorites')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.optionIconContainer, styles.optionIconContainerFavorites]}>
-                      <Apple size={32} color="#FF6B6B" strokeWidth={2} />
-                    </View>
-                    <Text style={styles.optionText}>מועדפים</Text>
-                  </TouchableOpacity>
+                  <View style={styles.optionsRow}>
+                    <TouchableOpacity
+                      style={styles.optionButtonLarge}
+                      onPress={() => handleOptionSelect('ai')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.optionIconContainerLarge}>
+                        <Sparkles size={48} color={colors.primary} strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionTextLarge}>AI</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity
+                      style={styles.optionButtonLarge}
+                      onPress={() => handleOptionSelect('barcode')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.optionIconContainerLarge}>
+                        <Barcode size={48} color={colors.primary} strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionTextLarge}>ברקוד</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </Animated.View>
             </TouchableOpacity>
@@ -1231,7 +1235,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
-    paddingBottom: 40,
+    paddingBottom: 48,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.3,
@@ -1259,10 +1263,22 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 12,
   },
+  optionsGrid: {
+    gap: 16,
+  },
+  optionsRow: {
+    flexDirection: "row-reverse" as any,
+    gap: 16,
+  },
   optionButton: {
     flex: 1,
     alignItems: "center",
     gap: 12,
+  },
+  optionButtonLarge: {
+    flex: 1,
+    alignItems: "center",
+    gap: 16,
   },
   optionIconContainer: {
     width: 80,
@@ -1274,6 +1290,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.primary,
   },
+  optionIconContainerLarge: {
+    width: 120,
+    height: 120,
+    borderRadius: 24,
+    backgroundColor: `${colors.primary}15`,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: colors.primary,
+  },
   optionIconContainerFavorites: {
     backgroundColor: "#FF6B6B15",
     borderColor: "#FF6B6B",
@@ -1281,6 +1307,12 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     fontWeight: "600" as const,
+    color: "#2d3748",
+    textAlign: "center",
+  },
+  optionTextLarge: {
+    fontSize: 20,
+    fontWeight: "700" as const,
     color: "#2d3748",
     textAlign: "center",
   },
