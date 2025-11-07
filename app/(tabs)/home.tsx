@@ -17,7 +17,7 @@ import { useWorkoutLogs } from "@/lib/useWorkoutLogs";
 
 export default function HomeScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(formatDate(new Date()));
-  const { profile, dailyLog, isLoading, isFetching, updateWater, goals, intake } = useHomeData(selectedDate);
+  const { profile, dailyLog, isLoading, isFetching, updateWater, isUpdatingWater, goals, intake } = useHomeData(selectedDate);
   const { user } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -253,7 +253,7 @@ export default function HomeScreen() {
         locations={[0, 0.8, 1]}
         style={StyleSheet.absoluteFill}
       />
-      {isFetching && (
+      {isFetching && !isUpdatingWater && (
         <View style={styles.fetchingOverlay}>
           <View style={styles.fetchingIndicator}>
             <ActivityIndicator size="large" color={colors.primary} />

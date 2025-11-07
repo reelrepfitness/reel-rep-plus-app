@@ -235,6 +235,7 @@ export function useHomeData(selectedDate?: string) {
     dailyLog: dailyLogQuery.data,
     isLoading: profileQuery.isLoading || dailyLogQuery.isLoading,
     isFetching: dailyLogQuery.isFetching,
+    isUpdatingWater: updateWaterMutation.isPending,
     updateWater: updateWaterMutation.mutate,
     updateActivity: updateActivityMutation.mutate,
     goals: {
