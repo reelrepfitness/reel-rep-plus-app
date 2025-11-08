@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
 import { useMemo } from "react";
-import { User, TrendingUp, Scale, Weight, Percent, Edit } from "lucide-react-native";
+import { User, TrendingUp, Scale, Weight, Percent, Edit, UtensilsCrossed } from "lucide-react-native";
 import { LineChart } from "react-native-chart-kit";
 import Svg, { Circle, Path } from "react-native-svg";
 import { BodyMeasurement } from "@/lib/types";
@@ -389,6 +389,18 @@ export default function UserDashboardScreen() {
             <Text style={styles.updateButtonText}>ביצוע שינויים</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={[styles.updateButton, styles.mealPlanButton]}
+          onPress={() => router.push({
+            pathname: "/admin-build-meal-plan",
+            params: { userId, userName }
+          })}
+          activeOpacity={0.8}
+        >
+          <UtensilsCrossed color="#FFFFFF" size={24} />
+          <Text style={styles.updateButtonText}>בניית תפריט</Text>
+        </TouchableOpacity>
 
         {data?.measurements && data.measurements.length > 0 && (
           <>
@@ -937,6 +949,9 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: "#FFD700",
+  },
+  mealPlanButton: {
+    backgroundColor: "#FF6B6B",
   },
   updateButtonText: {
     color: "#FFFFFF",

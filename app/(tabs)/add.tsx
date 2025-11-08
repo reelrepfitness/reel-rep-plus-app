@@ -112,7 +112,13 @@ export default function MealsScreen() {
     });
   }, [dailyLog, macroFlashAnimations, confettiAnimations]);
   
-  const hasMealPlan = user?.["meal_plan?"] === true || user?.meal_plan === true;
+  const hasMealPlan = user?.["meal_plan?"] === true || (user as any)?.meal_plan === true;
+  
+  console.log('[MealPlan] User meal plan status:', { 
+    'meal_plan?': user?.["meal_plan?"], 
+    'meal_plan': (user as any)?.meal_plan,
+    hasMealPlan 
+  });
 
   const mealNames = {
     breakfast: "ארוחת בוקר",
