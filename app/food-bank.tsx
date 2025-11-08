@@ -204,6 +204,10 @@ export default function FoodBankScreen() {
   const subCategories = useMemo(() => {
     if (!selectedMainCategory) return [];
     
+    if (selectedMainCategory === "מסעדות") {
+      return restaurants.map(r => r.name);
+    }
+    
     if (selectedMainCategory === "אלכוהול") {
       const subs = new Set(
         alcoholItems
@@ -219,7 +223,7 @@ export default function FoodBankScreen() {
         .map(item => item.sub_category)
     );
     return Array.from(subs).filter(Boolean) as string[];
-  }, [foodItems, alcoholItems, selectedMainCategory]);
+  }, [foodItems, alcoholItems, selectedMainCategory, restaurants]);
 
   const filteredItems = useMemo(() => {
     if (selectedMainCategory === "מסעדות" || selectedMainCategory === "אלכוהול") {
@@ -270,13 +274,19 @@ export default function FoodBankScreen() {
   const filteredRestaurants = useMemo(() => {
     if (selectedMainCategory !== "מסעדות") return [];
     
+    let filtered = restaurants;
+
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      return restaurants.filter(r => r.name.toLowerCase().includes(query));
+      filtered = filtered.filter(r => r.name.toLowerCase().includes(query));
+    }
+
+    if (selectedSubCategory) {
+      filtered = filtered.filter(r => r.name === selectedSubCategory);
     }
     
-    return restaurants;
-  }, [restaurants, selectedMainCategory, searchQuery]);
+    return filtered;
+  }, [restaurants, selectedMainCategory, searchQuery, selectedSubCategory]);
 
   const showRestaurantsList = selectedMainCategory === "מסעדות";
   const showAlcoholList = selectedMainCategory === "אלכוהול";
@@ -441,16 +451,27 @@ export default function FoodBankScreen() {
   };
 
   const handleSubCategoryPress = (subCategory: string) => {
-    if (selectedSubCategory === subCategory) {
-      setSelectedSubCategory(null);
+    if (selectedMainCategory === "מסעדות") {
+      const restaurant = restaurants.find(r => r.name === subCategory);
+      if (restaurant) {
+        handleRestaurantPress(restaurant);
+      }
     } else {
-      setSelectedSubCategory(subCategory);
+      if (selectedSubCategory === subCategory) {
+        setSelectedSubCategory(null);
+      } else {
+        setSelectedSubCategory(subCategory);
+      }
     }
   };
 
   const getSubCategoryIcon = (subCategory: string) => {
     const iconColor = selectedSubCategory === subCategory ? "#FFFFFF" : "#2d3748";
     const iconSize = 16;
+    
+    if (selectedMainCategory === "מסעדות") {
+      return null;
+    }
     
     switch (subCategory.toLowerCase()) {
       case "בשר בקר":
@@ -963,7 +984,7 @@ export default function FoodBankScreen() {
               </ScrollView>
             </View>
 
-            {subCategories.length > 0 && (
+            {subCategories.length > 0 && selectedMainCategory !== "מסעדות" && (
               <View style={styles.subCategoriesCard}>
                 <ScrollView
                   horizontal
@@ -984,9 +1005,11 @@ export default function FoodBankScreen() {
                         activeOpacity={0.7}
                       >
                         <View style={styles.subCategoryContent}>
-                          <View style={styles.subCategoryIconWrapper}>
-                            {subCategoryIcon}
-                          </View>
+                          {subCategoryIcon && (
+                            <View style={styles.subCategoryIconWrapper}>
+                              {subCategoryIcon}
+                            </View>
+                          )}
                           <Text
                             style={[
                               styles.subCategoryText,
@@ -1128,19 +1151,21 @@ export default function FoodBankScreen() {
                   onPress={() => handleRestaurantPress(restaurant)}
                   activeOpacity={0.8}
                 >
-                  {restaurant.img_url ? (
-                    <Image
-                      source={{ uri: restaurant.img_url }}
-                      style={styles.foodImage}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={styles.foodImagePlaceholder}>
-                      <Text style={styles.foodImagePlaceholderText}>
-                        {restaurant.name.charAt(0)}
-                      </Text>
-                    </View>
-                  )}
+                  <View style={styles.foodImageContainer}>
+                    {restaurant.img_url ? (
+                      <Image
+                        source={{ uri: restaurant.img_url }}
+                        style={styles.foodImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.foodImagePlaceholder}>
+                        <Text style={styles.foodImagePlaceholderText}>
+                          {restaurant.name.charAt(0)}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
 
                   <View style={styles.foodInfo}>
                     <Text style={styles.foodName} numberOfLines={2}>
