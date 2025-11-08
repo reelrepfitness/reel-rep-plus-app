@@ -279,28 +279,30 @@ export default function UserDashboardScreen() {
                   const strokeDashoffset = circumference - (circumference * progress);
 
                   return (
-                    <Svg width={size} height={size}>
-                      <Circle
-                        cx={size / 2}
-                        cy={size / 2}
-                        r={radius}
-                        stroke="#E0E0E0"
-                        strokeWidth={strokeWidth}
-                        fill="none"
-                      />
-                      <Circle
-                        cx={size / 2}
-                        cy={size / 2}
-                        r={radius}
-                        stroke={colors.primary}
-                        strokeWidth={strokeWidth}
-                        fill="none"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={strokeDashoffset}
-                        strokeLinecap="round"
-                        rotation="-90"
-                        origin={`${size / 2}, ${size / 2}`}
-                      />
+                    <View style={{ width: size, height: size }}>
+                      <Svg width={size} height={size} style={{ position: 'absolute' }}>
+                        <Circle
+                          cx={size / 2}
+                          cy={size / 2}
+                          r={radius}
+                          stroke="#E0E0E0"
+                          strokeWidth={strokeWidth}
+                          fill="none"
+                        />
+                        <Circle
+                          cx={size / 2}
+                          cy={size / 2}
+                          r={radius}
+                          stroke={colors.primary}
+                          strokeWidth={strokeWidth}
+                          fill="none"
+                          strokeDasharray={circumference}
+                          strokeDashoffset={strokeDashoffset}
+                          strokeLinecap="round"
+                          rotation="-90"
+                          origin={`${size / 2}, ${size / 2}`}
+                        />
+                      </Svg>
                       <View style={styles.progressTextContainer}>
                         <Image
                           source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1762354881/dumbbell-weightlifting_1_e7zyth.webp" }}
@@ -311,7 +313,7 @@ export default function UserDashboardScreen() {
                           {data?.workoutData?.totalStrengthWorkouts || 0}/{data?.workoutData?.weeklyStrengthGoal || 0}
                         </Text>
                       </View>
-                    </Svg>
+                    </View>
                   );
                 })()}
               </View>
@@ -333,28 +335,30 @@ export default function UserDashboardScreen() {
                   const strokeDashoffset = circumference - (circumference * progress);
 
                   return (
-                    <Svg width={size} height={size}>
-                      <Circle
-                        cx={size / 2}
-                        cy={size / 2}
-                        r={radius}
-                        stroke="#E0E0E0"
-                        strokeWidth={strokeWidth}
-                        fill="none"
-                      />
-                      <Circle
-                        cx={size / 2}
-                        cy={size / 2}
-                        r={radius}
-                        stroke={"#FF6B6B"}
-                        strokeWidth={strokeWidth}
-                        fill="none"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={strokeDashoffset}
-                        strokeLinecap="round"
-                        rotation="-90"
-                        origin={`${size / 2}, ${size / 2}`}
-                      />
+                    <View style={{ width: size, height: size }}>
+                      <Svg width={size} height={size} style={{ position: 'absolute' }}>
+                        <Circle
+                          cx={size / 2}
+                          cy={size / 2}
+                          r={radius}
+                          stroke="#E0E0E0"
+                          strokeWidth={strokeWidth}
+                          fill="none"
+                        />
+                        <Circle
+                          cx={size / 2}
+                          cy={size / 2}
+                          r={radius}
+                          stroke={"#FF6B6B"}
+                          strokeWidth={strokeWidth}
+                          fill="none"
+                          strokeDasharray={circumference}
+                          strokeDashoffset={strokeDashoffset}
+                          strokeLinecap="round"
+                          rotation="-90"
+                          origin={`${size / 2}, ${size / 2}`}
+                        />
+                      </Svg>
                       <View style={styles.progressTextContainer}>
                         <Image
                           source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1762355479/treadmill_8_ikxtks.webp" }}
@@ -365,7 +369,7 @@ export default function UserDashboardScreen() {
                           {data?.workoutData?.totalCardioMinutes || 0}/{data?.workoutData?.weeklyCardioGoal || 0}
                         </Text>
                       </View>
-                    </Svg>
+                    </View>
                   );
                 })()}
               </View>
