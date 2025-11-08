@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { I18nManager, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "@/contexts/auth";
+import { ToastProvider } from "@/components/ui/toast";
 import * as Updates from "expo-updates";
 
 if (!I18nManager.isRTL && Platform.OS !== "web") {
@@ -38,9 +39,11 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <RootLayoutNav />
-        </GestureHandlerRootView>
+        <ToastProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <RootLayoutNav />
+          </GestureHandlerRootView>
+        </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

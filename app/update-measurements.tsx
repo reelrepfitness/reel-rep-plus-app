@@ -29,6 +29,7 @@ import {
 } from "lucide-react-native";
 import { DatePicker } from '@/components/ui/date-picker';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from '@/components/ui/toast';
 
 type MeasurementData = {
   bodyWeight: string;
@@ -48,6 +49,7 @@ export default function UpdateMeasurementsScreen() {
   const { userId, userName } = useLocalSearchParams<{ userId: string; userName: string }>();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   const { data: userProfile } = useQuery({
     queryKey: ["user-profile", userId],
@@ -245,6 +247,24 @@ export default function UpdateMeasurementsScreen() {
     onSuccess: () => {
       console.log("[UpdateMeasurements] Measurements updated successfully");
       queryClient.invalidateQueries({ queryKey: ["user-calories-7days", userId] });
+      queryClient.invalidateQueries({ queryKey: ["previous-measurements", userId] });
+      
+      toast({
+        title: 'מדידות עודכנו בהצלחה!',
+        description: 'המדידות החדשות נשמרו במערכת',
+        variant: 'success',
+        duration: 6000,
+        action: {
+          label: 'צפה במדידות',
+          onPress: () => {
+            router.push({
+              pathname: '/admin-client-measurements',
+              params: { userId, userName }
+            });
+          },
+        },
+      });
+      
       setSubmitted(true);
       setTimeout(() => {
         router.back();
