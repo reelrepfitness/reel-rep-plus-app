@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Dimensions,
   Modal,
   TextInput,
   Pressable,
@@ -22,10 +21,8 @@ import { useAuth } from "@/contexts/auth";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { BodyMeasurement } from "@/lib/types";
-import { LineChart } from "react-native-chart-kit";
 import { DoughnutChart } from '@/components/charts/doughnut-chart';
-
-const screenWidth = Dimensions.get("window").width;
+import { AreaChart } from '@/components/charts/area-chart';
 
 export default function MeasurementsScreen() {
   const { user } = useAuth();
@@ -104,117 +101,67 @@ export default function MeasurementsScreen() {
 
   const latestMeasurement = measurements[measurements.length - 1];
 
-  const waistData = {
-    labels: measurements.slice(-6).map((m) => {
+  const waistData = measurements
+    .slice(-6)
+    .map((m) => {
       const date = new Date(m.measurement_date);
-      return `${date.getDate()}/${date.getMonth() + 1}`;
-    }),
-    datasets: [
-      {
-        data:
-          measurements
-            .slice(-6)
-            .map((m) => m.waist_circumference || 0)
-            .filter((v) => v > 0).length > 0
-            ? measurements
-                .slice(-6)
-                .map((m) => m.waist_circumference || 0)
-            : [0],
-        color: () => "#4ECDC4",
-        strokeWidth: 3,
-      },
-    ],
-  };
+      return {
+        x: `${date.getDate()}/${date.getMonth() + 1}`,
+        y: m.waist_circumference || 0,
+        label: `${date.getDate()}/${date.getMonth() + 1}`,
+      };
+    })
+    .filter((d) => d.y > 0);
 
-  const armData = {
-    labels: measurements.slice(-6).map((m) => {
+  const armData = measurements
+    .slice(-6)
+    .map((m) => {
       const date = new Date(m.measurement_date);
-      return `${date.getDate()}/${date.getMonth() + 1}`;
-    }),
-    datasets: [
-      {
-        data:
-          measurements
-            .slice(-6)
-            .map((m) => m.arm_circumference || 0)
-            .filter((v) => v > 0).length > 0
-            ? measurements
-                .slice(-6)
-                .map((m) => m.arm_circumference || 0)
-            : [0],
-        color: () => "#FFD93D",
-        strokeWidth: 3,
-      },
-    ],
-  };
+      return {
+        x: `${date.getDate()}/${date.getMonth() + 1}`,
+        y: m.arm_circumference || 0,
+        label: `${date.getDate()}/${date.getMonth() + 1}`,
+      };
+    })
+    .filter((d) => d.y > 0);
 
-  const thighData = {
-    labels: measurements.slice(-6).map((m) => {
+  const thighData = measurements
+    .slice(-6)
+    .map((m) => {
       const date = new Date(m.measurement_date);
-      return `${date.getDate()}/${date.getMonth() + 1}`;
-    }),
-    datasets: [
-      {
-        data:
-          measurements
-            .slice(-6)
-            .map((m) => m.thigh_circumference || 0)
-            .filter((v) => v > 0).length > 0
-            ? measurements
-                .slice(-6)
-                .map((m) => m.thigh_circumference || 0)
-            : [0],
-        color: () => "#6BCB77",
-        strokeWidth: 3,
-      },
-    ],
-  };
+      return {
+        x: `${date.getDate()}/${date.getMonth() + 1}`,
+        y: m.thigh_circumference || 0,
+        label: `${date.getDate()}/${date.getMonth() + 1}`,
+      };
+    })
+    .filter((d) => d.y > 0);
 
 
 
-  const bodyWeightData = {
-    labels: measurements.slice(-6).map((m) => {
+  const bodyWeightData = measurements
+    .slice(-6)
+    .map((m) => {
       const date = new Date(m.measurement_date);
-      return `${date.getDate()}/${date.getMonth() + 1}`;
-    }),
-    datasets: [
-      {
-        data:
-          measurements
-            .slice(-6)
-            .map((m) => m.body_weight || 0)
-            .filter((v) => v > 0).length > 0
-            ? measurements
-                .slice(-6)
-                .map((m) => m.body_weight || 0)
-            : [0],
-        color: () => colors.primary,
-        strokeWidth: 3,
-      },
-    ],
-  };
+      return {
+        x: `${date.getDate()}/${date.getMonth() + 1}`,
+        y: m.body_weight || 0,
+        label: `${date.getDate()}/${date.getMonth() + 1}`,
+      };
+    })
+    .filter((d) => d.y > 0);
 
-  const bodyFatData = {
-    labels: measurements.slice(-6).map((m) => {
+  const bodyFatData = measurements
+    .slice(-6)
+    .map((m) => {
       const date = new Date(m.measurement_date);
-      return `${date.getDate()}/${date.getMonth() + 1}`;
-    }),
-    datasets: [
-      {
-        data:
-          measurements
-            .slice(-6)
-            .map((m) => m.body_fat_percentage || 0)
-            .filter((v) => v > 0).length > 0
-            ? measurements
-                .slice(-6)
-                .map((m) => m.body_fat_percentage || 0)
-            : [0],
-        color: () => colors.primary,
-        strokeWidth: 3,
-      },
-    ],
-  };
+      return {
+        x: `${date.getDate()}/${date.getMonth() + 1}`,
+        y: m.body_fat_percentage || 0,
+        label: `${date.getDate()}/${date.getMonth() + 1}`,
+      };
+    })
+    .filter((d) => d.y > 0);
 
   const firstMeasurement = measurements[0];
   const weightChange = latestMeasurement && firstMeasurement && latestMeasurement.body_weight && firstMeasurement.body_weight
@@ -257,23 +204,6 @@ export default function MeasurementsScreen() {
         }}
       />
     );
-  };
-
-  const chartConfig = {
-    backgroundColor: "#ffffff",
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#ffffff",
-    decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(63, 205, 209, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(51, 51, 51, ${opacity})`,
-    style: {
-      borderRadius: 16,
-    },
-    propsForDots: {
-      r: "4",
-      strokeWidth: "2",
-      stroke: colors.primary,
-    },
   };
 
   if (loading) {
@@ -389,63 +319,51 @@ export default function MeasurementsScreen() {
                 <Text style={styles.cardTitle}>היקפים (ס״מ)</Text>
               </View>
               
-              {measurements.some((m) => m.waist_circumference) && (
+              {measurements.some((m) => m.waist_circumference) && waistData.length > 0 && (
                 <View style={styles.individualChartContainer}>
                   <Text style={styles.individualChartTitle}>מותניים</Text>
-                  {waistData.labels.length > 0 && (
-                    <LineChart
-                      data={waistData}
-                      width={screenWidth - 64}
-                      height={180}
-                      chartConfig={chartConfig}
-                      bezier
-                      style={styles.chartNoBg}
-                      withInnerLines={false}
-                      withOuterLines={true}
-                      withVerticalLines={false}
-                      withHorizontalLines={true}
-                    />
-                  )}
+                  <AreaChart
+                    data={waistData}
+                    config={{
+                      height: 200,
+                      showGrid: true,
+                      showLabels: true,
+                      animated: true,
+                      color: "#4ECDC4",
+                    }}
+                  />
                 </View>
               )}
 
-              {measurements.some((m) => m.arm_circumference) && (
+              {measurements.some((m) => m.arm_circumference) && armData.length > 0 && (
                 <View style={styles.individualChartContainer}>
                   <Text style={styles.individualChartTitle}>יד</Text>
-                  {armData.labels.length > 0 && (
-                    <LineChart
-                      data={armData}
-                      width={screenWidth - 64}
-                      height={180}
-                      chartConfig={chartConfig}
-                      bezier
-                      style={styles.chartNoBg}
-                      withInnerLines={false}
-                      withOuterLines={true}
-                      withVerticalLines={false}
-                      withHorizontalLines={true}
-                    />
-                  )}
+                  <AreaChart
+                    data={armData}
+                    config={{
+                      height: 200,
+                      showGrid: true,
+                      showLabels: true,
+                      animated: true,
+                      color: "#FFD93D",
+                    }}
+                  />
                 </View>
               )}
 
-              {measurements.some((m) => m.thigh_circumference) && (
+              {measurements.some((m) => m.thigh_circumference) && thighData.length > 0 && (
                 <View style={styles.individualChartContainer}>
                   <Text style={styles.individualChartTitle}>ירך</Text>
-                  {thighData.labels.length > 0 && (
-                    <LineChart
-                      data={thighData}
-                      width={screenWidth - 64}
-                      height={180}
-                      chartConfig={chartConfig}
-                      bezier
-                      style={styles.chartNoBg}
-                      withInnerLines={false}
-                      withOuterLines={true}
-                      withVerticalLines={false}
-                      withHorizontalLines={true}
-                    />
-                  )}
+                  <AreaChart
+                    data={thighData}
+                    config={{
+                      height: 200,
+                      showGrid: true,
+                      showLabels: true,
+                      animated: true,
+                      color: "#6BCB77",
+                    }}
+                  />
                 </View>
               )}
             </View>
@@ -480,22 +398,18 @@ export default function MeasurementsScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} style={styles.sheetContent}>
-              {measurements.some((m) => m.body_weight) && (
+              {measurements.some((m) => m.body_weight) && bodyWeightData.length > 0 && (
                 <View>
-                  {bodyWeightData.labels.length > 0 && (
-                    <LineChart
-                      data={bodyWeightData}
-                      width={screenWidth - 64}
-                      height={220}
-                      chartConfig={chartConfig}
-                      bezier
-                      style={styles.chart}
-                      withInnerLines={false}
-                      withOuterLines={true}
-                      withVerticalLines={false}
-                      withHorizontalLines={true}
-                    />
-                  )}
+                  <AreaChart
+                    data={bodyWeightData}
+                    config={{
+                      height: 220,
+                      showGrid: true,
+                      showLabels: true,
+                      animated: true,
+                      color: colors.primary,
+                    }}
+                  />
                   {weightChange !== 0 && (
                     <View style={styles.progressText}>
                       <Text style={styles.progressLabel}>
@@ -574,22 +488,18 @@ export default function MeasurementsScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} style={styles.sheetContent}>
-              {measurements.some((m) => m.body_fat_percentage) && (
+              {measurements.some((m) => m.body_fat_percentage) && bodyFatData.length > 0 && (
                 <View>
-                  {bodyFatData.labels.length > 0 && (
-                    <LineChart
-                      data={bodyFatData}
-                      width={screenWidth - 64}
-                      height={220}
-                      chartConfig={chartConfig}
-                      bezier
-                      style={styles.chart}
-                      withInnerLines={false}
-                      withOuterLines={true}
-                      withVerticalLines={false}
-                      withHorizontalLines={true}
-                    />
-                  )}
+                  <AreaChart
+                    data={bodyFatData}
+                    config={{
+                      height: 220,
+                      showGrid: true,
+                      showLabels: true,
+                      animated: true,
+                      color: colors.primary,
+                    }}
+                  />
                   {bodyFatChange !== 0 && (
                     <View style={styles.progressText}>
                       <Text style={styles.progressLabel}>
