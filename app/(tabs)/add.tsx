@@ -284,7 +284,7 @@ export default function MealsScreen() {
       if (option === 'food-bank') {
         router.push({ pathname: "/food-bank", params: { mealType: selectedMealType || "" } });
       } else if (option === 'barcode') {
-        router.push({ pathname: "/barcode-scanner", params: { mealType: selectedMealType || "" } });
+        router.push({ pathname: "/barcode", params: { mealType: selectedMealType || "" } });
       } else if (option === 'ai') {
         router.push({ pathname: "/ai-photo-analysis", params: { mealType: selectedMealType || "" } });
       } else if (option === 'favorites') {
