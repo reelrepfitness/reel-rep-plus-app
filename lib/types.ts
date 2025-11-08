@@ -29,6 +29,7 @@ export interface User {
   food_limitations?: string | null;
   users_notes?: string | null;
   meal_plan?: boolean | null;
+  "meal_plan?"?: boolean | null;
   created_at: string;
   updated_at: string;
 }
