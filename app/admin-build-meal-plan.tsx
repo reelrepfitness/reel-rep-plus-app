@@ -285,6 +285,24 @@ export default function AdminBuildMealPlanScreen() {
     );
   };
 
+  const calculateRMR = (gender: string | null | undefined, age: string | null | undefined, height: number | null | undefined, weight: number | null | undefined) => {
+    if (!gender || !age || !height || !weight) return null;
+
+    const ageNum = parseInt(age, 10);
+    if (isNaN(ageNum)) return null;
+
+    let rmr = 0;
+    if (gender === "male") {
+      rmr = (10 * weight) + (6.25 * height) - (5 * ageNum) + 5;
+    } else if (gender === "female") {
+      rmr = (10 * weight) + (6.25 * height) - (5 * ageNum) - 161;
+    } else {
+      return null;
+    }
+
+    return Math.round(rmr);
+  };
+
   const renderMacroCard = (label: string, goal: number, current: number, color: string) => {
     const remaining = goal - current;
     const percentage = goal > 0 ? Math.min((current / goal) * 100, 100) : 0;
@@ -360,6 +378,45 @@ export default function AdminBuildMealPlanScreen() {
           contentContainerStyle={[styles.content, { paddingBottom: 100 }]}
           showsVerticalScrollIndicator={false}
         >
+          {userProfile && calculateRMR(userProfile.gender, userProfile.age, userProfile.height, userProfile.body_weight) && (
+            <View style={styles.rmrCard}>
+              <View style={styles.rmrCardHeader}>
+                <Text style={styles.rmrCardTitle}>RMR - קצב חילוף חומרים במנוחה</Text>
+              </View>
+              <View style={styles.rmrCardBody}>
+                <View style={styles.rmrValueContainer}>
+                  <Text style={styles.rmrValue}>
+                    {calculateRMR(userProfile.gender, userProfile.age, userProfile.height, userProfile.body_weight)}
+                  </Text>
+                  <Text style={styles.rmrUnit}>קק"ל</Text>
+                </View>
+                <View style={styles.rmrDetails}>
+                  <View style={styles.rmrDetailRow}>
+                    <Text style={styles.rmrDetailValue}>{userProfile.body_weight} ק"ג</Text>
+                    <Text style={styles.rmrDetailLabel}>משקל:</Text>
+                  </View>
+                  <View style={styles.rmrDetailRow}>
+                    <Text style={styles.rmrDetailValue}>{userProfile.height} ס"מ</Text>
+                    <Text style={styles.rmrDetailLabel}>גובה:</Text>
+                  </View>
+                  <View style={styles.rmrDetailRow}>
+                    <Text style={styles.rmrDetailValue}>{userProfile.age}</Text>
+                    <Text style={styles.rmrDetailLabel}>גיל:</Text>
+                  </View>
+                  <View style={styles.rmrDetailRow}>
+                    <Text style={styles.rmrDetailValue}>{userProfile.gender === "male" ? "זכר" : "נקבה"}</Text>
+                    <Text style={styles.rmrDetailLabel}>מגדר:</Text>
+                  </View>
+                </View>
+              </View>
+              <View style={styles.rmrFooter}>
+                <Text style={styles.rmrFooterText}>חישוב לפי נוסחת Mifflin-St Jeor</Text>
+              </View>
+            </View>
+          )}
+
+          <Text style={styles.sectionHeader}>יעדים תזונתיים</Text>
+
           {userProfile && (
             <View style={styles.macroCardsWrapper}>
               <ScrollView
@@ -1291,5 +1348,87 @@ const styles = StyleSheet.create({
   macroCardRemainingLabel: {
     fontSize: 12,
     color: "rgba(255, 255, 255, 0.7)",
+  },
+  rmrCard: {
+    backgroundColor: "#0A0A0A",
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: "#FF6B35",
+    shadowColor: "#FF6B35",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  rmrCardHeader: {
+    marginBottom: 20,
+  },
+  rmrCardTitle: {
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: "#FF6B35",
+    textAlign: "right",
+  },
+  rmrCardBody: {
+    gap: 16,
+  },
+  rmrValueContainer: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "baseline",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.1)",
+  },
+  rmrValue: {
+    fontSize: 48,
+    fontWeight: "800" as const,
+    color: "#FFFFFF",
+  },
+  rmrUnit: {
+    fontSize: 20,
+    fontWeight: "600" as const,
+    color: "rgba(255, 255, 255, 0.7)",
+  },
+  rmrDetails: {
+    gap: 8,
+  },
+  rmrDetailRow: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 6,
+  },
+  rmrDetailLabel: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "rgba(255, 255, 255, 0.8)",
+  },
+  rmrDetailValue: {
+    fontSize: 14,
+    fontWeight: "500" as const,
+    color: "#FFFFFF",
+  },
+  rmrFooter: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255, 255, 255, 0.1)",
+  },
+  rmrFooterText: {
+    fontSize: 11,
+    color: "rgba(255, 255, 255, 0.5)",
+    textAlign: "center",
+    fontStyle: "italic" as const,
+  },
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+    textAlign: "right",
+    marginBottom: 16,
   },
 });
