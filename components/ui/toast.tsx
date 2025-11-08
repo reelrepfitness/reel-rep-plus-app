@@ -28,6 +28,10 @@ type ToastOptions = {
 
 type ToastContextType = {
   toast: (options: ToastOptions) => void;
+  success: (title: string, description?: string) => void;
+  error: (title: string, description?: string) => void;
+  warning: (title: string, description?: string) => void;
+  info: (title: string, description?: string) => void;
 };
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -64,7 +68,23 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const contextValue = useMemo(() => ({ toast }), [toast]);
+  const success = useCallback((title: string, description?: string) => {
+    toast({ title, description, variant: 'success' });
+  }, [toast]);
+
+  const error = useCallback((title: string, description?: string) => {
+    toast({ title, description, variant: 'error' });
+  }, [toast]);
+
+  const warning = useCallback((title: string, description?: string) => {
+    toast({ title, description, variant: 'warning' });
+  }, [toast]);
+
+  const info = useCallback((title: string, description?: string) => {
+    toast({ title, description, variant: 'info' });
+  }, [toast]);
+
+  const contextValue = useMemo(() => ({ toast, success, error, warning, info }), [toast, success, error, warning, info]);
 
   return (
     <ToastContext.Provider value={contextValue}>

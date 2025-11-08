@@ -372,7 +372,7 @@ export default function HomeScreen() {
                     />
                     <Path
                       d={`M 20 ${size / 2} A ${radius} ${radius} 0 0 1 ${size - 20} ${size / 2}`}
-                      stroke="#70eeff"
+                      stroke={consumedCalories > goalCalories ? "#FF6B6B" : "#70eeff"}
                       strokeWidth={20}
                       fill="none"
                       strokeLinecap="round"
