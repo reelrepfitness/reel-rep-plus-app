@@ -12,6 +12,7 @@ import { useMemo, useRef, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth";
 import { formatDate } from "@/lib/utils";
 import { useWorkoutLogs } from "@/lib/useWorkoutLogs";
+import { ProgressRingChart } from "@/components/charts/progress-ring-chart";
 
 
 
@@ -405,13 +406,14 @@ export default function HomeScreen() {
           <View style={styles.macroRingsContainer}>
             <View style={styles.macroRingsRowTop}>
               {[macros[0], macros[1], macros[2]].map((macro, index) => {
-                const progress = macro.goal > 0 ? Math.min(macro.value / macro.goal, 1) : 0;
-                const circumference = 2 * Math.PI * 35;
-                const strokeDashoffset = circumference - (progress * circumference);
+                const progress = macro.goal > 0 ? Math.min((macro.value / macro.goal) * 100, 100) : 0;
                 const glowOpacity = macroGlows[index].interpolate({
                   inputRange: [0, 1],
                   outputRange: [0, 0.4],
                 });
+                
+                const lighterColor = macro.color + '88';
+                
                 return (
                   <Animated.View
                     key={index}
@@ -426,39 +428,25 @@ export default function HomeScreen() {
                       },
                     ]}
                   >
-                    <View style={styles.macroRing}>
-                      <Svg width={80} height={80} style={styles.svgProgress}>
-                        <Circle
-                          cx={40}
-                          cy={40}
-                          r={35}
-                          stroke="rgba(156, 163, 175, 0.3)"
-                          strokeWidth={8}
-                          fill="none"
-                          strokeLinecap="round"
-                        />
-                        <Circle
-                          cx={40}
-                          cy={40}
-                          r={35}
-                          stroke={macro.color}
-                          strokeWidth={8}
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeDasharray={`${circumference} ${circumference}`}
-                          strokeDashoffset={strokeDashoffset}
-                          rotation="-90"
-                          {...(Platform.OS === 'web' ? { transformOrigin: '40 40' } : { origin: '40, 40' })}
-                        />
-                      </Svg>
-                      <View style={styles.macroIconContainer}>
+                    <ProgressRingChart
+                      progress={progress}
+                      size={80}
+                      strokeWidth={8}
+                      color={macro.color}
+                      gradientColors={[macro.color, lighterColor]}
+                      config={{
+                        animated: true,
+                        duration: 2000,
+                        gradient: true,
+                      }}
+                      centerContent={
                         <Image
                           source={{ uri: macro.iconOutline }}
                           style={styles.macroIcon}
                           resizeMode="contain"
                         />
-                      </View>
-                    </View>
+                      }
+                    />
                     <Text style={styles.macroLabel}>
                       <Text style={styles.macroLabelValue}>{formatUnit(macro.value)}</Text>
                       <Text style={styles.macroLabelGoal}>/{formatUnit(macro.goal)}</Text>
@@ -469,14 +457,15 @@ export default function HomeScreen() {
             </View>
             <View style={styles.macroRingsRowBottom}>
               {[macros[3], macros[4]].map((macro, index) => {
-                const progress = macro.goal > 0 ? Math.min(macro.value / macro.goal, 1) : 0;
-                const circumference = 2 * Math.PI * 35;
-                const strokeDashoffset = circumference - (progress * circumference);
+                const progress = macro.goal > 0 ? Math.min((macro.value / macro.goal) * 100, 100) : 0;
                 const actualIndex = index + 3;
                 const glowOpacity = macroGlows[actualIndex].interpolate({
                   inputRange: [0, 1],
                   outputRange: [0, 0.4],
                 });
+                
+                const lighterColor = macro.color + '88';
+                
                 return (
                   <Animated.View
                     key={index}
@@ -491,39 +480,25 @@ export default function HomeScreen() {
                       },
                     ]}
                   >
-                    <View style={styles.macroRing}>
-                      <Svg width={80} height={80} style={styles.svgProgress}>
-                        <Circle
-                          cx={40}
-                          cy={40}
-                          r={35}
-                          stroke="rgba(156, 163, 175, 0.3)"
-                          strokeWidth={8}
-                          fill="none"
-                          strokeLinecap="round"
-                        />
-                        <Circle
-                          cx={40}
-                          cy={40}
-                          r={35}
-                          stroke={macro.color}
-                          strokeWidth={8}
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeDasharray={`${circumference} ${circumference}`}
-                          strokeDashoffset={strokeDashoffset}
-                          rotation="-90"
-                          {...(Platform.OS === 'web' ? { transformOrigin: '40 40' } : { origin: '40, 40' })}
-                        />
-                      </Svg>
-                      <View style={styles.macroIconContainer}>
+                    <ProgressRingChart
+                      progress={progress}
+                      size={80}
+                      strokeWidth={8}
+                      color={macro.color}
+                      gradientColors={[macro.color, lighterColor]}
+                      config={{
+                        animated: true,
+                        duration: 2000,
+                        gradient: true,
+                      }}
+                      centerContent={
                         <Image
                           source={{ uri: macro.iconOutline }}
                           style={styles.macroIcon}
                           resizeMode="contain"
                         />
-                      </View>
-                    </View>
+                      }
+                    />
                     <Text style={styles.macroLabel}>
                       <Text style={styles.macroLabelValue}>{formatUnit(macro.value)}</Text>
                       <Text style={styles.macroLabelGoal}>/{formatUnit(macro.goal)}</Text>
