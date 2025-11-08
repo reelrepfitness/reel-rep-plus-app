@@ -22,7 +22,9 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { BodyMeasurement } from "@/lib/types";
 import { DoughnutChart } from '@/components/charts/doughnut-chart';
+import { LineChart } from '@/components/charts/line-chart';
 import { AreaChart } from '@/components/charts/area-chart';
+import { ChartContainer } from '@/components/charts/chart-container';
 
 export default function MeasurementsScreen() {
   const { user } = useAuth();
@@ -313,65 +315,86 @@ export default function MeasurementsScreen() {
               </View>
             )}
 
-            {measurements.some((m) => m.waist_circumference) && waistData.length > 0 && (
+            {((measurements.some((m) => m.waist_circumference) && waistData.length > 0) ||
+              (measurements.some((m) => m.arm_circumference) && armData.length > 0) ||
+              (measurements.some((m) => m.thigh_circumference) && thighData.length > 0)) && (
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
                   <TrendingUp color={colors.primary} size={24} />
-                  <Text style={styles.cardTitle}>היקף מותניים (ס״מ)</Text>
+                  <Text style={styles.cardTitle}>מדידות היקפים</Text>
                 </View>
-                <View style={styles.graphContainer}>
-                  <AreaChart
-                    data={waistData}
-                    config={{
-                      height: 200,
-                      showGrid: true,
-                      showLabels: true,
-                      animated: true,
-                      color: "#4ECDC4",
-                    }}
-                  />
-                </View>
-              </View>
-            )}
+                <View style={styles.chartsGrid}>
+                  {measurements.some((m) => m.waist_circumference) && waistData.length > 0 && (
+                    <View style={styles.chartWrapper}>
+                      <ChartContainer
+                        title='היקף מותניים'
+                        description='ס״מ'
+                      >
+                        <LineChart
+                          data={waistData}
+                          config={{
+                            height: 180,
+                            showGrid: true,
+                            showLabels: true,
+                            animated: true,
+                            duration: 1200,
+                            interactive: true,
+                            showYLabels: true,
+                            yLabelCount: 5,
+                            color: "#4ECDC4",
+                          }}
+                        />
+                      </ChartContainer>
+                    </View>
+                  )}
 
-            {measurements.some((m) => m.arm_circumference) && armData.length > 0 && (
-              <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <TrendingUp color={colors.primary} size={24} />
-                  <Text style={styles.cardTitle}>היקף יד (ס״מ)</Text>
-                </View>
-                <View style={styles.graphContainer}>
-                  <AreaChart
-                    data={armData}
-                    config={{
-                      height: 200,
-                      showGrid: true,
-                      showLabels: true,
-                      animated: true,
-                      color: "#FFD93D",
-                    }}
-                  />
-                </View>
-              </View>
-            )}
+                  {measurements.some((m) => m.arm_circumference) && armData.length > 0 && (
+                    <View style={styles.chartWrapper}>
+                      <ChartContainer
+                        title='היקף יד'
+                        description='ס״מ'
+                      >
+                        <LineChart
+                          data={armData}
+                          config={{
+                            height: 180,
+                            showGrid: true,
+                            showLabels: true,
+                            animated: true,
+                            duration: 1200,
+                            interactive: true,
+                            showYLabels: true,
+                            yLabelCount: 5,
+                            color: "#FFD93D",
+                          }}
+                        />
+                      </ChartContainer>
+                    </View>
+                  )}
 
-            {measurements.some((m) => m.thigh_circumference) && thighData.length > 0 && (
-              <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <TrendingUp color={colors.primary} size={24} />
-                  <Text style={styles.cardTitle}>היקף ירך (ס״מ)</Text>
-                </View>
-                <View style={styles.graphContainer}>
-                  <AreaChart
-                    data={thighData}
-                    config={{
-                      height: 200,
-                      showGrid: true,
-                      showLabels: true,
-                      animated: true,
-                      color: "#6BCB77",
-                    }}
-                  />
+                  {measurements.some((m) => m.thigh_circumference) && thighData.length > 0 && (
+                    <View style={styles.chartWrapper}>
+                      <ChartContainer
+                        title='היקף ירך'
+                        description='ס״מ'
+                      >
+                        <LineChart
+                          data={thighData}
+                          config={{
+                            height: 180,
+                            showGrid: true,
+                            showLabels: true,
+                            animated: true,
+                            duration: 1200,
+                            interactive: true,
+                            showYLabels: true,
+                            yLabelCount: 5,
+                            color: "#6BCB77",
+                          }}
+                        />
+                      </ChartContainer>
+                    </View>
+                  )}
                 </View>
               </View>
             )}
@@ -887,5 +910,11 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600" as const,
+  },
+  chartsGrid: {
+    gap: 20,
+  },
+  chartWrapper: {
+    marginBottom: 16,
   },
 });
