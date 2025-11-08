@@ -11,6 +11,7 @@ import {
   initializeNotifications,
   cleanupNotifications,
 } from "@/lib/pushNotifications";
+import { enableConnectionMonitoring } from "@/lib/connectionHelper";
 // import { supabase } from "@/lib/supabase"; // enable when you wire saving token
 
 if (!I18nManager.isRTL && Platform.OS !== "web") {
@@ -39,10 +40,14 @@ export default function RootLayout() {
   useEffect(() => {
     SplashScreen.hideAsync();
 
-    initializeNotifications(async (token) => {
-      // Here you can send the token to your backend / Supabase.
-      // Example (make sure you have the current user id before enabling):
-      // await supabase.from("profiles").update({ push_token: token }).eq("id", userId);
+    if (__DEV__) {
+      const cleanupConnection = enableConnectionMonitoring();
+      if (cleanupConnection) {
+        return cleanupConnection;
+      }
+    }
+
+    initializeNotifications(undefined, async (token: string) => {
       console.log("[Push] Expo push token:", token);
     });
 
