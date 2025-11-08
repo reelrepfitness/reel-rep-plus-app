@@ -2,8 +2,9 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
+import { supabase } from "@/lib/supabase";
 
-type TokenCallback = (token: string) => void | Promise<void>;
+type TokenCallback = (token: string, userId?: string) => void | Promise<void>;
 
 let tokenCallback: TokenCallback | null = null;
 let notificationListeners: {
@@ -21,9 +22,9 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export async function registerForPushNotificationsAsync(): Promise<
-  string | undefined
-> {
+export async function registerForPushNotificationsAsync(
+  userId?: string
+): Promise<string | undefined> {
   let token: string | undefined;
 
   if (Platform.OS === "android") {
@@ -66,9 +67,13 @@ export async function registerForPushNotificationsAsync(): Promise<
       token = pushTokenData.data;
       console.log("✅ Push token obtained:", token);
 
+      if (token && userId) {
+        await savePushToken(token, userId);
+      }
+
       if (tokenCallback && token) {
         console.log("📤 Sending token to callback");
-        await tokenCallback(token);
+        await tokenCallback(token, userId);
       }
     } catch (error) {
       console.error("❌ Error getting push token:", error);
@@ -118,7 +123,42 @@ export function setTokenCallback(callback: TokenCallback) {
   tokenCallback = callback;
 }
 
+export async function savePushToken(token: string, userId: string) {
+  try {
+    console.log("💾 Saving push token to Supabase...");
+
+    const deviceType = Platform.select({
+      ios: "ios",
+      android: "android",
+      web: "web",
+      default: "unknown",
+    });
+
+    const { error } = await supabase.from("push_tokens").upsert(
+      {
+        user_id: userId,
+        token: token,
+        device_type: deviceType,
+        updated_at: new Date().toISOString(),
+        last_used_at: new Date().toISOString(),
+      },
+      {
+        onConflict: "token",
+      }
+    );
+
+    if (error) {
+      console.error("❌ Error saving push token:", error.message);
+    } else {
+      console.log("✅ Push token saved successfully");
+    }
+  } catch (error) {
+    console.error("❌ Error saving push token:", error);
+  }
+}
+
 export async function initializeNotifications(
+  userId?: string,
   onTokenReceived?: TokenCallback
 ) {
   console.log("🚀 Initializing push notifications...");
@@ -129,7 +169,7 @@ export async function initializeNotifications(
 
   setupNotificationListeners();
 
-  const token = await registerForPushNotificationsAsync();
+  const token = await registerForPushNotificationsAsync(userId);
 
   return token;
 }

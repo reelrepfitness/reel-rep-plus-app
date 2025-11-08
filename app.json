@@ -93,7 +93,7 @@
       "disableAntiBrickingMeasures": false
     },
     "runtimeVersion": "<UNKNOWN>",
-  "extra": {
+    "extra": {
       "eas": {
         "projectId": "b22ezxscydzxy6y59xv7e"
       }

@@ -4,6 +4,7 @@ import { User } from "@/lib/types";
 import { Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatDate } from "@/lib/utils";
+import { registerForPushNotificationsAsync } from "@/lib/pushNotifications";
 
 interface AuthContextValue {
   session: Session | null;
@@ -126,6 +127,8 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
       setUser(data);
       
       await ensureDailyLog(userId);
+      
+      await registerForPushNotificationsAsync(userId);
     } catch (error) {
       console.error("[Auth] Failed to load profile:", error instanceof Error ? error.message : String(error));
       if (error && typeof error === 'object') {
