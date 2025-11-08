@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2, UtensilsCrossed, Sparkles, Heart, ShoppingBasket, ChefHat } from "lucide-react-native";
-import { Carousel, CarouselItem } from "@/components/ui/carousel";
+
 import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -674,82 +674,61 @@ export default function MealsScreen() {
                 <View style={styles.sheetHandle} />
                 <Text style={styles.sheetTitle}>הוסף מזון</Text>
                 
-                <View style={styles.carouselContainer}>
-                  <Carousel
-                    itemWidth={Dimensions.get('window').width * 0.7}
-                    spacing={16}
-                    showIndicators={true}
-                    indicatorColor="#CBD5E0"
-                    activeIndicatorColor={colors.primary}
+                <View style={styles.optionsGrid}>
+                  <TouchableOpacity
+                    style={styles.optionButton}
+                    onPress={() => handleOptionSelect('favorites')}
+                    activeOpacity={0.7}
                   >
-                    <CarouselItem style={styles.carouselCard}>
-                      <View style={styles.carouselCardContentSingle}>
-                        <TouchableOpacity
-                          style={styles.singleOptionButton}
-                          onPress={() => handleOptionSelect('recipes')}
-                          activeOpacity={0.7}
-                        >
-                          <View style={[styles.singleIconContainer, styles.singleIconContainerRecipes]}>
-                            <ChefHat size={32} color="#FF9800" strokeWidth={2.5} />
-                          </View>
-                          <Text style={styles.singleCardTitle}>מתכונים</Text>
-                          <Text style={styles.singleCardSubtitle}>מתכונים מותאמים אישית</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </CarouselItem>
-                    
-                    <CarouselItem style={styles.carouselCard}>
-                      <View style={styles.carouselCardContent}>
-                        <TouchableOpacity
-                          style={styles.groupedOptionButton}
-                          onPress={() => handleOptionSelect('barcode')}
-                          activeOpacity={0.7}
-                        >
-                          <View style={styles.groupedIconContainer}>
-                            <Barcode size={32} color={colors.primary} strokeWidth={2.5} />
-                          </View>
-                          <Text style={styles.groupedCardTitle}>ברקוד</Text>
-                        </TouchableOpacity>
-                        
-                        <TouchableOpacity
-                          style={styles.groupedOptionButton}
-                          onPress={() => handleOptionSelect('ai')}
-                          activeOpacity={0.7}
-                        >
-                          <View style={styles.groupedIconContainer}>
-                            <Sparkles size={32} color={colors.primary} strokeWidth={2.5} />
-                          </View>
-                          <Text style={styles.groupedCardTitle}>AI</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </CarouselItem>
-                    
-                    <CarouselItem style={styles.carouselCard}>
-                      <View style={styles.carouselCardContent}>
-                        <TouchableOpacity
-                          style={styles.groupedOptionButton}
-                          onPress={() => handleOptionSelect('favorites')}
-                          activeOpacity={0.7}
-                        >
-                          <View style={[styles.groupedIconContainer, styles.groupedIconContainerFavorites]}>
-                            <Heart size={32} color="#FF6B6B" strokeWidth={2.5} />
-                          </View>
-                          <Text style={styles.groupedCardTitle}>מועדפים</Text>
-                        </TouchableOpacity>
-                        
-                        <TouchableOpacity
-                          style={styles.groupedOptionButton}
-                          onPress={() => handleOptionSelect('food-bank')}
-                          activeOpacity={0.7}
-                        >
-                          <View style={styles.groupedIconContainer}>
-                            <ShoppingBasket size={32} color={colors.primary} strokeWidth={2.5} />
-                          </View>
-                          <Text style={styles.groupedCardTitle}>בנק מזון</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </CarouselItem>
-                  </Carousel>
+                    <View style={[styles.optionIconContainer, styles.optionIconContainerFavorites]}>
+                      <Heart size={32} color="#FF6B6B" strokeWidth={2.5} />
+                    </View>
+                    <Text style={styles.optionText}>מועדפים</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.optionButton}
+                    onPress={() => handleOptionSelect('food-bank')}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.optionIconContainer}>
+                      <ShoppingBasket size={32} color={colors.primary} strokeWidth={2.5} />
+                    </View>
+                    <Text style={styles.optionText}>בנק מזון</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.optionButton}
+                    onPress={() => handleOptionSelect('barcode')}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.optionIconContainer}>
+                      <Barcode size={32} color={colors.primary} strokeWidth={2.5} />
+                    </View>
+                    <Text style={styles.optionText}>ברקוד</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.optionButton}
+                    onPress={() => handleOptionSelect('ai')}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.optionIconContainer}>
+                      <Sparkles size={32} color={colors.primary} strokeWidth={2.5} />
+                    </View>
+                    <Text style={styles.optionText}>AI</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.optionButton}
+                    onPress={() => handleOptionSelect('recipes')}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.optionIconContainer, styles.optionIconContainerRecipes]}>
+                      <ChefHat size={32} color="#FF9800" strokeWidth={2.5} />
+                    </View>
+                    <Text style={styles.optionText}>מתכונים</Text>
+                  </TouchableOpacity>
                 </View>
               </Animated.View>
             </TouchableOpacity>
@@ -1308,16 +1287,17 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   optionsGrid: {
-    gap: 16,
+    gap: 20,
+    paddingHorizontal: 8,
   },
   optionsRow: {
     flexDirection: "row-reverse" as any,
     gap: 16,
   },
   optionButton: {
-    flex: 1,
     alignItems: "center",
     gap: 12,
+    width: "100%",
   },
   optionButtonLarge: {
     flex: 1,
@@ -1325,13 +1305,13 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   optionIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: `${colors.primary}15`,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 2.5,
     borderColor: colors.primary,
   },
   optionIconContainerLarge: {
@@ -1347,6 +1327,10 @@ const styles = StyleSheet.create({
   optionIconContainerFavorites: {
     backgroundColor: "#FF6B6B15",
     borderColor: "#FF6B6B",
+  },
+  optionIconContainerRecipes: {
+    backgroundColor: "#FF980015",
+    borderColor: "#FF9800",
   },
   optionText: {
     fontSize: 16,
