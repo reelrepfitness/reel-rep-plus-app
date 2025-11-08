@@ -10,17 +10,19 @@ import {
   Image,
   Animated,
   Keyboard,
+  Pressable,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Search, X, Weight, Coffee, Soup, Hash } from "lucide-react-native";
+import { ChevronLeft, Search, X, Weight, Coffee, Soup, Hash, Heart } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { FoodBankItem, Restaurant, RestaurantMenuItem } from "@/lib/types";
 import { useState, useMemo, useRef, useEffect } from "react";
+import { useAuth } from "@/contexts/auth";
 
 const categoryIcons = {
   "מסעדות": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984906/hamburger_rdbysh.webp",
@@ -39,6 +41,7 @@ export default function FoodBankScreen() {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const { goals, dailyLog } = useHomeData();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>("חלבון");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
@@ -112,6 +115,30 @@ export default function FoodBankScreen() {
       console.log(`[FoodBank] Loaded ${data?.length || 0} restaurants`);
       return data as Restaurant[];
     },
+  });
+
+  const { data: userFavorites = [] } = useQuery({
+    queryKey: ["userFavorites", user?.user_id],
+    queryFn: async () => {
+      if (!user?.user_id) return [];
+      
+      console.log("[FoodBank] Fetching user favorites");
+      
+      const { data, error } = await supabase
+        .from("favorites")
+        .select("food_id")
+        .eq("user_id", user.user_id);
+
+      if (error) {
+        console.error("[FoodBank] Error fetching favorites:", error);
+        return [];
+      }
+
+      const foodIds = data?.map(f => f.food_id) || [];
+      console.log(`[FoodBank] Loaded ${foodIds.length} favorites`);
+      return foodIds;
+    },
+    enabled: !!user?.user_id,
   });
 
   const { data: restaurantMenuItems = [] } = useQuery({
@@ -549,6 +576,83 @@ export default function FoodBankScreen() {
   };
 
   const [successItem, setSuccessItem] = useState<FoodBankItem | null>(null);
+  const [heartAnimations] = useState<{ [key: number]: Animated.Value }>({});
+  const lastTapRef = useRef<{ [key: number]: number }>({});
+
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async ({ foodId, isFavorite }: { foodId: number; isFavorite: boolean }) => {
+      if (!user?.user_id) throw new Error("User not authenticated");
+
+      if (isFavorite) {
+        console.log("[FoodBank] Removing favorite:", foodId);
+        const { error } = await supabase
+          .from("favorites")
+          .delete()
+          .eq("user_id", user.user_id)
+          .eq("food_id", foodId);
+        
+        if (error) throw error;
+      } else {
+        console.log("[FoodBank] Adding favorite:", foodId);
+        const { error } = await supabase
+          .from("favorites")
+          .insert({
+            user_id: user.user_id,
+            food_id: foodId,
+          });
+        
+        if (error) throw error;
+      }
+
+      return { foodId, isFavorite: !isFavorite };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userFavorites", user?.user_id] });
+    },
+    onError: (error) => {
+      console.error("[FoodBank] Error toggling favorite:", error);
+    },
+  });
+
+  const getHeartAnimation = (foodId: number) => {
+    if (!heartAnimations[foodId]) {
+      heartAnimations[foodId] = new Animated.Value(0);
+    }
+    return heartAnimations[foodId];
+  };
+
+  const handleDoubleTap = (foodId: number, isFavorite: boolean) => {
+    const now = Date.now();
+    const lastTap = lastTapRef.current[foodId] || 0;
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap < DOUBLE_TAP_DELAY) {
+      console.log("[FoodBank] Double tap detected on food:", foodId);
+      
+      const anim = getHeartAnimation(foodId);
+      anim.setValue(0);
+      
+      Animated.sequence([
+        Animated.spring(anim, {
+          toValue: 1,
+          friction: 3,
+          tension: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: 200,
+          delay: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      toggleFavoriteMutation.mutate({ foodId, isFavorite });
+      lastTapRef.current[foodId] = 0;
+    } else {
+      lastTapRef.current[foodId] = now;
+    }
+  };
 
   useEffect(() => {
     if (categoryScrollRef.current && mainCategories.length > 0) {
@@ -897,27 +1001,63 @@ export default function FoodBankScreen() {
               {filteredItems.map((item) => {
                 const showCategoryIcon = !["ממרחים", "מסעדות", "מכולת"].includes(item.category);
                 const categoryIcon = categoryIcons[item.category as keyof typeof categoryIcons];
+                const isFavorite = userFavorites.includes(item.id);
+                const heartAnim = getHeartAnimation(item.id);
                 
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={item.id}
                     style={styles.foodCard}
-                    onPress={() => handleFoodPress(item)}
-                    activeOpacity={0.8}
+                    onPress={() => {
+                      handleDoubleTap(item.id, isFavorite);
+                      setTimeout(() => {
+                        if (lastTapRef.current[item.id] !== 0) {
+                          handleFoodPress(item);
+                        }
+                      }, 320);
+                    }}
                   >
-                    {item.img_url ? (
-                      <Image
-                        source={{ uri: item.img_url }}
-                        style={styles.foodImage}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <View style={styles.foodImagePlaceholder}>
-                        <Text style={styles.foodImagePlaceholderText}>
-                          {item.name.charAt(0)}
-                        </Text>
-                      </View>
-                    )}
+                    <View style={styles.foodImageContainer}>
+                      {item.img_url ? (
+                        <Image
+                          source={{ uri: item.img_url }}
+                          style={styles.foodImage}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View style={styles.foodImagePlaceholder}>
+                          <Text style={styles.foodImagePlaceholderText}>
+                            {item.name.charAt(0)}
+                          </Text>
+                        </View>
+                      )}
+
+                      {isFavorite && (
+                        <View style={styles.favoriteIconStatic}>
+                          <Heart color="#FF6B6B" size={18} fill="#FF6B6B" />
+                        </View>
+                      )}
+
+                      <Animated.View
+                        style={[
+                          styles.heartAnimationContainer,
+                          {
+                            opacity: heartAnim,
+                            transform: [
+                              {
+                                scale: heartAnim.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [0.3, 1.2],
+                                }),
+                              },
+                            ],
+                          },
+                        ]}
+                        pointerEvents="none"
+                      >
+                        <Heart color="#FF6B6B" size={60} fill="#FF6B6B" />
+                      </Animated.View>
+                    </View>
 
                     <View style={styles.foodInfo}>
                       <Text style={styles.foodName} numberOfLines={2}>
@@ -995,7 +1135,7 @@ export default function FoodBankScreen() {
                         )}
                       </View>
                     </View>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>
@@ -2026,14 +2166,19 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  foodImage: {
+  foodImageContainer: {
+    position: "relative" as const,
     width: "100%",
     height: 140,
+  },
+  foodImage: {
+    width: "100%",
+    height: "100%",
     backgroundColor: "#F0F0F0",
   },
   foodImagePlaceholder: {
     width: "100%",
-    height: 140,
+    height: "100%",
     backgroundColor: "#E0E0E0",
     justifyContent: "center",
     alignItems: "center",
@@ -2496,5 +2641,32 @@ const styles = StyleSheet.create({
     color: "#2d3748",
     minWidth: 50,
     textAlign: "center",
+  },
+  favoriteIconStatic: {
+    position: "absolute" as const,
+    top: 8,
+    right: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: 20,
+    width: 32,
+    height: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 10,
+  },
+  heartAnimationContainer: {
+    position: "absolute" as const,
+    top: "50%",
+    left: "50%",
+    marginLeft: -30,
+    marginTop: -30,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 5,
   },
 });
