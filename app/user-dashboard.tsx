@@ -252,6 +252,15 @@ export default function UserDashboardScreen() {
               </Text>
               <Text style={styles.statLabel}>ממוצע שבועי</Text>
             </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>
+                {data ? Math.round(data.weekData.reduce((sum, d) => {
+                  const caloriesLeft = (data.goal || 0) - d.calories;
+                  return sum + caloriesLeft;
+                }, 0)) : 0}
+              </Text>
+              <Text style={styles.statLabel}>יתרה שבועית</Text>
+            </View>
           </View>
         </View>
 
