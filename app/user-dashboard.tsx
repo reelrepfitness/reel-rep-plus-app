@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
 import { useMemo } from "react";
-import { User, TrendingUp, Scale, Weight, Percent, Edit, UtensilsCrossed } from "lucide-react-native";
+import { User, TrendingUp, Scale, Weight, Percent, Edit, UtensilsCrossed, Activity, ChefHat } from "lucide-react-native";
 import { LineChart } from "react-native-chart-kit";
 import Svg, { Circle, Path } from "react-native-svg";
 import { BodyMeasurement } from "@/lib/types";
@@ -364,43 +364,49 @@ export default function UserDashboardScreen() {
           </View>
         </View>
 
-        <View style={styles.buttonsRow}>
+        <View style={styles.actionCardsRow}>
           <TouchableOpacity
-            style={styles.updateButton}
+            style={styles.actionCard}
             onPress={() => router.push({
-              pathname: "/update-measurements",
+              pathname: "/admin-client-measurements",
               params: { userId, userName }
             })}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
-            <User color="#FFFFFF" size={24} />
-            <Text style={styles.updateButtonText}>עדכון מדידות</Text>
+            <View style={[styles.actionCardIcon, { backgroundColor: "rgba(63, 205, 209, 0.2)" }]}>
+              <Activity color={colors.primary} size={28} />
+            </View>
+            <Text style={styles.actionCardText}>מדידות</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.updateButton, styles.editButton]}
+            style={styles.actionCard}
+            onPress={() => router.push({
+              pathname: "/admin-build-meal-plan",
+              params: { userId, userName }
+            })}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.actionCardIcon, { backgroundColor: "rgba(255, 107, 107, 0.2)" }]}>
+              <ChefHat color="#FF6B6B" size={28} />
+            </View>
+            <Text style={styles.actionCardText}>תפריט</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionCard}
             onPress={() => router.push({
               pathname: "/admin-edit-client",
               params: { userId, userName }
             })}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
-            <Edit color="#FFFFFF" size={24} />
-            <Text style={styles.updateButtonText}>ביצוע שינויים</Text>
+            <View style={[styles.actionCardIcon, { backgroundColor: "rgba(255, 215, 0, 0.2)" }]}>
+              <Edit color="#FFD700" size={28} />
+            </View>
+            <Text style={styles.actionCardText}>ערוך</Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          style={[styles.updateButton, styles.mealPlanButton]}
-          onPress={() => router.push({
-            pathname: "/admin-build-meal-plan",
-            params: { userId, userName }
-          })}
-          activeOpacity={0.8}
-        >
-          <UtensilsCrossed color="#FFFFFF" size={24} />
-          <Text style={styles.updateButtonText}>בניית תפריט</Text>
-        </TouchableOpacity>
 
         {data?.measurements && data.measurements.length > 0 && (
           <>
@@ -926,37 +932,42 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.71)",
     fontWeight: "500" as const,
   },
-  buttonsRow: {
+  actionCardsRow: {
     flexDirection: "row-reverse" as any,
     gap: 12,
     marginTop: 24,
   },
-  updateButton: {
+  actionCard: {
     flex: 1,
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    flexDirection: "row" as any,
+    backgroundColor: "rgba(255, 255, 255, 0.43)",
+    borderRadius: 24,
+    padding: 20,
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+    ...Platform.select({
+      web: {
+        backdropFilter: "blur(6.95px)",
+      } as any,
+    }),
   },
-  editButton: {
-    backgroundColor: "#FFD700",
+  actionCardIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  mealPlanButton: {
-    backgroundColor: "#FF6B6B",
-  },
-  updateButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
+  actionCardText: {
+    color: colors.text,
+    fontSize: 14,
     fontWeight: "700" as const,
+    textAlign: "center",
   },
   measurementsTitleSection: {
     marginBottom: 24,
