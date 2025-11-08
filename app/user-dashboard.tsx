@@ -1144,6 +1144,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: "column",
+    gap: 4,
   },
   progressValue: {
     fontSize: 20,
@@ -1158,7 +1160,6 @@ const styles = StyleSheet.create({
   workoutProgressIcon: {
     width: 30,
     height: 30,
-    marginBottom: 4,
   },
   progressValueText: {
     fontSize: 12,
