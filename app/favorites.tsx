@@ -44,7 +44,7 @@ export default function FavoritesScreen() {
       setError(null);
 
       const { data, error } = await supabase
-        .from("favorite_foods")
+        .from("favorites")
         .select("food_id, food_bank(*)")
         .eq("user_id", user.user_id)
         .order("created_at", { ascending: false });
