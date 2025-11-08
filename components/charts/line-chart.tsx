@@ -120,7 +120,7 @@ export function LineChart({ data, config }: LineChartProps) {
   });
 
   const yLabels = Array.from({ length: yLabelCount }, (_, i) => {
-    const value = minY + (yRange * i) / (yLabelCount - 1);
+    const value = maxY - (yRange * i) / (yLabelCount - 1);
     return value;
   });
 
@@ -131,7 +131,7 @@ export function LineChart({ data, config }: LineChartProps) {
           {showGrid && (
             <>
               {yLabels.map((_, index) => {
-                const y = paddingVertical + chartHeight * (1 - index / (yLabelCount - 1));
+                const y = paddingVertical + chartHeight * (index / (yLabelCount - 1));
                 return (
                   <Line
                     key={`grid-${index}`}
@@ -185,14 +185,6 @@ export function LineChart({ data, config }: LineChartProps) {
             ))}
           </View>
         )}
-
-        <View style={[styles.valuesContainer, { paddingHorizontal: paddingHorizontal - 10 }]}>
-          {points.map((point, index) => (
-            <View key={`value-${index}`} style={[styles.valueWrapper, { left: point.x - paddingHorizontal + 10 }]}>
-              <Text style={[styles.valueText, { color }]}>{point.originalY.toFixed(1)}</Text>
-            </View>
-          ))}
-        </View>
 
         {activePoint !== null && (
           <View
