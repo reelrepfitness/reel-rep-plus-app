@@ -622,7 +622,11 @@ export default function MealsScreen() {
           showsVerticalScrollIndicator={false}
         >
           {hasMealPlan && (
-            <TouchableOpacity style={styles.mealPlanCard} activeOpacity={0.7}>
+            <TouchableOpacity 
+              style={styles.mealPlanCard} 
+              activeOpacity={0.7}
+              onPress={() => router.push('/meal-plan')}
+            >
               <UtensilsCrossed size={24} color="#000000" strokeWidth={2.5} />
               <Text style={styles.mealPlanText}>התפריט שלי</Text>
             </TouchableOpacity>
