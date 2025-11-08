@@ -13,7 +13,7 @@ import {
   Pressable,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Weight, Coffee, Soup, Hash, Heart } from "lucide-react-native";
+import { ChevronLeft, Weight, Coffee, Soup, Hash, Heart, Beef, Fish, Egg, Drumstick, Milk, Package } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SearchBar } from "@/components/ui/searchbar";
 
@@ -390,6 +390,32 @@ export default function FoodBankScreen() {
       setSelectedSubCategory(null);
     } else {
       setSelectedSubCategory(subCategory);
+    }
+  };
+
+  const getSubCategoryIcon = (subCategory: string) => {
+    const iconColor = selectedSubCategory === subCategory ? "#FFFFFF" : "#2d3748";
+    const iconSize = 16;
+    
+    switch (subCategory.toLowerCase()) {
+      case "בשר בקר":
+      case "בקר":
+        return <Beef size={iconSize} color={iconColor} />;
+      case "עוף":
+      case "עופות":
+        return <Drumstick size={iconSize} color={iconColor} />;
+      case "דגים":
+      case "דג":
+        return <Fish size={iconSize} color={iconColor} />;
+      case "ביצים":
+      case "ביצה":
+        return <Egg size={iconSize} color={iconColor} />;
+      case "חלב":
+      case "חלבי":
+      case "גבינה":
+        return <Milk size={iconSize} color={iconColor} />;
+      default:
+        return <Package size={iconSize} color={iconColor} />;
     }
   };
 
@@ -886,11 +912,12 @@ export default function FoodBankScreen() {
               <View style={styles.subCategoriesCard}>
                 <ScrollView
                   horizontal
-                  showsHorizontalScrollIndicator={true}
+                  showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.subCategoriesScroll}
                 >
                   {subCategories.map((subCategory) => {
                     const isSelected = selectedSubCategory === subCategory;
+                    const subCategoryIcon = getSubCategoryIcon(subCategory);
                     return (
                       <TouchableOpacity
                         key={subCategory}
@@ -901,14 +928,19 @@ export default function FoodBankScreen() {
                         onPress={() => handleSubCategoryPress(subCategory)}
                         activeOpacity={0.7}
                       >
-                        <Text
-                          style={[
-                            styles.subCategoryText,
-                            isSelected && styles.subCategoryTextActive,
-                          ]}
-                        >
-                          {subCategory}
-                        </Text>
+                        <View style={styles.subCategoryContent}>
+                          <View style={styles.subCategoryIconWrapper}>
+                            {subCategoryIcon}
+                          </View>
+                          <Text
+                            style={[
+                              styles.subCategoryText,
+                              isSelected && styles.subCategoryTextActive,
+                            ]}
+                          >
+                            {subCategory}
+                          </Text>
+                        </View>
                       </TouchableOpacity>
                     );
                   })}
@@ -2113,10 +2145,10 @@ const styles = StyleSheet.create({
   subCategoryChip: {
     backgroundColor: "#F5F5F5",
     borderRadius: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 10,
     borderWidth: 0,
-    minWidth: 100,
+    minWidth: 90,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
@@ -2124,6 +2156,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  subCategoryContent: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    gap: 6,
+  },
+  subCategoryIconWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   subCategoryChipActive: {
     backgroundColor: colors.primary,
