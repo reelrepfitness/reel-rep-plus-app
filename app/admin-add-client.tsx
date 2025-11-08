@@ -31,12 +31,11 @@ export default function AdminAddClientScreen() {
     email: "",
     password: "",
     name: "",
-    role: "user" as "user" | "coach" | "admin",
     phone: "",
     age: "",
-    gender: "" as "זכר" | "נקבה" | "",
-    goal: "" as "ירידה במשקל" | "עליה במשקל" | "שמירה על משקל" | "הרזיה" | "בניית שריר" | "",
-    activity: "" as "בישיבה" | "פעילות קלה" | "פעילות בינונית" | "פעילות גבוהה" | "פעילות גבוהה מאוד" | "",
+    gender: "" as "male" | "female" | "",
+    goal: "" as "חיטוב" | "ניטראלי" | "מסה" | "",
+    activity: "" as "רמה 1 - יושבנית במלואה" | "רמה 2 - יושבנית למחצה" | "רמה 3 - חצי פעילה" | "רמה 4 - פעילה" | "",
     bodyWeight: "",
     height: "",
     waterDailyGoal: "12",
@@ -121,7 +120,7 @@ export default function AdminAddClientScreen() {
             user_id: authData.user.id,
             email: formData.email,
             name: formData.name,
-            role: formData.role,
+            role: "user",
             phone: formData.phone || null,
             age: formData.age || null,
             gender: formData.gender || null,
@@ -249,24 +248,6 @@ export default function AdminAddClientScreen() {
           <Text style={styles.sectionTitle}>פרטים אישיים</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>תפקיד</Text>
-            <View style={styles.radioGroup}>
-              {[
-                { label: 'משתמש', value: 'user' },
-                { label: 'מאמן', value: 'coach' },
-                { label: 'מנהל', value: 'admin' },
-              ].map((option) => (
-                <RadioButton
-                  key={option.value}
-                  option={option}
-                  selected={formData.role === option.value}
-                  onPress={() => setFormData({ ...formData, role: option.value as any })}
-                />
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
             <Text style={styles.label}>טלפון</Text>
             <TextInput
               style={styles.input}
@@ -294,8 +275,8 @@ export default function AdminAddClientScreen() {
             <Text style={styles.label}>מגדר</Text>
             <View style={styles.radioGroup}>
               {[
-                { label: 'זכר', value: 'זכר' },
-                { label: 'נקבה', value: 'נקבה' },
+                { label: 'זכר', value: 'male' },
+                { label: 'נקבה', value: 'female' },
               ].map((option) => (
                 <RadioButton
                   key={option.value}
@@ -311,11 +292,9 @@ export default function AdminAddClientScreen() {
             <Text style={styles.label}>מטרה</Text>
             <View style={styles.radioGroup}>
               {[
-                { label: 'ירידה במשקל', value: 'ירידה במשקל' },
-                { label: 'עליה במשקל', value: 'עליה במשקל' },
-                { label: 'שמירה על משקל', value: 'שמירה על משקל' },
-                { label: 'הרזיה', value: 'הרזיה' },
-                { label: 'בניית שריר', value: 'בניית שריר' },
+                { label: 'חיטוב', value: 'חיטוב' },
+                { label: 'ניטראלי', value: 'ניטראלי' },
+                { label: 'מסה', value: 'מסה' },
               ].map((option) => (
                 <RadioButton
                   key={option.value}
@@ -331,11 +310,10 @@ export default function AdminAddClientScreen() {
             <Text style={styles.label}>רמת פעילות</Text>
             <View style={styles.radioGroup}>
               {[
-                { label: 'בישיבה', value: 'בישיבה' },
-                { label: 'פעילות קלה', value: 'פעילות קלה' },
-                { label: 'פעילות בינונית', value: 'פעילות בינונית' },
-                { label: 'פעילות גבוהה', value: 'פעילות גבוהה' },
-                { label: 'פעילות גבוהה מאוד', value: 'פעילות גבוהה מאוד' },
+                { label: 'רמה 1 - יושבנית במלואה', value: 'רמה 1 - יושבנית במלואה' },
+                { label: 'רמה 2 - יושבנית למחצה', value: 'רמה 2 - יושבנית למחצה' },
+                { label: 'רמה 3 - חצי פעילה', value: 'רמה 3 - חצי פעילה' },
+                { label: 'רמה 4 - פעילה', value: 'רמה 4 - פעילה' },
               ].map((option) => (
                 <RadioButton
                   key={option.value}
