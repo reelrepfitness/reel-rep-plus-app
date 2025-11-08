@@ -65,7 +65,7 @@ export function AreaChart({ data, config }: AreaChartProps) {
   }
 
   const paddingHorizontal = 40;
-  const paddingVertical = 30;
+  const paddingVertical = 50;
   const chartWidth = screenWidth - 80;
   const chartHeight = height - paddingVertical * 2;
 
@@ -127,6 +127,14 @@ export function AreaChart({ data, config }: AreaChartProps) {
         ))}
       </Svg>
 
+      <View style={[styles.valuesContainer, { paddingHorizontal: paddingHorizontal - 10 }]}>
+        {points.map((point, index) => (
+          <View key={`value-${index}`} style={[styles.valueWrapper, { left: point.x - paddingHorizontal + 10 }]}>
+            <Text style={[styles.valueText, { color }]}>{point.originalY.toFixed(1)}</Text>
+          </View>
+        ))}
+      </View>
+
       {showLabels && (
         <View style={[styles.labelsContainer, { paddingHorizontal: paddingHorizontal - 10 }]}>
           {data.map((point, index) => (
@@ -160,6 +168,24 @@ const styles = StyleSheet.create({
   noDataText: {
     fontSize: 16,
     color: colors.gray,
+    textAlign: 'center',
+  },
+  valuesContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  valueWrapper: {
+    position: 'absolute',
+    alignItems: 'center',
+  },
+  valueText: {
+    fontSize: 12,
+    fontWeight: '700' as const,
     textAlign: 'center',
   },
 });

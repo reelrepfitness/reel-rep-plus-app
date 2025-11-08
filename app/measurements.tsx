@@ -313,15 +313,13 @@ export default function MeasurementsScreen() {
               </View>
             )}
 
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
-                <TrendingUp color={colors.primary} size={24} />
-                <Text style={styles.cardTitle}>היקפים (ס״מ)</Text>
-              </View>
-              
-              {measurements.some((m) => m.waist_circumference) && waistData.length > 0 && (
-                <View style={styles.individualChartContainer}>
-                  <Text style={styles.individualChartTitle}>מותניים</Text>
+            {measurements.some((m) => m.waist_circumference) && waistData.length > 0 && (
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <TrendingUp color={colors.primary} size={24} />
+                  <Text style={styles.cardTitle}>היקף מותניים (ס״מ)</Text>
+                </View>
+                <View style={styles.graphContainer}>
                   <AreaChart
                     data={waistData}
                     config={{
@@ -333,11 +331,16 @@ export default function MeasurementsScreen() {
                     }}
                   />
                 </View>
-              )}
+              </View>
+            )}
 
-              {measurements.some((m) => m.arm_circumference) && armData.length > 0 && (
-                <View style={styles.individualChartContainer}>
-                  <Text style={styles.individualChartTitle}>יד</Text>
+            {measurements.some((m) => m.arm_circumference) && armData.length > 0 && (
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <TrendingUp color={colors.primary} size={24} />
+                  <Text style={styles.cardTitle}>היקף יד (ס״מ)</Text>
+                </View>
+                <View style={styles.graphContainer}>
                   <AreaChart
                     data={armData}
                     config={{
@@ -349,11 +352,16 @@ export default function MeasurementsScreen() {
                     }}
                   />
                 </View>
-              )}
+              </View>
+            )}
 
-              {measurements.some((m) => m.thigh_circumference) && thighData.length > 0 && (
-                <View style={styles.individualChartContainer}>
-                  <Text style={styles.individualChartTitle}>ירך</Text>
+            {measurements.some((m) => m.thigh_circumference) && thighData.length > 0 && (
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <TrendingUp color={colors.primary} size={24} />
+                  <Text style={styles.cardTitle}>היקף ירך (ס״מ)</Text>
+                </View>
+                <View style={styles.graphContainer}>
                   <AreaChart
                     data={thighData}
                     config={{
@@ -365,8 +373,8 @@ export default function MeasurementsScreen() {
                     }}
                   />
                 </View>
-              )}
-            </View>
+              </View>
+            )}
 
 
           </>
@@ -853,6 +861,12 @@ const styles = StyleSheet.create({
     color: colors.text,
     textAlign: "center",
     marginBottom: 12,
+  },
+  graphContainer: {
+    marginHorizontal: -20,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   keyboardAccessory: {
     backgroundColor: "#F7F7F7",
