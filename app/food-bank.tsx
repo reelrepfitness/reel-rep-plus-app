@@ -175,6 +175,9 @@ export default function FoodBankScreen() {
     if (!filteredCategories.includes("מסעדות")) {
       filteredCategories.push("מסעדות");
     }
+    if (!filteredCategories.includes("אלכוהול")) {
+      filteredCategories.push("אלכוהול");
+    }
     return filteredCategories;
   }, [foodItems]);
 
