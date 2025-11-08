@@ -258,7 +258,6 @@ export default function HomeScreen() {
           </View>
         </View>
       )}
-      <View style={styles.contentWrapper} pointerEvents="box-none">
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
         style={styles.scrollView}
@@ -1011,7 +1010,6 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </Modal>
       </ScrollView>
-      </View>
     </View>
   );
 }
@@ -1021,9 +1019,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#5ce1e6",
   },
-  contentWrapper: {
-    flex: 1,
-  },
+
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
