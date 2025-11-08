@@ -1210,8 +1210,8 @@ export default function FoodBankScreen() {
                       </Text>
                       
                       {item.measurement_method && (
-                        <Text style={styles.servingText} numberOfLines={2}>
-                          {formatUnit(item.amount)} {item.measurement_method} שווים למנה אחת
+                        <Text style={styles.alcoholMeasurementText} numberOfLines={2}>
+                          {item.measurement_method}
                         </Text>
                       )}
                       
@@ -2517,6 +2517,14 @@ const styles = StyleSheet.create({
     textAlign: "right",
     marginBottom: 4,
     lineHeight: 13,
+  },
+  alcoholMeasurementText: {
+    fontSize: 11,
+    fontWeight: "600" as const,
+    color: "#718096",
+    textAlign: "right",
+    marginBottom: 4,
+    lineHeight: 15,
   },
   foodNutrition: {
     flexDirection: "row-reverse" as any,
