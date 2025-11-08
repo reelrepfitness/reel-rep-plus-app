@@ -1198,7 +1198,7 @@ export default function FoodBankScreen() {
                       ) : (
                         <View style={styles.foodImagePlaceholder}>
                           <Text style={styles.foodImagePlaceholderText}>
-                            {item.name.charAt(0)}
+                            אני יודע שאין תמונה.{"\n"}אני על זה.
                           </Text>
                         </View>
                       )}
@@ -1287,7 +1287,7 @@ export default function FoodBankScreen() {
                       ) : (
                         <View style={styles.foodImagePlaceholder}>
                           <Text style={styles.foodImagePlaceholderText}>
-                            {item.name.charAt(0)}
+                            אני יודע שאין תמונה.{"\n"}אני על זה.
                           </Text>
                         </View>
                       )}
@@ -2475,9 +2475,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   foodImagePlaceholderText: {
-    fontSize: 48,
-    fontWeight: "700" as const,
+    fontSize: 14,
+    fontWeight: "600" as const,
     color: "#999",
+    textAlign: "center" as const,
+    lineHeight: 20,
   },
   foodInfo: {
     padding: 12,
