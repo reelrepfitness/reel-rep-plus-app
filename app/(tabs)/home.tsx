@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/auth";
 import { formatDate } from "@/lib/utils";
 import { useWorkoutLogs } from "@/lib/useWorkoutLogs";
 import { ProgressRingChart } from "@/components/charts/progress-ring-chart";
-import { Popover, PopoverTrigger, PopoverContent, PopoverClose } from "@/components/ui/popover";
+import { MacroPopover } from "@/components/MacroPopover";
 
 
 
@@ -415,44 +415,57 @@ export default function HomeScreen() {
                 
                 const lighterColor = macro.color + '88';
                 
+                const macroTypeMap: { [key: number]: 'protein' | 'carb' | 'fat' } = {
+                  0: 'protein',
+                  1: 'carb',
+                  2: 'fat',
+                };
+                
                 return (
-                  <Animated.View
+                  <MacroPopover
                     key={index}
-                    style={[
-                      styles.macroRingContainer,
-                      {
-                        transform: [{ scale: macroAnimations[index] }],
-                        shadowColor: macro.color,
-                        shadowOpacity: glowOpacity,
-                        shadowRadius: 20,
-                        shadowOffset: { width: 0, height: 0 },
-                      },
-                    ]}
+                    macroName={macro.name}
+                    macroType={macroTypeMap[index]}
+                    macroColor={macro.color}
+                    selectedDate={selectedDate}
                   >
-                    <ProgressRingChart
-                      progress={progress}
-                      size={80}
-                      strokeWidth={8}
-                      color={macro.color}
-                      gradientColors={[macro.color, lighterColor]}
-                      config={{
-                        animated: true,
-                        duration: 2000,
-                        gradient: true,
-                      }}
-                      centerContent={
-                        <Image
-                          source={{ uri: macro.iconOutline }}
-                          style={styles.macroIcon}
-                          resizeMode="contain"
-                        />
-                      }
-                    />
-                    <Text style={styles.macroLabel}>
-                      <Text style={styles.macroLabelValue}>{formatUnit(macro.value)}</Text>
-                      <Text style={styles.macroLabelGoal}>/{formatUnit(macro.goal)}</Text>
-                    </Text>
-                  </Animated.View>
+                    <Animated.View
+                      style={[
+                        styles.macroRingContainer,
+                        {
+                          transform: [{ scale: macroAnimations[index] }],
+                          shadowColor: macro.color,
+                          shadowOpacity: glowOpacity,
+                          shadowRadius: 20,
+                          shadowOffset: { width: 0, height: 0 },
+                        },
+                      ]}
+                    >
+                      <ProgressRingChart
+                        progress={progress}
+                        size={80}
+                        strokeWidth={8}
+                        color={macro.color}
+                        gradientColors={[macro.color, lighterColor]}
+                        config={{
+                          animated: true,
+                          duration: 2000,
+                          gradient: true,
+                        }}
+                        centerContent={
+                          <Image
+                            source={{ uri: macro.iconOutline }}
+                            style={styles.macroIcon}
+                            resizeMode="contain"
+                          />
+                        }
+                      />
+                      <Text style={styles.macroLabel}>
+                        <Text style={styles.macroLabelValue}>{formatUnit(macro.value)}</Text>
+                        <Text style={styles.macroLabelGoal}>/{formatUnit(macro.goal)}</Text>
+                      </Text>
+                    </Animated.View>
+                  </MacroPopover>
                 );
               })}
             </View>
@@ -467,44 +480,56 @@ export default function HomeScreen() {
                 
                 const lighterColor = macro.color + '88';
                 
+                const macroTypeMap: { [key: number]: 'fruit' | 'veg' } = {
+                  0: 'fruit',
+                  1: 'veg',
+                };
+                
                 return (
-                  <Animated.View
+                  <MacroPopover
                     key={index}
-                    style={[
-                      styles.macroRingContainer,
-                      {
-                        transform: [{ scale: macroAnimations[actualIndex] }],
-                        shadowColor: macro.color,
-                        shadowOpacity: glowOpacity,
-                        shadowRadius: 20,
-                        shadowOffset: { width: 0, height: 0 },
-                      },
-                    ]}
+                    macroName={macro.name}
+                    macroType={macroTypeMap[index]}
+                    macroColor={macro.color}
+                    selectedDate={selectedDate}
                   >
-                    <ProgressRingChart
-                      progress={progress}
-                      size={80}
-                      strokeWidth={8}
-                      color={macro.color}
-                      gradientColors={[macro.color, lighterColor]}
-                      config={{
-                        animated: true,
-                        duration: 2000,
-                        gradient: true,
-                      }}
-                      centerContent={
-                        <Image
-                          source={{ uri: macro.iconOutline }}
-                          style={styles.macroIcon}
-                          resizeMode="contain"
-                        />
-                      }
-                    />
-                    <Text style={styles.macroLabel}>
-                      <Text style={styles.macroLabelValue}>{formatUnit(macro.value)}</Text>
-                      <Text style={styles.macroLabelGoal}>/{formatUnit(macro.goal)}</Text>
-                    </Text>
-                  </Animated.View>
+                    <Animated.View
+                      style={[
+                        styles.macroRingContainer,
+                        {
+                          transform: [{ scale: macroAnimations[actualIndex] }],
+                          shadowColor: macro.color,
+                          shadowOpacity: glowOpacity,
+                          shadowRadius: 20,
+                          shadowOffset: { width: 0, height: 0 },
+                        },
+                      ]}
+                    >
+                      <ProgressRingChart
+                        progress={progress}
+                        size={80}
+                        strokeWidth={8}
+                        color={macro.color}
+                        gradientColors={[macro.color, lighterColor]}
+                        config={{
+                          animated: true,
+                          duration: 2000,
+                          gradient: true,
+                        }}
+                        centerContent={
+                          <Image
+                            source={{ uri: macro.iconOutline }}
+                            style={styles.macroIcon}
+                            resizeMode="contain"
+                          />
+                        }
+                      />
+                      <Text style={styles.macroLabel}>
+                        <Text style={styles.macroLabelValue}>{formatUnit(macro.value)}</Text>
+                        <Text style={styles.macroLabelGoal}>/{formatUnit(macro.goal)}</Text>
+                      </Text>
+                    </Animated.View>
+                  </MacroPopover>
                 );
               })}
             </View>
