@@ -282,7 +282,7 @@ export default function MeasurementsScreen() {
                 onPress={() => setShowBodyFatSheet(true)}
                 activeOpacity={0.7}
               >
-                <Percent color={colors.primary} size={32} style={styles.summaryIcon} />
+                <Percent color="#0D7C7E" size={32} style={styles.summaryIcon} />
                 <Text style={styles.summaryLabel}>אחוז שומן נוכחי</Text>
                 <Text style={styles.summaryValue}>
                   {latestMeasurement?.body_fat_percentage?.toFixed(1) || "0.0"}%
@@ -293,7 +293,7 @@ export default function MeasurementsScreen() {
                 onPress={() => setShowWeightSheet(true)}
                 activeOpacity={0.7}
               >
-                <Weight color={colors.primary} size={32} style={styles.summaryIcon} />
+                <Weight color="#0D7C7E" size={32} style={styles.summaryIcon} />
                 <Text style={styles.summaryLabel}>משקל נוכחי</Text>
                 <Text style={styles.summaryValue}>
                   {latestMeasurement?.body_weight?.toFixed(1) || "0.0"} ק״ג
