@@ -361,42 +361,44 @@ export default function AdminBuildMealPlanScreen() {
           showsVerticalScrollIndicator={false}
         >
           {userProfile && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.macroCardsContainer}
-            >
-              {renderMacroCard(
-                "חלבון",
-                userProfile.protein_units || 0,
-                mealPlanItems.reduce((sum, item) => sum + item.protein_units, 0),
-                colors.protein
-              )}
-              {renderMacroCard(
-                "פחמימה",
-                userProfile.carb_units || 0,
-                mealPlanItems.reduce((sum, item) => sum + item.carb_units, 0),
-                colors.carb
-              )}
-              {renderMacroCard(
-                "שומן",
-                userProfile.fat_units || 0,
-                mealPlanItems.reduce((sum, item) => sum + item.fat_units, 0),
-                colors.fat
-              )}
-              {renderMacroCard(
-                "ירק",
-                userProfile.veg_units || 0,
-                mealPlanItems.reduce((sum, item) => sum + item.veg_units, 0),
-                colors.vegetable
-              )}
-              {renderMacroCard(
-                "פרי",
-                userProfile.fruit_units || 0,
-                mealPlanItems.reduce((sum, item) => sum + item.fruit_units, 0),
-                colors.fruit
-              )}
-            </ScrollView>
+            <View style={styles.macroCardsWrapper}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.macroCardsContainer}
+              >
+                {renderMacroCard(
+                  "חלבון",
+                  userProfile.protein_units || 0,
+                  mealPlanItems.reduce((sum, item) => sum + item.protein_units, 0),
+                  colors.protein
+                )}
+                {renderMacroCard(
+                  "פחמימה",
+                  userProfile.carb_units || 0,
+                  mealPlanItems.reduce((sum, item) => sum + item.carb_units, 0),
+                  colors.carb
+                )}
+                {renderMacroCard(
+                  "שומן",
+                  userProfile.fat_units || 0,
+                  mealPlanItems.reduce((sum, item) => sum + item.fat_units, 0),
+                  colors.fat
+                )}
+                {renderMacroCard(
+                  "ירק",
+                  userProfile.veg_units || 0,
+                  mealPlanItems.reduce((sum, item) => sum + item.veg_units, 0),
+                  colors.vegetable
+                )}
+                {renderMacroCard(
+                  "פרי",
+                  userProfile.fruit_units || 0,
+                  mealPlanItems.reduce((sum, item) => sum + item.fruit_units, 0),
+                  colors.fruit
+                )}
+              </ScrollView>
+            </View>
           )}
 
           {MEAL_CATEGORIES.map((category) => {
@@ -1214,10 +1216,16 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
     color: "#718096",
   },
+  macroCardsWrapper: {
+    borderWidth: 2,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 20,
+    padding: 12,
+    marginBottom: 20,
+  },
   macroCardsContainer: {
     flexDirection: "row-reverse" as any,
     gap: 12,
-    marginBottom: 20,
     paddingRight: 4,
   },
   macroCard: {
