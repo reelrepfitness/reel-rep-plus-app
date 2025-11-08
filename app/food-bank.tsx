@@ -25,6 +25,7 @@ import { supabase } from "@/lib/supabase";
 import { FoodBankItem, Restaurant, RestaurantMenuItem } from "@/lib/types";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/auth";
+import { useToast } from "@/components/ui/toast";
 
 const categoryIcons = {
   "מסעדות": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984906/hamburger_rdbysh.webp",
@@ -45,6 +46,7 @@ export default function FoodBankScreen() {
   const queryClient = useQueryClient();
   const { goals, dailyLog } = useHomeData();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>("חלבון");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
@@ -698,13 +700,14 @@ export default function FoodBankScreen() {
       if (vegUnits > 0) triggerMacroAnimation('veg', newVeg, goals.veg || 0);
       if (fruitUnits > 0) triggerMacroAnimation('fruit', newFruit, goals.fruit || 0);
 
-      setSuccessItem(selectedFood);
-      setShowSuccess(true);
+      toast({
+        title: `${selectedFood.name} נוסף ליומן שלך בהצלחה`,
+        variant: 'success',
+        duration: 3000,
+      });
+
       closeSheet();
-      setTimeout(() => {
-        setShowSuccess(false);
-        setQuantity("1");
-      }, 2000);
+      setQuantity("1");
     } catch (error) {
       console.error("[FoodBank] Failed to add food:", error);
     }
@@ -2033,12 +2036,14 @@ export default function FoodBankScreen() {
       if (carbUnits > 0) triggerMacroAnimation('carb', newCarb, goals.carb);
       if (fatUnits > 0) triggerMacroAnimation('fat', newFat, goals.fat);
 
-      setShowSuccess(true);
+      toast({
+        title: `${selectedRestaurantItem.name} נוסף ליומן שלך בהצלחה`,
+        variant: 'success',
+        duration: 3000,
+      });
+
       closeRestaurantSheet();
-      setTimeout(() => {
-        setShowSuccess(false);
-        setQuantity("1");
-      }, 2000);
+      setQuantity("1");
     } catch (error) {
       console.error("[FoodBank] Failed to add restaurant item:", error);
     }
@@ -2118,13 +2123,14 @@ export default function FoodBankScreen() {
       if (carbUnits > 0) triggerMacroAnimation('carb', newCarb, goals.carb);
       if (fatUnits > 0) triggerMacroAnimation('fat', newFat, goals.fat);
 
-      setSuccessItem(selectedFood);
-      setShowSuccess(true);
+      toast({
+        title: `${selectedFood.name} נוסף ליומן שלך בהצלחה`,
+        variant: 'success',
+        duration: 3000,
+      });
+
       closeSheet();
-      setTimeout(() => {
-        setShowSuccess(false);
-        setQuantity("1");
-      }, 2000);
+      setQuantity("1");
     } catch (error) {
       console.error("[FoodBank] Failed to add food:", error);
     }
