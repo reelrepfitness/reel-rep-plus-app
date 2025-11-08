@@ -183,6 +183,9 @@ export default function UserDashboardScreen() {
           headerTitleAlign: "center",
         }}
       />
+      <View style={styles.stickyNotch}>
+        <Text style={styles.notchText}>{userName || "משתמש"}</Text>
+      </View>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -791,7 +794,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingTop: 60,
     paddingBottom: 150,
   },
   centerContainer: {
@@ -1170,5 +1173,28 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: colors.primary,
     textAlign: "center" as any,
+  },
+  stickyNotch: {
+    position: "absolute" as any,
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#000000",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    zIndex: 1000,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  notchText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700" as const,
+    textAlign: "center",
   },
 });
