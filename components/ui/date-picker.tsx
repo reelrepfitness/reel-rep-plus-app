@@ -8,6 +8,7 @@ import {
   Pressable,
   TextInput,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Calendar } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
@@ -65,96 +66,101 @@ export function DatePicker({
         animationType="slide"
         onRequestClose={() => setShowDatePicker(false)}
       >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowDatePicker(false)}
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoidingView}
         >
-          <Pressable style={styles.datePickerSheet} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.datePickerHeader}>
-              <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                <Text style={styles.datePickerDone}>סגור</Text>
-              </TouchableOpacity>
-              <Text style={styles.datePickerTitle}>בחר תאריך</Text>
-              <View style={{ width: 60 }} />
-            </View>
-            
-            <View style={styles.datePickerButtons}>
-              <TouchableOpacity
-                style={styles.dateButton}
-                onPress={() => {
-                  const today = new Date();
-                  handleDateChange(today);
-                  setShowDatePicker(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.dateButtonText}>היום</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.dateButton}
-                onPress={() => {
-                  const yesterday = new Date();
-                  yesterday.setDate(yesterday.getDate() - 1);
-                  handleDateChange(yesterday);
-                  setShowDatePicker(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.dateButtonText}>אתמול</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.manualDateContainer}>
-              <Text style={styles.manualDateLabel}>או בחר תאריך ספציפי:</Text>
-              <View style={styles.dateInputRow}>
-                <TextInput
-                  style={styles.dateInput}
-                  placeholder="יום"
-                  placeholderTextColor={colors.gray}
-                  value={internalDate.getDate().toString()}
-                  onChangeText={(text) => {
-                    const day = parseInt(text) || 1;
-                    const newDate = new Date(internalDate);
-                    newDate.setDate(Math.min(Math.max(day, 1), 31));
-                    handleDateChange(newDate);
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={2}
-                />
-                <Text style={styles.dateSeparator}>/</Text>
-                <TextInput
-                  style={styles.dateInput}
-                  placeholder="חודש"
-                  placeholderTextColor={colors.gray}
-                  value={(internalDate.getMonth() + 1).toString()}
-                  onChangeText={(text) => {
-                    const month = parseInt(text) || 1;
-                    const newDate = new Date(internalDate);
-                    newDate.setMonth(Math.min(Math.max(month - 1, 0), 11));
-                    handleDateChange(newDate);
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={2}
-                />
-                <Text style={styles.dateSeparator}>/</Text>
-                <TextInput
-                  style={styles.dateInput}
-                  placeholder="שנה"
-                  placeholderTextColor={colors.gray}
-                  value={internalDate.getFullYear().toString()}
-                  onChangeText={(text) => {
-                    const year = parseInt(text) || new Date().getFullYear();
-                    const newDate = new Date(internalDate);
-                    newDate.setFullYear(year);
-                    handleDateChange(newDate);
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={4}
-                />
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setShowDatePicker(false)}
+          >
+            <Pressable style={styles.datePickerSheet} onPress={(e) => e.stopPropagation()}>
+              <View style={styles.datePickerHeader}>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <Text style={styles.datePickerDone}>סגור</Text>
+                </TouchableOpacity>
+                <Text style={styles.datePickerTitle}>בחר תאריך</Text>
+                <View style={{ width: 60 }} />
               </View>
-            </View>
+              
+              <View style={styles.datePickerButtons}>
+                <TouchableOpacity
+                  style={styles.dateButton}
+                  onPress={() => {
+                    const today = new Date();
+                    handleDateChange(today);
+                    setShowDatePicker(false);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.dateButtonText}>היום</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.dateButton}
+                  onPress={() => {
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    handleDateChange(yesterday);
+                    setShowDatePicker(false);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.dateButtonText}>אתמול</Text>
+                </TouchableOpacity>
+              </View>
+              
+              <View style={styles.manualDateContainer}>
+                <Text style={styles.manualDateLabel}>או בחר תאריך ספציפי:</Text>
+                <View style={styles.dateInputRow}>
+                  <TextInput
+                    style={styles.dateInput}
+                    placeholder="יום"
+                    placeholderTextColor={colors.gray}
+                    value={internalDate.getDate().toString()}
+                    onChangeText={(text) => {
+                      const day = parseInt(text) || 1;
+                      const newDate = new Date(internalDate);
+                      newDate.setDate(Math.min(Math.max(day, 1), 31));
+                      handleDateChange(newDate);
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                  />
+                  <Text style={styles.dateSeparator}>/</Text>
+                  <TextInput
+                    style={styles.dateInput}
+                    placeholder="חודש"
+                    placeholderTextColor={colors.gray}
+                    value={(internalDate.getMonth() + 1).toString()}
+                    onChangeText={(text) => {
+                      const month = parseInt(text) || 1;
+                      const newDate = new Date(internalDate);
+                      newDate.setMonth(Math.min(Math.max(month - 1, 0), 11));
+                      handleDateChange(newDate);
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                  />
+                  <Text style={styles.dateSeparator}>/</Text>
+                  <TextInput
+                    style={styles.dateInput}
+                    placeholder="שנה"
+                    placeholderTextColor={colors.gray}
+                    value={internalDate.getFullYear().toString()}
+                    onChangeText={(text) => {
+                      const year = parseInt(text) || new Date().getFullYear();
+                      const newDate = new Date(internalDate);
+                      newDate.setFullYear(year);
+                      handleDateChange(newDate);
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={4}
+                  />
+                </View>
+              </View>
+            </Pressable>
           </Pressable>
-        </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -194,6 +200,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600' as const,
     color: colors.text,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   modalOverlay: {
     flex: 1,
