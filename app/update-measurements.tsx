@@ -10,7 +10,6 @@ import {
   Platform,
   InputAccessoryView,
   Pressable,
-  Modal,
 } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -26,9 +25,9 @@ import {
   Activity,
   CheckCircle,
   AlertCircle,
-  Calendar,
   TrendingUp,
 } from "lucide-react-native";
+import { DatePicker } from '@/components/ui/date-picker';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type MeasurementData = {
@@ -94,8 +93,7 @@ export default function UpdateMeasurementsScreen() {
   });
 
   const [submitted, setSubmitted] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   const calculateBMI = useMemo(() => {
     const { bodyWeight, height } = measurements;
@@ -205,7 +203,7 @@ export default function UpdateMeasurementsScreen() {
 
       const measurementData: any = {
         user_id: userId,
-        measurement_date: selectedDate.toISOString(),
+        measurement_date: (selectedDate || new Date()).toISOString(),
       };
 
       if (data.bodyWeight) measurementData.body_weight = parseFloat(data.bodyWeight);
@@ -323,21 +321,12 @@ export default function UpdateMeasurementsScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity 
-          style={styles.dateCard}
-          onPress={() => setShowDatePicker(true)}
-          activeOpacity={0.7}
-        >
-          <Calendar color={colors.primary} size={24} />
-          <Text style={styles.dateText}>
-            {selectedDate.toLocaleDateString('he-IL', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </Text>
-        </TouchableOpacity>
+        <DatePicker
+          label="תאריך המדידה"
+          value={selectedDate}
+          onChange={setSelectedDate}
+          placeholder="בחר תאריך מדידה"
+        />
 
         <View style={styles.infoCard}>
           <Activity color={colors.primary} size={28} />
@@ -549,100 +538,7 @@ export default function UpdateMeasurementsScreen() {
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      <Modal
-        visible={showDatePicker}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowDatePicker(false)}
-      >
-        <Pressable 
-          style={styles.modalOverlay}
-          onPress={() => setShowDatePicker(false)}
-        >
-          <Pressable style={styles.datePickerSheet} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.datePickerHeader}>
-              <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                <Text style={styles.datePickerDone}>סגור</Text>
-              </TouchableOpacity>
-              <Text style={styles.datePickerTitle}>בחר תאריך</Text>
-              <View style={{ width: 60 }} />
-            </View>
-            <View style={styles.datePickerButtons}>
-              <TouchableOpacity
-                style={styles.dateButton}
-                onPress={() => {
-                  setSelectedDate(new Date());
-                  setShowDatePicker(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.dateButtonText}>היום</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.dateButton}
-                onPress={() => {
-                  const yesterday = new Date();
-                  yesterday.setDate(yesterday.getDate() - 1);
-                  setSelectedDate(yesterday);
-                  setShowDatePicker(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.dateButtonText}>אתמול</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.manualDateContainer}>
-              <Text style={styles.manualDateLabel}>או בחר תאריך ספציפי:</Text>
-              <View style={styles.dateInputRow}>
-                <TextInput
-                  style={styles.dateInput}
-                  placeholder="יום"
-                  placeholderTextColor={colors.gray}
-                  value={selectedDate.getDate().toString()}
-                  onChangeText={(text) => {
-                    const day = parseInt(text) || 1;
-                    const newDate = new Date(selectedDate);
-                    newDate.setDate(Math.min(Math.max(day, 1), 31));
-                    setSelectedDate(newDate);
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={2}
-                />
-                <Text style={styles.dateSeparator}>/</Text>
-                <TextInput
-                  style={styles.dateInput}
-                  placeholder="חודש"
-                  placeholderTextColor={colors.gray}
-                  value={(selectedDate.getMonth() + 1).toString()}
-                  onChangeText={(text) => {
-                    const month = parseInt(text) || 1;
-                    const newDate = new Date(selectedDate);
-                    newDate.setMonth(Math.min(Math.max(month - 1, 0), 11));
-                    setSelectedDate(newDate);
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={2}
-                />
-                <Text style={styles.dateSeparator}>/</Text>
-                <TextInput
-                  style={styles.dateInput}
-                  placeholder="שנה"
-                  placeholderTextColor={colors.gray}
-                  value={selectedDate.getFullYear().toString()}
-                  onChangeText={(text) => {
-                    const year = parseInt(text) || new Date().getFullYear();
-                    const newDate = new Date(selectedDate);
-                    newDate.setFullYear(year);
-                    setSelectedDate(newDate);
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={4}
-                />
-              </View>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+
 
       {Platform.OS === 'ios' && (
         <InputAccessoryView nativeID="measurementDone">
@@ -788,31 +684,7 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 120,
   },
-  dateCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.43)",
-    borderRadius: 24,
-    padding: 16,
-    flexDirection: "row-reverse" as any,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    ...Platform.select({
-      web: {
-        backdropFilter: "blur(6.95px)",
-      } as any,
-    }),
-  },
-  dateText: {
-    fontSize: 15,
-    fontWeight: "600" as const,
-    color: colors.text,
-  },
+
   infoCard: {
     backgroundColor: "rgba(255, 255, 255, 0.43)",
     borderRadius: 24,
@@ -1198,88 +1070,5 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
     color: colors.text,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  datePickerSheet: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingBottom: 32,
-    paddingTop: 12,
-  },
-  datePickerHeader: {
-    flexDirection: "row-reverse" as any,
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  datePickerTitle: {
-    fontSize: 18,
-    fontWeight: "700" as const,
-    color: colors.text,
-  },
-  datePickerDone: {
-    fontSize: 16,
-    fontWeight: "600" as const,
-    color: colors.primary,
-  },
-  datePickerButtons: {
-    flexDirection: "row-reverse" as any,
-    gap: 12,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  dateButton: {
-    flex: 1,
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  dateButtonText: {
-    fontSize: 16,
-    fontWeight: "700" as const,
-    color: colors.white,
-  },
-  manualDateContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-  manualDateLabel: {
-    fontSize: 15,
-    fontWeight: "600" as const,
-    color: colors.text,
-    textAlign: "right",
-    marginBottom: 12,
-  },
-  dateInputRow: {
-    flexDirection: "row-reverse" as any,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  dateInput: {
-    backgroundColor: "#F8F9FA",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: colors.text,
-    textAlign: "center",
-    borderWidth: 2,
-    borderColor: "transparent",
-    fontWeight: "600" as const,
-    minWidth: 70,
-  },
-  dateSeparator: {
-    fontSize: 20,
-    fontWeight: "700" as const,
-    color: colors.gray,
-  },
+
 });
