@@ -118,6 +118,8 @@ const styles = StyleSheet.create({
     letterSpacing: -0.14,
     color: '#1A1C1E',
     textAlign: 'right' as const,
+    paddingVertical: 0,
+    textAlignVertical: 'center' as const,
   },
   eyeIcon: {
     padding: 4,
