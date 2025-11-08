@@ -534,11 +534,11 @@ export default function HomeScreen() {
 
         <View style={styles.waterCard}>
           <View style={styles.waterHeader}>
-            <Text style={styles.waterSubtitle}>12 כוסות מים ביום</Text>
             <View style={styles.waterHeaderRight}>
               <Droplets color="#3FCDD1" size={24} strokeWidth={2.5} />
               <Text style={styles.waterTitle}>מים</Text>
             </View>
+            <Text style={styles.waterSubtitle}>12 כוסות מים ביום</Text>
           </View>
           
           <View style={styles.waterCupsContainer}>
