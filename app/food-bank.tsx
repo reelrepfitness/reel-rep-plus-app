@@ -34,6 +34,7 @@ const categoryIcons = {
   "ממרחים": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984926/sauce_xujuvj.webp",
   "חלבון": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984930/steak_1_h9xrdj.webp",
   "מכולת": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758994452/grocery-basket_xutxrp.webp",
+  "אלכוהול": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984862/martini-glass-citrus_pl3pmc.webp",
 };
 
 export default function FoodBankScreen() {
@@ -167,7 +168,7 @@ export default function FoodBankScreen() {
   });
 
   const mainCategories = useMemo(() => {
-    const categoryOrder = ["חלבון", "פחמימה", "שומן", "ירק", "פרי", "ממרחים", "מכולת", "מסעדות"];
+    const categoryOrder = ["חלבון", "פחמימה", "שומן", "ירק", "פרי", "ממרחים", "מכולת", "מסעדות", "אלכוהול"];
     const categories = new Set(foodItems.map(item => item.category));
     const availableCategories = Array.from(categories).filter(Boolean);
     const filteredCategories = categoryOrder.filter(cat => availableCategories.includes(cat));
