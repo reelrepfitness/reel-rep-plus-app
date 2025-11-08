@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Animated, Dimensions, Pressable, Linking, TextInput, Modal } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Linking, TextInput, Modal, Pressable } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/contexts/auth";
@@ -6,31 +6,15 @@ import { supabase } from "@/lib/supabase";
 import { User } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
-import { useMemo, useState, useRef, useEffect } from "react";
-import { Droplet, UserPlus, Menu, X, Users, Utensils, BookOpen, Settings, Bell, BarChart3, MessageCircle, LayoutDashboard, MessageSquare, Image as LucideImage } from "lucide-react-native";
+import { useMemo, useState } from "react";
+import { Droplet, UserPlus, Menu, X, MessageSquare } from "lucide-react-native";
 import { Image } from "expo-image";
-
-const { width } = Dimensions.get("window");
-const DRAWER_WIDTH = width * 0.75;
-
-const menuItems = [
-  { id: "dashboard", title: "מסך ניהול", icon: LayoutDashboard },
-  { id: "clients", title: "לקוחות", icon: Users },
-  { id: "notifications", title: "ניהול התראות", icon: Bell },
-  { id: "add-food", title: "הוסף מזון", icon: Utensils },
-  { id: "guides", title: "מדריכים", icon: BookOpen },
-  { id: "analytics", title: "דוחות ואנליטיקה", icon: BarChart3 },
-  { id: "settings", title: "הגדרות", icon: Settings },
-  { id: "support", title: "תמיכה ופניות", icon: MessageCircle },
-];
+import { AdminMenuSheet } from "@/components/AdminMenuSheet";
 
 export default function AdminClientsScreen() {
   const { user } = useAuth();
   const router = useRouter();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const drawerAnim = useRef(new Animated.Value(width)).current;
-  const overlayAnim = useRef(new Animated.Value(0)).current;
-  const [selectedMenu, setSelectedMenu] = useState("clients");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [whatsappSheetVisible, setWhatsappSheetVisible] = useState(false);
   const [selectedClient, setSelectedClient] = useState<User | null>(null);
   const [whatsappMessage, setWhatsappMessage] = useState("");
@@ -93,48 +77,7 @@ export default function AdminClientsScreen() {
     });
   }, [clients, dailyLogs]);
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.spring(drawerAnim, {
-        toValue: isDrawerOpen ? 0 : width,
-        useNativeDriver: true,
-        tension: 65,
-        friction: 11,
-      }),
-      Animated.timing(overlayAnim, {
-        toValue: isDrawerOpen ? 1 : 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [isDrawerOpen]);
 
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
-
-  const handleMenuSelect = (menuId: string) => {
-    setSelectedMenu(menuId);
-    setIsDrawerOpen(false);
-    
-    if (menuId === "dashboard") {
-      router.push("/admin-dashboard" as any);
-    } else if (menuId === "clients") {
-      return;
-    } else if (menuId === "notifications") {
-      router.push("/admin-notifications" as any);
-    } else if (menuId === "add-food") {
-      router.push("/admin-add-food" as any);
-    } else if (menuId === "guides") {
-      router.push("/admin-guides" as any);
-    } else if (menuId === "analytics") {
-      router.push("/admin-analytics" as any);
-    } else if (menuId === "settings") {
-      router.push("/admin-settings" as any);
-    } else if (menuId === "support") {
-      router.push("/admin-support" as any);
-    }
-  };
 
   if (user?.role !== "admin") {
     return (
@@ -153,7 +96,7 @@ export default function AdminClientsScreen() {
             headerTintColor: "#FFFFFF",
             headerTitleAlign: "center",
             headerRight: () => (
-              <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+              <TouchableOpacity onPress={() => setIsMenuOpen(true)} style={{ paddingHorizontal: 16 }}>
                 <Menu size={24} color="#FFFFFF" />
               </TouchableOpacity>
             ),
@@ -183,7 +126,7 @@ export default function AdminClientsScreen() {
             headerTintColor: "#FFFFFF",
             headerTitleAlign: "center",
             headerRight: () => (
-              <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+              <TouchableOpacity onPress={() => setIsMenuOpen(true)} style={{ paddingHorizontal: 16 }}>
                 <Menu size={24} color="#FFFFFF" />
               </TouchableOpacity>
             ),
@@ -409,6 +352,8 @@ export default function AdminClientsScreen() {
           </Pressable>
         </Pressable>
       </Modal>
+      
+      <AdminMenuSheet open={isMenuOpen} onOpenChange={setIsMenuOpen} currentScreen="clients" />
     </LinearGradient>
   );
 }

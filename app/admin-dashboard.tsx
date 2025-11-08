@@ -1,36 +1,19 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Animated, Dimensions, Pressable, Platform } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Platform } from "react-native";
 import { BlurView } from "expo-blur";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/contexts/auth";
 import { supabase } from "@/lib/supabase";
 import { User } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
-import { useMemo, useState, useRef, useEffect } from "react";
-import { AlertTriangle, Clock, Droplet, Flame, TrendingUp, Activity, Database, Zap, AlertCircle, Menu, X, Users, Utensils, BookOpen, Settings, Bell, BarChart3, MessageCircle, LayoutDashboard } from "lucide-react-native";
-
-const { width } = Dimensions.get("window");
-const DRAWER_WIDTH = width * 0.75;
-
-const menuItems = [
-  { id: "dashboard", title: "מסך ניהול", icon: LayoutDashboard },
-  { id: "clients", title: "לקוחות", icon: Users },
-  { id: "notifications", title: "ניהול התראות", icon: Bell },
-  { id: "add-food", title: "הוסף מזון", icon: Utensils },
-  { id: "guides", title: "מדריכים", icon: BookOpen },
-  { id: "analytics", title: "דוחות ואנליטיקה", icon: BarChart3 },
-  { id: "settings", title: "הגדרות", icon: Settings },
-  { id: "support", title: "תמיכה ופניות", icon: MessageCircle },
-];
+import { useMemo, useState } from "react";
+import { AlertTriangle, Clock, Flame, TrendingUp, Activity, Database, Zap, Menu } from "lucide-react-native";
+import { AdminMenuSheet } from "@/components/AdminMenuSheet";
 
 export default function AdminDashboardScreen() {
   const { user } = useAuth();
-  const router = useRouter();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const drawerAnim = useRef(new Animated.Value(width)).current;
-  const overlayAnim = useRef(new Animated.Value(0)).current;
-  const [selectedMenu, setSelectedMenu] = useState("dashboard");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
 
   const today = useMemo(() => {
@@ -195,49 +178,7 @@ export default function AdminDashboardScreen() {
     };
   }, [clients, dailyLogs]);
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.spring(drawerAnim, {
-        toValue: isDrawerOpen ? 0 : width,
-        useNativeDriver: true,
-        tension: 65,
-        friction: 11,
-      }),
-      Animated.timing(overlayAnim, {
-        toValue: isDrawerOpen ? 1 : 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [isDrawerOpen]);
 
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
-
-  const handleMenuSelect = (menuId: string) => {
-    console.log("[AdminDashboard] Menu selected:", menuId);
-    setSelectedMenu(menuId);
-    setIsDrawerOpen(false);
-    
-    if (menuId === "dashboard") {
-      return;
-    } else if (menuId === "clients") {
-      router.push("/admin-clients" as any);
-    } else if (menuId === "notifications") {
-      router.push("/admin-notifications" as any);
-    } else if (menuId === "add-food") {
-      router.push("/admin-add-food" as any);
-    } else if (menuId === "guides") {
-      router.push("/admin-guides" as any);
-    } else if (menuId === "analytics") {
-      router.push("/admin-analytics" as any);
-    } else if (menuId === "settings") {
-      router.push("/admin-settings" as any);
-    } else if (menuId === "support") {
-      router.push("/admin-support" as any);
-    }
-  };
 
   if (user?.role !== "admin") {
     return (
@@ -256,7 +197,7 @@ export default function AdminDashboardScreen() {
             headerTintColor: "#FFFFFF",
             headerTitleAlign: "center",
             headerRight: () => (
-              <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+              <TouchableOpacity onPress={() => setIsMenuOpen(true)} style={{ paddingHorizontal: 16 }}>
                 <Menu size={24} color="#FFFFFF" />
               </TouchableOpacity>
             ),
@@ -286,7 +227,7 @@ export default function AdminDashboardScreen() {
             headerTintColor: "#FFFFFF",
             headerTitleAlign: "center",
             headerRight: () => (
-              <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+              <TouchableOpacity onPress={() => setIsMenuOpen(true)} style={{ paddingHorizontal: 16 }}>
                 <Menu size={24} color="#FFFFFF" />
               </TouchableOpacity>
             ),
@@ -315,7 +256,7 @@ export default function AdminDashboardScreen() {
           headerTintColor: "#FFFFFF",
           headerTitleAlign: "center",
           headerRight: () => (
-            <TouchableOpacity onPress={toggleDrawer} style={{ paddingHorizontal: 16 }}>
+            <TouchableOpacity onPress={() => setIsMenuOpen(true)} style={{ paddingHorizontal: 16 }}>
               <Menu size={24} color="#FFFFFF" />
             </TouchableOpacity>
           ),
@@ -543,82 +484,7 @@ export default function AdminDashboardScreen() {
         </View>
       </ScrollView>
 
-      <Animated.View
-        pointerEvents={isDrawerOpen ? "auto" : "none"}
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            backgroundColor: "rgba(0,0,0,0.5)",
-            opacity: overlayAnim,
-          },
-        ]}
-      >
-        <Pressable
-          style={StyleSheet.absoluteFill}
-          onPress={toggleDrawer}
-        />
-      </Animated.View>
-
-      <Animated.View
-        style={[
-          styles.drawer,
-          {
-            transform: [{ translateX: drawerAnim }],
-          },
-        ]}
-      >
-        <LinearGradient
-          colors={["#3FCDD1", "#2AB8BC"]}
-          style={styles.drawerHeader}
-        >
-          <View style={styles.drawerHeaderContent}>
-            <Text style={styles.drawerTitle}>תפריט מנהל</Text>
-            <TouchableOpacity onPress={toggleDrawer}>
-              <X size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.adminInfo}>
-            <View style={styles.adminAvatar}>
-              <Text style={styles.adminAvatarText}>{user?.email?.charAt(0).toUpperCase() || "A"}</Text>
-            </View>
-            <View style={styles.adminDetails}>
-              <Text style={styles.adminName}>איוון</Text>
-              <Text style={styles.adminRole}>מנהל מערכת</Text>
-            </View>
-          </View>
-        </LinearGradient>
-
-        <ScrollView style={styles.drawerContent} showsVerticalScrollIndicator={false}>
-          {menuItems.map((item) => {
-            const IconComponent = item.icon;
-            const isSelected = selectedMenu === item.id;
-            return (
-              <TouchableOpacity
-                key={item.id}
-                style={[
-                  styles.menuItem,
-                  isSelected && styles.menuItemSelected,
-                ]}
-                onPress={() => handleMenuSelect(item.id)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.menuItemContent}>
-                  <Text style={[
-                    styles.menuItemText,
-                    isSelected && styles.menuItemTextSelected,
-                  ]}>
-                    {item.title}
-                  </Text>
-                  <IconComponent
-                    size={22}
-                    color={isSelected ? "#3FCDD1" : "#64748B"}
-                  />
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </Animated.View>
+      <AdminMenuSheet open={isMenuOpen} onOpenChange={setIsMenuOpen} currentScreen="dashboard" />
     </LinearGradient>
   );
 }
@@ -961,95 +827,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#2d3748",
-  },
-  drawer: {
-    position: "absolute" as const,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: DRAWER_WIDTH,
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: { width: -2, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 16,
-  },
-  drawerHeader: {
-    paddingTop: 60,
-    paddingBottom: 24,
-    paddingHorizontal: 20,
-  },
-  drawerHeaderContent: {
-    flexDirection: "row-reverse" as any,
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  drawerTitle: {
-    fontSize: 24,
-    fontWeight: "700" as const,
-    color: "#FFFFFF",
-  },
-  adminInfo: {
-    flexDirection: "row-reverse" as any,
-    alignItems: "center",
-    gap: 12,
-  },
-  adminAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  adminAvatarText: {
-    fontSize: 24,
-    fontWeight: "700" as const,
-    color: "#FFFFFF",
-  },
-  adminDetails: {
-    flex: 1,
-    alignItems: "flex-end",
-  },
-  adminName: {
-    fontSize: 18,
-    fontWeight: "600" as const,
-    color: "#FFFFFF",
-    marginBottom: 4,
-  },
-  adminRole: {
-    fontSize: 14,
-    color: "rgba(255, 255, 255, 0.8)",
-  },
-  drawerContent: {
-    flex: 1,
-    paddingTop: 8,
-  },
-  menuItem: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
-  },
-  menuItemSelected: {
-    backgroundColor: "rgba(63, 205, 209, 0.1)",
-    borderLeftWidth: 4,
-    borderLeftColor: "#3FCDD1",
-  },
-  menuItemContent: {
-    flexDirection: "row-reverse" as any,
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  menuItemText: {
-    fontSize: 16,
-    fontWeight: "600" as const,
-    color: "#64748B",
-  },
-  menuItemTextSelected: {
-    color: "#3FCDD1",
-    fontWeight: "700" as const,
   },
 });
