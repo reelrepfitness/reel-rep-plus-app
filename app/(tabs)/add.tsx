@@ -675,60 +675,66 @@ export default function MealsScreen() {
                 <Text style={styles.sheetTitle}>הוסף מזון</Text>
                 
                 <View style={styles.optionsGrid}>
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('favorites')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.optionIconContainer, styles.optionIconContainerFavorites]}>
-                      <Heart size={32} color="#FF6B6B" strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.optionText}>מועדפים</Text>
-                  </TouchableOpacity>
+                  <View style={styles.optionsRow}>
+                    <TouchableOpacity
+                      style={styles.optionButton}
+                      onPress={() => handleOptionSelect('favorites')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={[styles.optionIconContainer, styles.optionIconContainerFavorites]}>
+                        <Heart size={32} color="#FF6B6B" strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionText}>מועדפים</Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('food-bank')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionIconContainer}>
-                      <ShoppingBasket size={32} color={colors.primary} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.optionText}>בנק מזון</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.optionButton}
+                      onPress={() => handleOptionSelect('food-bank')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.optionIconContainer}>
+                        <ShoppingBasket size={32} color={colors.primary} strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionText}>בנק מזון</Text>
+                    </TouchableOpacity>
+                  </View>
 
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('barcode')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionIconContainer}>
-                      <Barcode size={32} color={colors.primary} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.optionText}>ברקוד</Text>
-                  </TouchableOpacity>
+                  <View style={styles.optionsRow}>
+                    <TouchableOpacity
+                      style={styles.optionButton}
+                      onPress={() => handleOptionSelect('barcode')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.optionIconContainer}>
+                        <Barcode size={32} color={colors.primary} strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionText}>ברקוד</Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('ai')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionIconContainer}>
-                      <Sparkles size={32} color={colors.primary} strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.optionText}>AI</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.optionButton}
+                      onPress={() => handleOptionSelect('ai')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.optionIconContainer}>
+                        <Sparkles size={32} color={colors.primary} strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionText}>AI</Text>
+                    </TouchableOpacity>
+                  </View>
 
-                  <TouchableOpacity
-                    style={styles.optionButton}
-                    onPress={() => handleOptionSelect('recipes')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.optionIconContainer, styles.optionIconContainerRecipes]}>
-                      <ChefHat size={32} color="#FF9800" strokeWidth={2.5} />
-                    </View>
-                    <Text style={styles.optionText}>מתכונים</Text>
-                  </TouchableOpacity>
+                  <View style={styles.optionsRowCentered}>
+                    <TouchableOpacity
+                      style={styles.optionButton}
+                      onPress={() => handleOptionSelect('recipes')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={[styles.optionIconContainer, styles.optionIconContainerRecipes]}>
+                        <ChefHat size={32} color="#FF9800" strokeWidth={2.5} />
+                      </View>
+                      <Text style={styles.optionText}>מתכונים</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </Animated.View>
             </TouchableOpacity>
@@ -1289,15 +1295,25 @@ const styles = StyleSheet.create({
   optionsGrid: {
     gap: 20,
     paddingHorizontal: 8,
+    alignItems: "center",
   },
   optionsRow: {
     flexDirection: "row-reverse" as any,
     gap: 16,
+    width: "100%",
+    justifyContent: "space-evenly",
+  },
+  optionsRowCentered: {
+    flexDirection: "row-reverse" as any,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   optionButton: {
     alignItems: "center",
     gap: 12,
-    width: "100%",
+    flex: 1,
+    minWidth: 120,
   },
   optionButtonLarge: {
     flex: 1,
