@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { BottomSheet, useBottomSheet } from "@/components/ui/bottom-sheet";
-import { FoodBankItem } from "@/lib/types";
+import { FoodBankItem, User } from "@/lib/types";
 import { SearchBar } from "@/components/ui/searchbar";
 import { useState, useMemo } from "react";
 
@@ -64,6 +64,30 @@ export default function AdminBuildMealPlanScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   
+  const { data: userProfile } = useQuery({
+    queryKey: ["userProfile", userId],
+    queryFn: async () => {
+      if (!userId) return null;
+
+      console.log("[AdminMealPlan] Fetching user profile:", userId);
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+
+      if (error) {
+        console.error("[AdminMealPlan] Error fetching user profile:", error);
+        throw error;
+      }
+
+      console.log("[AdminMealPlan] User profile loaded");
+      return data as User;
+    },
+    enabled: !!userId,
+  });
+
   const { data: mealPlanItems = [], isLoading } = useQuery({
     queryKey: ["adminMealPlan", userId],
     queryFn: async () => {
@@ -261,6 +285,38 @@ export default function AdminBuildMealPlanScreen() {
     );
   };
 
+  const renderMacroCard = (label: string, goal: number, current: number, color: string) => {
+    const remaining = goal - current;
+    const percentage = goal > 0 ? Math.min((current / goal) * 100, 100) : 0;
+
+    return (
+      <View key={label} style={[styles.macroCard, { borderColor: color }]}>
+        <View style={styles.macroCardHeader}>
+          <Text style={styles.macroCardLabel}>{label}</Text>
+        </View>
+        
+        <View style={styles.macroCardContent}>
+          <View style={styles.macroCardRow}>
+            <Text style={styles.macroCardValue}>{Math.round(current)}</Text>
+            <Text style={styles.macroCardDivider}>/</Text>
+            <Text style={[styles.macroCardGoal, { color }]}>{Math.round(goal)}</Text>
+          </View>
+          
+          <View style={styles.progressBarContainer}>
+            <View style={[styles.progressBarFill, { width: `${percentage}%`, backgroundColor: color }]} />
+          </View>
+          
+          <View style={styles.macroCardFooter}>
+            <Text style={[styles.macroCardRemaining, { color: remaining > 0 ? "#10B981" : "#EF4444" }]}>
+              {remaining > 0 ? "+" : ""}{Math.round(remaining)}
+            </Text>
+            <Text style={styles.macroCardRemainingLabel}>נותר</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
   if (isLoading) {
     return (
       <>
@@ -304,6 +360,41 @@ export default function AdminBuildMealPlanScreen() {
           contentContainerStyle={[styles.content, { paddingBottom: 100 }]}
           showsVerticalScrollIndicator={false}
         >
+          {userProfile && (
+            <View style={styles.macroCardsContainer}>
+              {renderMacroCard(
+                "קלוריות",
+                userProfile.kcal_goal || 0,
+                mealPlanItems.reduce((sum, item) => sum + item.kcal, 0),
+                "#FF6B6B"
+              )}
+              {renderMacroCard(
+                "חלבון",
+                userProfile.protein_units || 0,
+                mealPlanItems.reduce((sum, item) => sum + item.protein_units, 0),
+                colors.protein
+              )}
+              {renderMacroCard(
+                "פחמימות",
+                userProfile.carb_units || 0,
+                mealPlanItems.reduce((sum, item) => sum + item.carb_units, 0),
+                colors.carb
+              )}
+              {renderMacroCard(
+                "שומן",
+                userProfile.fat_units || 0,
+                mealPlanItems.reduce((sum, item) => sum + item.fat_units, 0),
+                colors.fat
+              )}
+              {renderMacroCard(
+                "ירקות ופירות",
+                (userProfile.veg_units || 0) + (userProfile.fruit_units || 0),
+                mealPlanItems.reduce((sum, item) => sum + item.veg_units + item.fruit_units, 0),
+                colors.vegetable
+              )}
+            </View>
+          )}
+
           {MEAL_CATEGORIES.map((category) => {
             const categoryItems = mealPlanItems.filter(
               (item) => item.meal_category === category
@@ -1092,5 +1183,75 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700" as const,
     color: "#718096",
+  },
+  macroCardsContainer: {
+    flexDirection: "row-reverse" as any,
+    flexWrap: "wrap",
+    gap: 12,
+    marginBottom: 20,
+  },
+  macroCard: {
+    width: "48%" as any,
+    backgroundColor: "#0A0A0A",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+  },
+  macroCardHeader: {
+    marginBottom: 12,
+  },
+  macroCardLabel: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "rgba(255, 255, 255, 0.8)",
+    textAlign: "right",
+  },
+  macroCardContent: {
+    gap: 8,
+  },
+  macroCardRow: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+  },
+  macroCardValue: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#FFFFFF",
+  },
+  macroCardDivider: {
+    fontSize: 20,
+    fontWeight: "600" as const,
+    color: "rgba(255, 255, 255, 0.5)",
+  },
+  macroCardGoal: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+  },
+  progressBarContainer: {
+    height: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: "100%" as any,
+    borderRadius: 3,
+  },
+  macroCardFooter: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    marginTop: 4,
+  },
+  macroCardRemaining: {
+    fontSize: 18,
+    fontWeight: "700" as const,
+  },
+  macroCardRemainingLabel: {
+    fontSize: 12,
+    color: "rgba(255, 255, 255, 0.7)",
   },
 });
