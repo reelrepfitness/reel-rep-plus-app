@@ -361,13 +361,11 @@ export default function AdminBuildMealPlanScreen() {
           showsVerticalScrollIndicator={false}
         >
           {userProfile && (
-            <View style={styles.macroCardsContainer}>
-              {renderMacroCard(
-                "קלוריות",
-                userProfile.kcal_goal || 0,
-                mealPlanItems.reduce((sum, item) => sum + item.kcal, 0),
-                "#FF6B6B"
-              )}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.macroCardsContainer}
+            >
               {renderMacroCard(
                 "חלבון",
                 userProfile.protein_units || 0,
@@ -375,7 +373,7 @@ export default function AdminBuildMealPlanScreen() {
                 colors.protein
               )}
               {renderMacroCard(
-                "פחמימות",
+                "פחמימה",
                 userProfile.carb_units || 0,
                 mealPlanItems.reduce((sum, item) => sum + item.carb_units, 0),
                 colors.carb
@@ -387,12 +385,18 @@ export default function AdminBuildMealPlanScreen() {
                 colors.fat
               )}
               {renderMacroCard(
-                "ירקות ופירות",
-                (userProfile.veg_units || 0) + (userProfile.fruit_units || 0),
-                mealPlanItems.reduce((sum, item) => sum + item.veg_units + item.fruit_units, 0),
+                "ירק",
+                userProfile.veg_units || 0,
+                mealPlanItems.reduce((sum, item) => sum + item.veg_units, 0),
                 colors.vegetable
               )}
-            </View>
+              {renderMacroCard(
+                "פרי",
+                userProfile.fruit_units || 0,
+                mealPlanItems.reduce((sum, item) => sum + item.fruit_units, 0),
+                colors.fruit
+              )}
+            </ScrollView>
           )}
 
           {MEAL_CATEGORIES.map((category) => {
@@ -1186,12 +1190,12 @@ const styles = StyleSheet.create({
   },
   macroCardsContainer: {
     flexDirection: "row-reverse" as any,
-    flexWrap: "wrap",
     gap: 12,
     marginBottom: 20,
+    paddingRight: 4,
   },
   macroCard: {
-    width: "48%" as any,
+    width: 140,
     backgroundColor: "#0A0A0A",
     borderRadius: 16,
     padding: 16,
