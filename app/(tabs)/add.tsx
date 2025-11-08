@@ -690,12 +690,10 @@ export default function MealsScreen() {
                           activeOpacity={0.7}
                         >
                           <View style={[styles.groupedIconContainer, styles.groupedIconContainerFavorites]}>
-                            <Heart size={36} color="#FF6B6B" strokeWidth={2.5} />
+                            <Heart size={32} color="#FF6B6B" strokeWidth={2.5} />
                           </View>
                           <Text style={styles.groupedCardTitle}>מועדפים</Text>
                         </TouchableOpacity>
-                        
-                        <View style={styles.groupDivider} />
                         
                         <TouchableOpacity
                           style={styles.groupedOptionButton}
@@ -703,7 +701,7 @@ export default function MealsScreen() {
                           activeOpacity={0.7}
                         >
                           <View style={styles.groupedIconContainer}>
-                            <ShoppingBasket size={36} color={colors.primary} strokeWidth={2.5} />
+                            <ShoppingBasket size={32} color={colors.primary} strokeWidth={2.5} />
                           </View>
                           <Text style={styles.groupedCardTitle}>בנק מזון</Text>
                         </TouchableOpacity>
@@ -718,12 +716,10 @@ export default function MealsScreen() {
                           activeOpacity={0.7}
                         >
                           <View style={styles.groupedIconContainer}>
-                            <Barcode size={36} color={colors.primary} strokeWidth={2.5} />
+                            <Barcode size={32} color={colors.primary} strokeWidth={2.5} />
                           </View>
                           <Text style={styles.groupedCardTitle}>ברקוד</Text>
                         </TouchableOpacity>
-                        
-                        <View style={styles.groupDivider} />
                         
                         <TouchableOpacity
                           style={styles.groupedOptionButton}
@@ -731,7 +727,7 @@ export default function MealsScreen() {
                           activeOpacity={0.7}
                         >
                           <View style={styles.groupedIconContainer}>
-                            <Sparkles size={36} color={colors.primary} strokeWidth={2.5} />
+                            <Sparkles size={32} color={colors.primary} strokeWidth={2.5} />
                           </View>
                           <Text style={styles.groupedCardTitle}>AI</Text>
                         </TouchableOpacity>
@@ -746,7 +742,7 @@ export default function MealsScreen() {
                           activeOpacity={0.7}
                         >
                           <View style={[styles.singleIconContainer, styles.singleIconContainerRecipes]}>
-                            <ChefHat size={52} color="#FF9800" strokeWidth={2.5} />
+                            <ChefHat size={32} color="#FF9800" strokeWidth={2.5} />
                           </View>
                           <Text style={styles.singleCardTitle}>מתכונים</Text>
                           <Text style={styles.singleCardSubtitle}>מתכונים מותאמים אישית</Text>
@@ -1288,6 +1284,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 20,
+    maxHeight: "70%",
   },
   sheetHandle: {
     width: 40,
@@ -1524,15 +1521,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   carouselCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "transparent",
     borderRadius: 24,
     padding: 20,
     minHeight: 240,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
   },
   carouselCardContent: {
     flex: 1,
@@ -1558,9 +1550,9 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   groupedIconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: `${colors.primary}15`,
     justifyContent: "center",
     alignItems: "center",
@@ -1572,13 +1564,13 @@ const styles = StyleSheet.create({
     borderColor: "#FF6B6B",
   },
   singleIconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: `${colors.primary}15`,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 3,
+    borderWidth: 2.5,
     borderColor: colors.primary,
   },
   singleIconContainerRecipes: {
@@ -1603,11 +1595,7 @@ const styles = StyleSheet.create({
     color: "#718096",
     textAlign: "center",
   },
-  groupDivider: {
-    width: 1,
-    height: "80%",
-    backgroundColor: "#E2E8F0",
-  },
+
   carouselIconContainer: {
     width: 80,
     height: 80,
