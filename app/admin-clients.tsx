@@ -200,6 +200,17 @@ export default function AdminClientsScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.clientHeader}>
+                    <View style={styles.clientInfo}>
+                      <View style={styles.clientAvatar}>
+                        <Text style={styles.clientAvatarText}>
+                          {client.name?.charAt(0) || "?"}
+                        </Text>
+                      </View>
+                      <View style={styles.clientDetails}>
+                        <Text style={styles.clientName}>{client.name || "ללא שם"}</Text>
+                        <Text style={styles.clientEmail}>{client.email}</Text>
+                      </View>
+                    </View>
                     {client.whatsapp_link && (
                       <TouchableOpacity
                         style={styles.whatsappButton}
@@ -217,17 +228,6 @@ export default function AdminClientsScreen() {
                         />
                       </TouchableOpacity>
                     )}
-                    <View style={styles.clientInfo}>
-                      <View style={styles.clientAvatar}>
-                        <Text style={styles.clientAvatarText}>
-                          {client.name?.charAt(0) || "?"}
-                        </Text>
-                      </View>
-                      <View style={styles.clientDetails}>
-                        <Text style={styles.clientName}>{client.name || "ללא שם"}</Text>
-                        <Text style={styles.clientEmail}>{client.email}</Text>
-                      </View>
-                    </View>
                   </View>
 
                   <View style={styles.progressBars}>
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   clientHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: "row" as any,
     alignItems: "flex-start",
     justifyContent: "space-between",
     marginBottom: 16,
