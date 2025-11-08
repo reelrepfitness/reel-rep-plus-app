@@ -286,8 +286,7 @@ export default function MealsScreen() {
       } else if (option === 'ai') {
         router.push({ pathname: "/ai-photo-analysis", params: { mealType: selectedMealType || "" } });
       } else if (option === 'favorites') {
-        // TODO: Navigate to favorites screen
-        console.log('Favorites pressed');
+        router.push({ pathname: "/favorites", params: { mealType: selectedMealType || "" } });
       }
     }, 300);
   };
