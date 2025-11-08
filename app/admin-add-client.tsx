@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { colors } from "@/constants/colors";
 import { useState } from "react";
 import { UserPlus } from "lucide-react-native";
+import { RadioButton } from "@/components/ui/radio";
 
 export default function AdminAddClientScreen() {
   const { user } = useAuth();
@@ -16,6 +17,19 @@ export default function AdminAddClientScreen() {
     email: "",
     password: "",
     name: "",
+    role: "user" as "user" | "coach" | "admin",
+    phone: "",
+    age: "",
+    gender: "" as "זכר" | "נקבה" | "",
+    goal: "" as "ירידה במשקל" | "עליה במשקל" | "שמירה על משקל" | "הרזיה" | "בניית שריר" | "",
+    activity: "" as "בישיבה" | "פעילות קלה" | "פעילות בינונית" | "פעילות גבוהה" | "פעילות גבוהה מאוד" | "",
+    bodyWeight: "",
+    height: "",
+    waterDailyGoal: "12",
+    whatsappLink: "",
+    foodLimitations: "",
+    usersNotes: "",
+    mealPlan: false,
     kcalGoal: "",
     proteinUnits: "",
     carbUnits: "",
@@ -48,8 +62,23 @@ export default function AdminAddClientScreen() {
       if (authData.user) {
         const { error: profileError } = await supabase
           .from("profiles")
-          .update({
+          .insert({
+            user_id: authData.user.id,
+            email: formData.email,
             name: formData.name,
+            role: formData.role,
+            phone: formData.phone || null,
+            age: formData.age || null,
+            gender: formData.gender || null,
+            goal: formData.goal || null,
+            activity: formData.activity || null,
+            body_weight: Number(formData.bodyWeight) || null,
+            height: Number(formData.height) || null,
+            water_daily_goal: Number(formData.waterDailyGoal) || 12,
+            whatsapp_link: formData.whatsappLink || null,
+            food_limitations: formData.foodLimitations || null,
+            users_notes: formData.usersNotes || null,
+            meal_plan: formData.mealPlan,
             kcal_goal: Number(formData.kcalGoal) || 0,
             protein_units: Number(formData.proteinUnits) || 0,
             carb_units: Number(formData.carbUnits) || 0,
@@ -58,8 +87,7 @@ export default function AdminAddClientScreen() {
             veg_units: Number(formData.vegUnits) || 0,
             weekly_cardio_minutes: Number(formData.weeklyCardioMinutes) || 0,
             weekly_strength_workouts: Number(formData.weeklyStrengthWorkouts) || 0,
-          })
-          .eq("user_id", authData.user.id);
+          });
 
         if (profileError) {
           console.error("[AdminAddClient] Profile error:", profileError);
@@ -161,6 +189,197 @@ export default function AdminAddClientScreen() {
               placeholder="הזן שם מלא"
               textAlign="right"
             />
+          </View>
+
+          <Text style={styles.sectionTitle}>פרטים אישיים</Text>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>תפקיד</Text>
+            <View style={styles.radioGroup}>
+              {[
+                { label: 'משתמש', value: 'user' },
+                { label: 'מאמן', value: 'coach' },
+                { label: 'מנהל', value: 'admin' },
+              ].map((option) => (
+                <RadioButton
+                  key={option.value}
+                  option={option}
+                  selected={formData.role === option.value}
+                  onPress={() => setFormData({ ...formData, role: option.value as any })}
+                />
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>טלפון</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.phone}
+              onChangeText={(text) => setFormData({ ...formData, phone: text })}
+              placeholder="הזן טלפון"
+              keyboardType="phone-pad"
+              textAlign="right"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>גיל</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.age}
+              onChangeText={(text) => setFormData({ ...formData, age: text })}
+              placeholder="הזן גיל"
+              keyboardType="numeric"
+              textAlign="right"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>מגדר</Text>
+            <View style={styles.radioGroup}>
+              {[
+                { label: 'זכר', value: 'זכר' },
+                { label: 'נקבה', value: 'נקבה' },
+              ].map((option) => (
+                <RadioButton
+                  key={option.value}
+                  option={option}
+                  selected={formData.gender === option.value}
+                  onPress={() => setFormData({ ...formData, gender: option.value as any })}
+                />
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>מטרה</Text>
+            <View style={styles.radioGroup}>
+              {[
+                { label: 'ירידה במשקל', value: 'ירידה במשקל' },
+                { label: 'עליה במשקל', value: 'עליה במשקל' },
+                { label: 'שמירה על משקל', value: 'שמירה על משקל' },
+                { label: 'הרזיה', value: 'הרזיה' },
+                { label: 'בניית שריר', value: 'בניית שריר' },
+              ].map((option) => (
+                <RadioButton
+                  key={option.value}
+                  option={option}
+                  selected={formData.goal === option.value}
+                  onPress={() => setFormData({ ...formData, goal: option.value as any })}
+                />
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>רמת פעילות</Text>
+            <View style={styles.radioGroup}>
+              {[
+                { label: 'בישיבה', value: 'בישיבה' },
+                { label: 'פעילות קלה', value: 'פעילות קלה' },
+                { label: 'פעילות בינונית', value: 'פעילות בינונית' },
+                { label: 'פעילות גבוהה', value: 'פעילות גבוהה' },
+                { label: 'פעילות גבוהה מאוד', value: 'פעילות גבוהה מאוד' },
+              ].map((option) => (
+                <RadioButton
+                  key={option.value}
+                  option={option}
+                  selected={formData.activity === option.value}
+                  onPress={() => setFormData({ ...formData, activity: option.value as any })}
+                />
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>משקל גוף (ק״ג)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.bodyWeight}
+              onChangeText={(text) => setFormData({ ...formData, bodyWeight: text })}
+              placeholder="0"
+              keyboardType="decimal-pad"
+              textAlign="right"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>גובה (ס״מ)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.height}
+              onChangeText={(text) => setFormData({ ...formData, height: text })}
+              placeholder="0"
+              keyboardType="numeric"
+              textAlign="right"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>יעד צריכת מים יומי (כוסות)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.waterDailyGoal}
+              onChangeText={(text) => setFormData({ ...formData, waterDailyGoal: text })}
+              placeholder="12"
+              keyboardType="numeric"
+              textAlign="right"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>קישור וואטסאפ</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.whatsappLink}
+              onChangeText={(text) => setFormData({ ...formData, whatsappLink: text })}
+              placeholder="הזן קישור וואטסאפ"
+              textAlign="right"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>מגבלות מזון</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={formData.foodLimitations}
+              onChangeText={(text) => setFormData({ ...formData, foodLimitations: text })}
+              placeholder="הזן מגבלות מזון"
+              textAlign="right"
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>הערות</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={formData.usersNotes}
+              onChangeText={(text) => setFormData({ ...formData, usersNotes: text })}
+              placeholder="הזן הערות"
+              textAlign="right"
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>תפריט ארוחות</Text>
+            <View style={styles.radioGroup}>
+              {[
+                { label: 'כן', value: 'true' },
+                { label: 'לא', value: 'false' },
+              ].map((option) => (
+                <RadioButton
+                  key={option.value}
+                  option={option}
+                  selected={formData.mealPlan === (option.value === 'true')}
+                  onPress={() => setFormData({ ...formData, mealPlan: option.value === 'true' })}
+                />
+              ))}
+            </View>
           </View>
 
           <Text style={styles.sectionTitle}>יעדים תזונתיים</Text>
@@ -364,5 +583,13 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "700" as const,
+  },
+  radioGroup: {
+    gap: 8,
+  },
+  textArea: {
+    minHeight: 80,
+    textAlignVertical: "top" as const,
+    paddingTop: 16,
   },
 });
