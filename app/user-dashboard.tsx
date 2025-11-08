@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
 import { useMemo } from "react";
-import { User, TrendingUp, Scale, Weight, Percent, Edit, UtensilsCrossed, Activity, ChefHat } from "lucide-react-native";
+import { User, TrendingUp, Scale, Weight, Percent, Edit, UtensilsCrossed, Activity, ChefHat, ArrowLeft } from "lucide-react-native";
 import { LineChart } from "react-native-chart-kit";
 import Svg, { Circle, Path } from "react-native-svg";
 import { BodyMeasurement } from "@/lib/types";
@@ -150,13 +150,7 @@ export default function UserDashboardScreen() {
       >
         <Stack.Screen
           options={{
-            headerShown: true,
-            title: `${userName || "משתמש"}`,
-            headerStyle: {
-              backgroundColor: "#3FCDD1",
-            },
-            headerTintColor: "#FFFFFF",
-            headerTitleAlign: "center",
+            headerShown: false,
           }}
         />
         <View style={styles.centerContainer}>
@@ -174,16 +168,17 @@ export default function UserDashboardScreen() {
     >
       <Stack.Screen
         options={{
-          headerShown: true,
-          title: `${userName || "משתמש"}`,
-          headerStyle: {
-            backgroundColor: "#3FCDD1",
-          },
-          headerTintColor: "#FFFFFF",
-          headerTitleAlign: "center",
+          headerShown: false,
         }}
       />
       <View style={styles.stickyNotch}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+          activeOpacity={0.7}
+        >
+          <ArrowLeft color="#FFFFFF" size={24} />
+        </TouchableOpacity>
         <Text style={styles.notchText}>{userName || "משתמש"}</Text>
       </View>
       <ScrollView
@@ -1190,6 +1185,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 10,
+    flexDirection: "row" as any,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  backButton: {
+    position: "absolute" as any,
+    left: 24,
+    padding: 4,
   },
   notchText: {
     color: "#FFFFFF",
