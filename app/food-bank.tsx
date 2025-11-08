@@ -119,10 +119,10 @@ export default function FoodBankScreen() {
     },
   });
 
-  const { data: restaurants = [] } = useQuery({
-    queryKey: ["restaurants"],
+  const { data: restaurantItems = [] } = useQuery({
+    queryKey: ["restaurantItems"],
     queryFn: async () => {
-      console.log("[FoodBank] Fetching restaurants");
+      console.log("[FoodBank] Fetching restaurant items");
       
       const { data, error } = await supabase
         .from("restaurants")
@@ -130,12 +130,12 @@ export default function FoodBankScreen() {
         .order("name", { ascending: true });
 
       if (error) {
-        console.error("[FoodBank] Error fetching restaurants:", error);
+        console.error("[FoodBank] Error fetching restaurant items:", error);
         throw error;
       }
 
-      console.log(`[FoodBank] Loaded ${data?.length || 0} restaurants`);
-      return data as Restaurant[];
+      console.log(`[FoodBank] Loaded ${data?.length || 0} restaurant items`);
+      return data as any[];
     },
   });
 
@@ -205,7 +205,12 @@ export default function FoodBankScreen() {
     if (!selectedMainCategory) return [];
     
     if (selectedMainCategory === "מסעדות") {
-      return restaurants.map(r => r.name);
+      const categories = new Set(
+        restaurantItems
+          .filter(item => item.category)
+          .map(item => item.category)
+      );
+      return Array.from(categories).filter(Boolean) as string[];
     }
     
     if (selectedMainCategory === "אלכוהול") {
@@ -223,7 +228,7 @@ export default function FoodBankScreen() {
         .map(item => item.sub_category)
     );
     return Array.from(subs).filter(Boolean) as string[];
-  }, [foodItems, alcoholItems, selectedMainCategory, restaurants]);
+  }, [foodItems, alcoholItems, selectedMainCategory, restaurantItems]);
 
   const filteredItems = useMemo(() => {
     if (selectedMainCategory === "מסעדות" || selectedMainCategory === "אלכוהול") {
@@ -271,22 +276,22 @@ export default function FoodBankScreen() {
     return filtered;
   }, [alcoholItems, searchQuery, selectedSubCategory, selectedMainCategory]);
 
-  const filteredRestaurants = useMemo(() => {
+  const filteredRestaurantItems = useMemo(() => {
     if (selectedMainCategory !== "מסעדות") return [];
     
-    let filtered = restaurants;
+    let filtered = restaurantItems;
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(r => r.name.toLowerCase().includes(query));
+      filtered = filtered.filter(item => item.name.toLowerCase().includes(query));
     }
 
     if (selectedSubCategory) {
-      filtered = filtered.filter(r => r.name === selectedSubCategory);
+      filtered = filtered.filter(item => item.category === selectedSubCategory);
     }
     
     return filtered;
-  }, [restaurants, selectedMainCategory, searchQuery, selectedSubCategory]);
+  }, [restaurantItems, selectedMainCategory, searchQuery, selectedSubCategory]);
 
   const showRestaurantsList = selectedMainCategory === "מסעדות";
   const showAlcoholList = selectedMainCategory === "אלכוהול";
@@ -451,17 +456,10 @@ export default function FoodBankScreen() {
   };
 
   const handleSubCategoryPress = (subCategory: string) => {
-    if (selectedMainCategory === "מסעדות") {
-      const restaurant = restaurants.find(r => r.name === subCategory);
-      if (restaurant) {
-        handleRestaurantPress(restaurant);
-      }
+    if (selectedSubCategory === subCategory) {
+      setSelectedSubCategory(null);
     } else {
-      if (selectedSubCategory === subCategory) {
-        setSelectedSubCategory(null);
-      } else {
-        setSelectedSubCategory(subCategory);
-      }
+      setSelectedSubCategory(subCategory);
     }
   };
 
@@ -984,7 +982,7 @@ export default function FoodBankScreen() {
               </ScrollView>
             </View>
 
-            {subCategories.length > 0 && selectedMainCategory !== "מסעדות" && (
+            {subCategories.length > 0 && (
               <View style={styles.subCategoriesCard}>
                 <ScrollView
                   horizontal
@@ -1059,13 +1057,80 @@ export default function FoodBankScreen() {
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
-          ) : showRestaurantsList && filteredRestaurants.length === 0 ? (
+          ) : showRestaurantsList && filteredRestaurantItems.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>אין מסעדות זמינות</Text>
+              <Text style={styles.emptyText}>אין פריטי מסעדה זמינים</Text>
             </View>
           ) : showAlcoholList && filteredAlcoholItems.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>אין פריטי אלכוהול זמינים</Text>
+            </View>
+          ) : showRestaurantsList ? (
+            <View style={styles.foodGrid}>
+              {filteredRestaurantItems.map((item) => (
+                <Pressable
+                  key={item.id}
+                  style={styles.foodCard}
+                  onPress={() => {
+                    console.log("[FoodBank] Selected restaurant item:", item.name);
+                  }}
+                >
+                  <View style={styles.foodImageContainer}>
+                    {item.grid_restaurants ? (
+                      <Image
+                        source={{ uri: item.grid_restaurants }}
+                        style={styles.foodImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.foodImagePlaceholder}>
+                        <Text style={styles.foodImagePlaceholderText}>
+                          {item.name.charAt(0)}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.foodInfo}>
+                    <Text style={styles.foodName} numberOfLines={2}>
+                      {item.name}
+                    </Text>
+                    
+                    <View style={styles.foodNutrition}>
+                      {item.protien_units > 0 && (
+                        <View style={[styles.nutritionBadge, { backgroundColor: `${colors.protein}30` }]}>
+                          <Image
+                            source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
+                            style={styles.nutritionIcon}
+                            resizeMode="contain"
+                          />
+                          <Text style={styles.nutritionText}>{formatUnit(item.protien_units)}</Text>
+                        </View>
+                      )}
+                      {item.carb_units > 0 && (
+                        <View style={[styles.nutritionBadge, { backgroundColor: `${colors.carb}30` }]}>
+                          <Image
+                            source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
+                            style={styles.nutritionIcon}
+                            resizeMode="contain"
+                          />
+                          <Text style={styles.nutritionText}>{formatUnit(item.carb_units)}</Text>
+                        </View>
+                      )}
+                      {item.fats_units > 0 && (
+                        <View style={[styles.nutritionBadge, { backgroundColor: `${colors.fat}30` }]}>
+                          <Image
+                            source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
+                            style={styles.nutritionIcon}
+                            resizeMode="contain"
+                          />
+                          <Text style={styles.nutritionText}>{formatUnit(item.fats_units)}</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </Pressable>
+              ))}
             </View>
           ) : showAlcoholList ? (
             <View style={styles.foodGrid}>
@@ -1141,39 +1206,6 @@ export default function FoodBankScreen() {
                   </Pressable>
                 );
               })}
-            </View>
-          ) : showRestaurantsList ? (
-            <View style={styles.foodGrid}>
-              {filteredRestaurants.map((restaurant) => (
-                <TouchableOpacity
-                  key={restaurant.id}
-                  style={styles.foodCard}
-                  onPress={() => handleRestaurantPress(restaurant)}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.foodImageContainer}>
-                    {restaurant.img_url ? (
-                      <Image
-                        source={{ uri: restaurant.img_url }}
-                        style={styles.foodImage}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <View style={styles.foodImagePlaceholder}>
-                        <Text style={styles.foodImagePlaceholderText}>
-                          {restaurant.name.charAt(0)}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-
-                  <View style={styles.foodInfo}>
-                    <Text style={styles.foodName} numberOfLines={2}>
-                      {restaurant.name}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
             </View>
           ) : filteredItems.length === 0 ? (
             <View style={styles.emptyContainer}>
