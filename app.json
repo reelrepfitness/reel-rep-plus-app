@@ -92,7 +92,7 @@
       "assetPatternsToBeBundled": [],
       "disableAntiBrickingMeasures": false
     },
-    "runtimeVersion": "<UNKNOWN>"
+    "runtimeVersion": "<UNKNOWN>",
   "extra": {
       "eas": {
         "projectId": "b22ezxscydzxy6y59xv7e"
