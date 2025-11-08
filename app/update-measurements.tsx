@@ -43,6 +43,8 @@ type MeasurementData = {
   backArmSkinfold: string;
   subscapularSkinfold: string;
   abdominalSkinfold: string;
+  bodyDensity: string;
+  bodyFatPercentage: string;
 };
 
 export default function UpdateMeasurementsScreen() {
@@ -92,6 +94,8 @@ export default function UpdateMeasurementsScreen() {
     backArmSkinfold: "",
     subscapularSkinfold: "",
     abdominalSkinfold: "",
+    bodyDensity: "",
+    bodyFatPercentage: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -131,7 +135,7 @@ export default function UpdateMeasurementsScreen() {
     return { value: bmi.toFixed(2), classification };
   }, [measurements]);
 
-  const calculateBodyFat = useMemo(() => {
+  const calculateBodyDensity = useMemo(() => {
     const { frontArmSkinfold, backArmSkinfold, subscapularSkinfold, abdominalSkinfold } = measurements;
     const gender = userProfile?.gender;
     const age = userProfile?.age;
@@ -147,7 +151,7 @@ export default function UpdateMeasurementsScreen() {
     const suprailiac = parseFloat(abdominalSkinfold);
 
     if (ageNum < 17 || ageNum > 100) {
-      return { error: "גי�� חייב להיות בין 17-100" };
+      return { error: "גיל חייב להיות בין 17-100" };
     }
 
     if (biceps < 1 || biceps > 50 || triceps < 1 || triceps > 50 || 
@@ -190,14 +194,58 @@ export default function UpdateMeasurementsScreen() {
       return { error: "תוצאת חישוב לא תקינה - נא לבדוק את המדידות" };
     }
 
+    return { value: bodyDensity.toFixed(4) };
+  }, [measurements, userProfile]);
+
+  const calculateBodyFat = useMemo(() => {
+    const bodyDensityValue = measurements.bodyDensity || (calculateBodyDensity && !calculateBodyDensity.error ? calculateBodyDensity.value : null);
+    
+    if (!bodyDensityValue) {
+      return null;
+    }
+
+    const bodyDensity = parseFloat(bodyDensityValue);
+
+    if (bodyDensity < 1.0 || bodyDensity > 1.1) {
+      return { error: "תוצאת חישוב לא תקינה - נא לבדוק את המדידות" };
+    }
+
     const bodyFatPercentage = ((4.95 / bodyDensity) - 4.50) * 100;
 
     if (bodyFatPercentage < 3 || bodyFatPercentage > 50) {
       return { error: "תוצאת אחוז שומן לא סבירה - נא לבדוק את המדידות" };
     }
 
-    return { value: bodyFatPercentage.toFixed(1) };
-  }, [measurements, userProfile]);
+    return { value: bodyFatPercentage.toFixed(1), source: measurements.bodyDensity ? 'manual' : 'calculated' };
+  }, [measurements.bodyDensity, calculateBodyDensity]);
+
+  const finalBodyFatPercentage = useMemo(() => {
+    if (measurements.bodyFatPercentage) {
+      const value = parseFloat(measurements.bodyFatPercentage);
+      if (!isNaN(value) && value >= 3 && value <= 50) {
+        return { value: value.toFixed(1), source: 'manual' as const };
+      }
+    }
+    return calculateBodyFat;
+  }, [measurements.bodyFatPercentage, calculateBodyFat]);
+
+  const bodyComposition = useMemo(() => {
+    if (!measurements.bodyWeight) return null;
+    
+    const weight = parseFloat(measurements.bodyWeight);
+    if (isNaN(weight) || weight <= 0) return null;
+
+    const fatPercentage = finalBodyFatPercentage?.value ? parseFloat(finalBodyFatPercentage.value) : null;
+    if (!fatPercentage) return null;
+
+    const bodyFatMass = (weight * fatPercentage) / 100;
+    const leanMass = weight - bodyFatMass;
+
+    return {
+      bodyFatMass: bodyFatMass.toFixed(2),
+      leanMass: leanMass.toFixed(2),
+    };
+  }, [measurements.bodyWeight, finalBodyFatPercentage]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: MeasurementData) => {
@@ -210,8 +258,8 @@ export default function UpdateMeasurementsScreen() {
 
       if (data.bodyWeight) measurementData.body_weight = parseFloat(data.bodyWeight);
       
-      if (calculateBodyFat && !calculateBodyFat.error && calculateBodyFat.value) {
-        measurementData.body_fat_percentage = parseFloat(calculateBodyFat.value);
+      if (finalBodyFatPercentage && !finalBodyFatPercentage.error && finalBodyFatPercentage.value) {
+        measurementData.body_fat_percentage = parseFloat(finalBodyFatPercentage.value);
       }
       
       if (data.waist) measurementData.waist_circumference = parseFloat(data.waist);
@@ -220,11 +268,9 @@ export default function UpdateMeasurementsScreen() {
       if (data.neck) measurementData.neck_circumference = parseFloat(data.neck);
       if (data.shoulder) measurementData.shoulder_circumference = parseFloat(data.shoulder);
 
-      if (data.bodyWeight && calculateBodyFat && !calculateBodyFat.error && calculateBodyFat.value) {
-        const weight = parseFloat(data.bodyWeight);
-        const fatPercentage = parseFloat(calculateBodyFat.value);
-        measurementData.body_fat_mass = (weight * fatPercentage) / 100;
-        measurementData.lean_mass = weight - measurementData.body_fat_mass;
+      if (bodyComposition) {
+        measurementData.body_fat_mass = parseFloat(bodyComposition.bodyFatMass);
+        measurementData.lean_mass = parseFloat(bodyComposition.leanMass);
       }
 
       if (data.height) {
@@ -281,7 +327,7 @@ export default function UpdateMeasurementsScreen() {
     const hasAnyMeasurement = measurements.bodyWeight || measurements.height || 
                              measurements.waist || measurements.arm || 
                              measurements.thigh || measurements.neck || measurements.shoulder ||
-                             (calculateBodyFat && !calculateBodyFat.error);
+                             (finalBodyFatPercentage && !finalBodyFatPercentage.error);
     
     if (!hasAnyMeasurement) {
       return;
@@ -297,7 +343,7 @@ export default function UpdateMeasurementsScreen() {
   const isValid = measurements.bodyWeight || measurements.height || 
                   measurements.waist || measurements.arm || 
                   measurements.thigh || measurements.neck || measurements.shoulder ||
-                  (calculateBodyFat && !calculateBodyFat.error);
+                  (finalBodyFatPercentage && !finalBodyFatPercentage.error);
 
   if (submitted) {
     return (
@@ -520,24 +566,101 @@ export default function UpdateMeasurementsScreen() {
             placeholder="10.0"
             range="1-50"
           />
-
-          {calculateBodyFat && (
-            <View style={[styles.resultCard, calculateBodyFat.error && styles.resultCardError]}>
-              <Percent color={calculateBodyFat.error ? "#E53935" : colors.primary} size={32} />
-              <View style={styles.resultContent}>
-                {calculateBodyFat.error ? (
-                  <Text style={styles.resultError}>{calculateBodyFat.error}</Text>
-                ) : (
-                  <>
-                    <Text style={styles.resultLabel}>אחוז שומן מחושב</Text>
-                    <Text style={styles.resultValue}>{calculateBodyFat.value}%</Text>
-                    <Text style={styles.resultMethod}>שיטת Durnin-Womersley</Text>
-                  </>
-                )}
-              </View>
-            </View>
-          )}
         </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Percent color="#FF6B6B" size={24} />
+            <Text style={styles.sectionTitle}>מדידות ישירות (אופציונלי)</Text>
+          </View>
+          <View style={styles.skinfoldNote}>
+            <AlertCircle color="#3B82F6" size={18} />
+            <Text style={styles.skinfoldNoteText}>
+              אם יש לך מדידות ישירות, הכנס אותן כאן. אחרת המערכת תחשב אוטומטית מקפלי העור
+            </Text>
+          </View>
+
+          <MeasurementInput
+            label="Densidade Corporal (צפיפות גוף)"
+            icon={<Activity color="#8B5CF6" size={28} />}
+            value={measurements.bodyDensity}
+            onChange={(value) => updateMeasurement("bodyDensity", value)}
+            previousValues={[]}
+            placeholder="1.0500"
+            range="1.0-1.1"
+          />
+
+          <MeasurementInput
+            label="% Gordura Corporal (אחוז שומן)"
+            icon={<Percent color="#EC4899" size={28} />}
+            value={measurements.bodyFatPercentage}
+            onChange={(value) => updateMeasurement("bodyFatPercentage", value)}
+            previousValues={[]}
+            placeholder="15.5"
+            range="3-50%"
+          />
+        </View>
+
+        {(calculateBodyDensity || calculateBodyFat || finalBodyFatPercentage || bodyComposition) && (
+          <View style={styles.resultsSection}>
+            <View style={styles.sectionHeader}>
+              <TrendingUp color="#10B981" size={24} />
+              <Text style={styles.sectionTitle}>תוצאות חישוב</Text>
+            </View>
+
+            {calculateBodyDensity && (
+              <View style={[styles.resultCard, calculateBodyDensity.error && styles.resultCardError]}>
+                <Activity color={calculateBodyDensity.error ? "#E53935" : "#8B5CF6"} size={32} />
+                <View style={styles.resultContent}>
+                  {calculateBodyDensity.error ? (
+                    <Text style={styles.resultError}>{calculateBodyDensity.error}</Text>
+                  ) : (
+                    <>
+                      <Text style={styles.resultLabel}>Densidade Corporal (מחושב)</Text>
+                      <Text style={styles.resultValue}>{calculateBodyDensity.value}</Text>
+                      <Text style={styles.resultMethod}>Durnin-Womersley</Text>
+                    </>
+                  )}
+                </View>
+              </View>
+            )}
+
+            {finalBodyFatPercentage && !finalBodyFatPercentage.error && (
+              <View style={styles.resultCard}>
+                <Percent color={colors.primary} size={32} />
+                <View style={styles.resultContent}>
+                  <Text style={styles.resultLabel}>
+                    % Gordura Corporal ({finalBodyFatPercentage.source === 'manual' ? 'ידני' : 'מחושב'})
+                  </Text>
+                  <Text style={styles.resultValue}>{finalBodyFatPercentage.value}%</Text>
+                  {finalBodyFatPercentage.source === 'calculated' && (
+                    <Text style={styles.resultMethod}>שיטת Siri</Text>
+                  )}
+                </View>
+              </View>
+            )}
+
+            {bodyComposition && (
+              <>
+                <View style={styles.resultCard}>
+                  <Weight color="#EF4444" size={32} />
+                  <View style={styles.resultContent}>
+                    <Text style={styles.resultLabel}>מסת שומן</Text>
+                    <Text style={styles.resultValue}>{bodyComposition.bodyFatMass} ק״ג</Text>
+                  </View>
+                </View>
+
+                <View style={styles.resultCard}>
+                  <Weight color="#10B981" size={32} />
+                  <View style={styles.resultContent}>
+                    <Text style={styles.resultLabel}>מסת הגוף הרזה</Text>
+                    <Text style={styles.resultValue}>{bodyComposition.leanMass} ק״ג</Text>
+                  </View>
+                </View>
+              </>
+            )}
+          </View>
+        )}
 
         <TouchableOpacity
           style={[styles.submitButton, !isValid && styles.submitButtonDisabled]}
@@ -845,6 +968,10 @@ const styles = StyleSheet.create({
     color: "#F57C00",
     textAlign: "right",
     fontWeight: "500" as const,
+  },
+  resultsSection: {
+    marginTop: 8,
+    marginBottom: 28,
   },
   resultCard: {
     backgroundColor: "rgba(92, 225, 230, 0.15)",
