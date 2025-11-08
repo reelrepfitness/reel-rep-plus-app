@@ -24,6 +24,7 @@ import { useMealsData, DailyItem } from "@/lib/useMealsData";
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth";
+import { AvoidKeyboard } from "@/components/ui/avoid-keyboard";
 
 type MealType = "breakfast" | "snack" | "lunch" | "dinner";
 
@@ -863,6 +864,7 @@ export default function MealsScreen() {
                         </View>
                       </View>
                     ))}
+                    <AvoidKeyboard />
                   </ScrollView>
                   
                   {Platform.OS === 'ios' && (
@@ -1387,7 +1389,7 @@ const styles = StyleSheet.create({
   editItemsContent: {
     padding: 24,
     gap: 12,
-    paddingBottom: 40,
+    paddingBottom: 20,
   },
   editItemCard: {
     backgroundColor: "#F7FAFC",
