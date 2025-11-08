@@ -28,7 +28,8 @@ import {
   Apple,
   Fish,
   Wheat,
-  Candy
+  Candy,
+  ArrowLeft
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
@@ -273,15 +274,17 @@ export default function GuidesScreen() {
       style={styles.container}
     >
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <TouchableOpacity
-          onPress={handleBack}
-          style={styles.backButton}
-        >
-          <ChevronLeft color={colors.white} size={24} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>מדריכים</Text>
-        <View style={{ width: 40 }} />
+      <View style={[styles.customHeader, { paddingTop: insets.top }]}>
+        <View style={styles.headerRow1}>
+          <TouchableOpacity onPress={handleBack} style={styles.backButtonNew}>
+            <ArrowLeft color={colors.white} size={24} />
+          </TouchableOpacity>
+          <BookOpen color={colors.white} size={28} />
+          <View style={styles.backButtonNew} />
+        </View>
+        <View style={styles.headerRow2}>
+          <Text style={styles.customHeaderTitle}>מדריכים</Text>
+        </View>
       </View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {guides && guides.length > 0 ? (
@@ -357,6 +360,42 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: colors.white,
+  },
+  customHeader: {
+    backgroundColor: "#000000",
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  headerRow1: {
+    flexDirection: "row-reverse" as const,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  headerRow2: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 4,
+  },
+  backButtonNew: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  customHeaderTitle: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: colors.white,
+    textAlign: "center",
   },
   scrollView: {
     flex: 1,
