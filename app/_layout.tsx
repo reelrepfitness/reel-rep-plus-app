@@ -7,6 +7,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "@/contexts/auth";
 import { ToastProvider } from "@/components/ui/toast";
 import * as Updates from "expo-updates";
+import {
+  initializeNotifications,
+  cleanupNotifications,
+} from "@/lib/pushNotifications";
+// import { supabase } from "@/lib/supabase"; // enable when you wire saving token
 
 if (!I18nManager.isRTL && Platform.OS !== "web") {
   I18nManager.allowRTL(true);
@@ -16,7 +21,6 @@ if (!I18nManager.isRTL && Platform.OS !== "web") {
   });
 }
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
@@ -34,6 +38,17 @@ function RootLayoutNav() {
 export default function RootLayout() {
   useEffect(() => {
     SplashScreen.hideAsync();
+
+    initializeNotifications(async (token) => {
+      // Here you can send the token to your backend / Supabase.
+      // Example (make sure you have the current user id before enabling):
+      // await supabase.from("profiles").update({ push_token: token }).eq("id", userId);
+      console.log("[Push] Expo push token:", token);
+    });
+
+    return () => {
+      cleanupNotifications();
+    };
   }, []);
 
   return (
