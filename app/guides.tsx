@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Animated,
+  Modal,
 } from "react-native";
 import { Stack, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -37,12 +38,16 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Guide } from "@/lib/types";
 import { useState, ReactElement, useEffect, useRef } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function GuidesScreen() {
   const insets = useSafeAreaInsets();
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
   const slideAnims = useRef<Animated.Value[]>([]);
   const fadeAnims = useRef<Animated.Value[]>([]);
+  const [showImportantGuideModal, setShowImportantGuideModal] = useState(false);
+  const [importantGuide, setImportantGuide] = useState<Guide | null>(null);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const { data: guides, isLoading, error } = useQuery({
     queryKey: ["guides"],
@@ -57,9 +62,55 @@ export default function GuidesScreen() {
         throw error;
       }
 
-      return data as Guide[];
+      const guidesData = data as Guide[];
+      
+      const importantGuideTitle = "דגשים חשובים להתנהלות היומית";
+      const importantIndex = guidesData.findIndex(g => g.title.includes("דגשים") && g.title.includes("חשובים"));
+      
+      if (importantIndex > 0) {
+        const [important] = guidesData.splice(importantIndex, 1);
+        guidesData.unshift(important);
+      }
+
+      return guidesData;
     },
   });
+
+  useEffect(() => {
+    const checkFirstTime = async () => {
+      try {
+        const hasAcknowledged = await AsyncStorage.getItem("important_guide_acknowledged");
+        if (!hasAcknowledged && guides && guides.length > 0) {
+          const important = guides.find(g => g.title.includes("דגשים") && g.title.includes("חשובים"));
+          if (important) {
+            setImportantGuide(important);
+            setShowImportantGuideModal(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking first time:", error);
+      }
+    };
+
+    checkFirstTime();
+  }, [guides]);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
   useEffect(() => {
     if (guides && guides.length > 0 && !selectedGuide) {
@@ -92,6 +143,27 @@ export default function GuidesScreen() {
       setSelectedGuide(null);
     } else {
       router.back();
+    }
+  };
+
+  const handleAcknowledgeImportantGuide = async () => {
+    try {
+      await AsyncStorage.setItem("important_guide_acknowledged", "true");
+      setShowImportantGuideModal(false);
+      if (importantGuide) {
+        setSelectedGuide(importantGuide);
+      }
+    } catch (error) {
+      console.error("Error saving acknowledgment:", error);
+    }
+  };
+
+  const handleDismissModal = async () => {
+    try {
+      await AsyncStorage.setItem("important_guide_acknowledged", "true");
+      setShowImportantGuideModal(false);
+    } catch (error) {
+      console.error("Error saving acknowledgment:", error);
     }
   };
 
@@ -288,44 +360,105 @@ export default function GuidesScreen() {
       </View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {guides && guides.length > 0 ? (
-          guides.map((guide, index) => (
-            <Animated.View
-              key={guide.guide_id}
-              style={{
-                opacity: fadeAnims.current[index] || 1,
-                transform: [{ translateY: slideAnims.current[index] || 0 }],
-              }}
-            >
-              <TouchableOpacity
-                style={styles.guideCard}
-                onPress={() => setSelectedGuide(guide)}
-              >
-                <ChevronLeft color={colors.gray} size={20} />
-                <View style={styles.guideInfo}>
-                  <Text style={[
-                    styles.guideTitle,
-                    { writingDirection: "rtl" as const, textAlign: "right" as const }
-                  ]}>
-                    {guide.title}
-                  </Text>
-                  {guide.short_description && (
-                    <Text 
-                      style={[
-                        styles.guideDescriptionShort,
-                        { writingDirection: "rtl" as const, textAlign: "right" as const }
-                      ]} 
-                      numberOfLines={2}
+          guides.map((guide, index) => {
+            const isImportant = guide.title.includes("דגשים") && guide.title.includes("חשובים");
+            
+            if (isImportant) {
+              return (
+                <Animated.View
+                  key={guide.guide_id}
+                  style={{
+                    opacity: fadeAnims.current[index] || 1,
+                    transform: [
+                      { translateY: slideAnims.current[index] || 0 },
+                      { scale: pulseAnim }
+                    ],
+                  }}
+                >
+                  <TouchableOpacity
+                    style={styles.importantGuideCard}
+                    onPress={() => setSelectedGuide(guide)}
+                  >
+                    <LinearGradient
+                      colors={["#FFD700", "#FFA500"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.importantGradient}
                     >
-                      {guide.short_description}
+                      <View style={styles.importantBadge}>
+                        <AlertCircle color="#FFF" size={20} />
+                        <Text style={styles.importantBadgeText}>חשוב במיוחד</Text>
+                      </View>
+                      <View style={styles.importantContent}>
+                        <ChevronLeft color={colors.white} size={24} />
+                        <View style={styles.guideInfo}>
+                          <Text style={[
+                            styles.importantGuideTitle,
+                            { writingDirection: "rtl" as const, textAlign: "right" as const }
+                          ]}>
+                            {guide.title}
+                          </Text>
+                          {guide.short_description && (
+                            <Text 
+                              style={[
+                                styles.importantGuideDescription,
+                                { writingDirection: "rtl" as const, textAlign: "right" as const }
+                              ]} 
+                              numberOfLines={2}
+                            >
+                              {guide.short_description}
+                            </Text>
+                          )}
+                        </View>
+                        <View style={styles.importantIconContainer}>
+                          {getIconForGuide(guide.title, guide.emoji)}
+                        </View>
+                      </View>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </Animated.View>
+              );
+            }
+            
+            return (
+              <Animated.View
+                key={guide.guide_id}
+                style={{
+                  opacity: fadeAnims.current[index] || 1,
+                  transform: [{ translateY: slideAnims.current[index] || 0 }],
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.guideCard}
+                  onPress={() => setSelectedGuide(guide)}
+                >
+                  <ChevronLeft color={colors.gray} size={20} />
+                  <View style={styles.guideInfo}>
+                    <Text style={[
+                      styles.guideTitle,
+                      { writingDirection: "rtl" as const, textAlign: "right" as const }
+                    ]}>
+                      {guide.title}
                     </Text>
-                  )}
-                </View>
-                <View style={styles.guideIconContainer}>
-                  {getIconForGuide(guide.title, guide.emoji)}
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
-          ))
+                    {guide.short_description && (
+                      <Text 
+                        style={[
+                          styles.guideDescriptionShort,
+                          { writingDirection: "rtl" as const, textAlign: "right" as const }
+                        ]} 
+                        numberOfLines={2}
+                      >
+                        {guide.short_description}
+                      </Text>
+                    )}
+                  </View>
+                  <View style={styles.guideIconContainer}>
+                    {getIconForGuide(guide.title, guide.emoji)}
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          })
         ) : (
           <View style={styles.emptyContainer}>
             <BookOpen color={colors.gray} size={64} />
@@ -333,6 +466,47 @@ export default function GuidesScreen() {
           </View>
         )}
       </ScrollView>
+      <Modal
+        visible={showImportantGuideModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={handleDismissModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <LinearGradient
+              colors={["#FFD700", "#FFA500"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.modalGradient}
+            >
+              <View style={styles.modalIconContainer}>
+                <AlertCircle color="#FFF" size={64} />
+              </View>
+              <Text style={styles.modalTitle}>מדריך חשוב!</Text>
+              <Text style={styles.modalDescription}>
+                {importantGuide?.title}
+              </Text>
+              <Text style={styles.modalSubtext}>
+                מדריך זה מכיל מידע חיוני להתנהלות היומית שלך.
+מומלץ לקרוא לפני השימוש באפליקציה.
+              </Text>
+              <TouchableOpacity
+                style={styles.modalPrimaryButton}
+                onPress={handleAcknowledgeImportantGuide}
+              >
+                <Text style={styles.modalPrimaryButtonText}>קרא עכשיו</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalSecondaryButton}
+                onPress={handleDismissModal}
+              >
+                <Text style={styles.modalSecondaryButtonText}>אקרא מאוחר יותר</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -524,5 +698,144 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     marginTop: 4,
+  },
+  importantGuideCard: {
+    borderRadius: 20,
+    marginBottom: 20,
+    shadowColor: "#FFA500",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12,
+    overflow: "hidden",
+  },
+  importantGradient: {
+    padding: 20,
+    borderRadius: 20,
+  },
+  importantBadge: {
+    flexDirection: "row-reverse" as const,
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: "flex-end",
+    marginBottom: 12,
+  },
+  importantBadgeText: {
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "700" as const,
+  },
+  importantContent: {
+    flexDirection: "row-reverse" as const,
+    alignItems: "center",
+    gap: 12,
+  },
+  importantGuideTitle: {
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: colors.white,
+    marginBottom: 4,
+  },
+  importantGuideDescription: {
+    fontSize: 15,
+    color: "rgba(255, 255, 255, 0.9)",
+  },
+  importantIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    width: "100%",
+    maxWidth: 400,
+    borderRadius: 24,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 16,
+  },
+  modalGradient: {
+    padding: 32,
+    alignItems: "center",
+  },
+  modalIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 28,
+    fontWeight: "700" as const,
+    color: colors.white,
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  modalDescription: {
+    fontSize: 18,
+    fontWeight: "600" as const,
+    color: colors.white,
+    marginBottom: 16,
+    textAlign: "center",
+    writingDirection: "rtl" as const,
+  },
+  modalSubtext: {
+    fontSize: 15,
+    color: "rgba(255, 255, 255, 0.9)",
+    marginBottom: 32,
+    textAlign: "center",
+    lineHeight: 24,
+    writingDirection: "rtl" as const,
+  },
+  modalPrimaryButton: {
+    backgroundColor: colors.white,
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    borderRadius: 16,
+    marginBottom: 12,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modalPrimaryButtonText: {
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: "#FFA500",
+    textAlign: "center",
+  },
+  modalSecondaryButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    width: "100%",
+  },
+  modalSecondaryButtonText: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: colors.white,
+    textAlign: "center",
   },
 });
