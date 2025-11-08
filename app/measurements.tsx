@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { Stack, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ArrowLeft, Scale, Ruler, TrendingUp, Weight, Percent, X } from "lucide-react-native";
+import { ArrowLeft, Scale, Ruler, TrendingUp, Weight, Percent, X, Activity } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
 import { useAuth } from "@/contexts/auth";
@@ -259,12 +259,17 @@ export default function MeasurementsScreen() {
       style={styles.container}
     >
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft color={colors.white} size={24} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>הערכה גופנית</Text>
-        <View style={styles.addButton} />
+      <View style={[styles.customHeader, { paddingTop: insets.top }]}>
+        <View style={styles.headerRow1}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButtonNew}>
+            <ArrowLeft color={colors.white} size={24} />
+          </TouchableOpacity>
+          <Activity color={colors.white} size={28} />
+          <View style={styles.backButtonNew} />
+        </View>
+        <View style={styles.headerRow2}>
+          <Text style={styles.customHeaderTitle}>הערכה גופנית</Text>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -575,6 +580,42 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
+  },
+  customHeader: {
+    backgroundColor: "#000000",
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  headerRow1: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  headerRow2: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 4,
+  },
+  backButtonNew: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  customHeaderTitle: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: colors.white,
+    textAlign: "center",
   },
   scrollView: {
     flex: 1,
