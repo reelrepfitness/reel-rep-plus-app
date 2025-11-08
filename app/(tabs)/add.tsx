@@ -23,6 +23,7 @@ import { useState, useEffect, useRef } from "react";
 import { useMealsData, DailyItem } from "@/lib/useMealsData";
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/auth";
 
 type MealType = "breakfast" | "snack" | "lunch" | "dinner";
 
@@ -31,6 +32,7 @@ export default function MealsScreen() {
   const { meals } = useMealsData();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { user } = useAuth();
   
   const [selectedMealType, setSelectedMealType] = useState<string | null>(null);
   const [showAddSheet, setShowAddSheet] = useState<boolean>(false);
@@ -110,7 +112,7 @@ export default function MealsScreen() {
     });
   }, [dailyLog, macroFlashAnimations, confettiAnimations]);
   
-  const hasMealPlan = true;
+  const hasMealPlan = user?.meal_plan === true;
 
   const mealNames = {
     breakfast: "ארוחת בוקר",
