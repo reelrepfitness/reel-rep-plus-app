@@ -35,3 +35,8 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 .vercel
+
+# Google service account credentials (sensitive)
+google-service-account.json
+*.json.key
+*.service-account.json
