@@ -4,14 +4,28 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/contexts/auth";
 import { supabase } from "@/lib/supabase";
 import { colors } from "@/constants/colors";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserPlus } from "lucide-react-native";
 import { RadioButton } from "@/components/ui/radio";
+import { Picker } from "@/components/ui/picker";
+
+interface Template {
+  id: string;
+  kcal_plan: number;
+  protein_units: number;
+  carb_units: number;
+  fat_units: number;
+  veg_units: number;
+  fruit_units: number;
+}
 
 export default function AdminAddClientScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
   
   const [formData, setFormData] = useState({
     email: "",
@@ -39,6 +53,47 @@ export default function AdminAddClientScreen() {
     weeklyCardioMinutes: "",
     weeklyStrengthWorkouts: "",
   });
+
+  useEffect(() => {
+    fetchTemplates();
+  }, []);
+
+  const fetchTemplates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("target_templates")
+        .select("*")
+        .order("kcal_plan", { ascending: true });
+
+      if (error) {
+        console.error("[AdminAddClient] Error fetching templates:", error);
+        Alert.alert("שגיאה", "לא ניתן לטעון תבניות");
+      } else {
+        setTemplates(data || []);
+      }
+    } catch (error) {
+      console.error("[AdminAddClient] Error:", error);
+    } finally {
+      setIsLoadingTemplates(false);
+    }
+  };
+
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    const template = templates.find(t => t.id === templateId);
+    
+    if (template) {
+      setFormData(prev => ({
+        ...prev,
+        kcalGoal: template.kcal_plan.toString(),
+        proteinUnits: template.protein_units.toString(),
+        carbUnits: template.carb_units.toString(),
+        fatUnits: template.fat_units.toString(),
+        vegUnits: template.veg_units.toString(),
+        fruitUnits: template.fruit_units.toString(),
+      }));
+    }
+  };
 
   const handleSubmit = async () => {
     if (!formData.email || !formData.password || !formData.name) {
@@ -385,6 +440,29 @@ export default function AdminAddClientScreen() {
           <Text style={styles.sectionTitle}>יעדים תזונתיים</Text>
 
           <View style={styles.inputGroup}>
+            <Text style={styles.label}>בחר תבנית קלוריות</Text>
+            {isLoadingTemplates ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={colors.primary} />
+              </View>
+            ) : (
+              <Picker
+                value={selectedTemplate}
+                onValueChange={(value) => handleTemplateSelect(value as string)}
+                placeholder="בחר תבנית..."
+                variant="filled"
+                options={[
+                  { label: "בחר תבנית...", value: "" },
+                  ...templates.map(t => ({
+                    label: `${t.kcal_plan} קק"ל - חלבון: ${t.protein_units}, פחמימות: ${t.carb_units}, שומן: ${t.fat_units}`,
+                    value: t.id,
+                  })),
+                ]}
+              />
+            )}
+          </View>
+
+          <View style={styles.inputGroup}>
             <Text style={styles.label}>יעד קלוריות יומי</Text>
             <TextInput
               style={styles.input}
@@ -591,5 +669,10 @@ const styles = StyleSheet.create({
     minHeight: 80,
     textAlignVertical: "top" as const,
     paddingTop: 16,
+  },
+  loadingContainer: {
+    padding: 16,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
   },
 });
