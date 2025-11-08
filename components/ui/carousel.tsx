@@ -63,6 +63,7 @@ export function Carousel({
         contentContainerStyle={{
           paddingHorizontal: Platform.OS === 'android' ? (SCREEN_WIDTH - itemWidth) / 2 : 0,
           gap: spacing,
+          flexDirection: 'row-reverse' as any,
         }}
         onScroll={handleScroll}
         scrollEventThrottle={16}

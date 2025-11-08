@@ -676,80 +676,82 @@ export default function MealsScreen() {
                 
                 <View style={styles.carouselContainer}>
                   <Carousel
-                    itemWidth={Dimensions.get('window').width * 0.55}
-                    spacing={12}
+                    itemWidth={Dimensions.get('window').width * 0.7}
+                    spacing={16}
                     showIndicators={true}
                     indicatorColor="#CBD5E0"
                     activeIndicatorColor={colors.primary}
                   >
                     <CarouselItem style={styles.carouselCard}>
-                      <TouchableOpacity
-                        style={styles.carouselCardContent}
-                        onPress={() => handleOptionSelect('favorites')}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[styles.carouselIconContainer, styles.carouselIconContainerFavorites]}>
-                          <Heart size={44} color="#FF6B6B" strokeWidth={2.5} />
-                        </View>
-                        <Text style={styles.carouselCardTitle}>מועדפים</Text>
-                        <Text style={styles.carouselCardSubtitle}>המזונות האהובים עליך</Text>
-                      </TouchableOpacity>
+                      <View style={styles.carouselCardContent}>
+                        <TouchableOpacity
+                          style={styles.groupedOptionButton}
+                          onPress={() => handleOptionSelect('favorites')}
+                          activeOpacity={0.7}
+                        >
+                          <View style={[styles.groupedIconContainer, styles.groupedIconContainerFavorites]}>
+                            <Heart size={36} color="#FF6B6B" strokeWidth={2.5} />
+                          </View>
+                          <Text style={styles.groupedCardTitle}>מועדפים</Text>
+                        </TouchableOpacity>
+                        
+                        <View style={styles.groupDivider} />
+                        
+                        <TouchableOpacity
+                          style={styles.groupedOptionButton}
+                          onPress={() => handleOptionSelect('food-bank')}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.groupedIconContainer}>
+                            <ShoppingBasket size={36} color={colors.primary} strokeWidth={2.5} />
+                          </View>
+                          <Text style={styles.groupedCardTitle}>בנק מזון</Text>
+                        </TouchableOpacity>
+                      </View>
                     </CarouselItem>
                     
                     <CarouselItem style={styles.carouselCard}>
-                      <TouchableOpacity
-                        style={styles.carouselCardContent}
-                        onPress={() => handleOptionSelect('food-bank')}
-                        activeOpacity={0.7}
-                      >
-                        <View style={styles.carouselIconContainer}>
-                          <ShoppingBasket size={44} color={colors.primary} strokeWidth={2.5} />
-                        </View>
-                        <Text style={styles.carouselCardTitle}>בנק מזון</Text>
-                        <Text style={styles.carouselCardSubtitle}>אלפי מזונות</Text>
-                      </TouchableOpacity>
+                      <View style={styles.carouselCardContent}>
+                        <TouchableOpacity
+                          style={styles.groupedOptionButton}
+                          onPress={() => handleOptionSelect('barcode')}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.groupedIconContainer}>
+                            <Barcode size={36} color={colors.primary} strokeWidth={2.5} />
+                          </View>
+                          <Text style={styles.groupedCardTitle}>ברקוד</Text>
+                        </TouchableOpacity>
+                        
+                        <View style={styles.groupDivider} />
+                        
+                        <TouchableOpacity
+                          style={styles.groupedOptionButton}
+                          onPress={() => handleOptionSelect('ai')}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.groupedIconContainer}>
+                            <Sparkles size={36} color={colors.primary} strokeWidth={2.5} />
+                          </View>
+                          <Text style={styles.groupedCardTitle}>AI</Text>
+                        </TouchableOpacity>
+                      </View>
                     </CarouselItem>
                     
                     <CarouselItem style={styles.carouselCard}>
-                      <TouchableOpacity
-                        style={styles.carouselCardContent}
-                        onPress={() => handleOptionSelect('barcode')}
-                        activeOpacity={0.7}
-                      >
-                        <View style={styles.carouselIconContainer}>
-                          <Barcode size={44} color={colors.primary} strokeWidth={2.5} />
-                        </View>
-                        <Text style={styles.carouselCardTitle}>ברקוד</Text>
-                        <Text style={styles.carouselCardSubtitle}>סרוק ברקוד</Text>
-                      </TouchableOpacity>
-                    </CarouselItem>
-                    
-                    <CarouselItem style={styles.carouselCard}>
-                      <TouchableOpacity
-                        style={styles.carouselCardContent}
-                        onPress={() => handleOptionSelect('ai')}
-                        activeOpacity={0.7}
-                      >
-                        <View style={styles.carouselIconContainer}>
-                          <Sparkles size={44} color={colors.primary} strokeWidth={2.5} />
-                        </View>
-                        <Text style={styles.carouselCardTitle}>AI</Text>
-                        <Text style={styles.carouselCardSubtitle}>צלם וזהה</Text>
-                      </TouchableOpacity>
-                    </CarouselItem>
-                    
-                    <CarouselItem style={styles.carouselCard}>
-                      <TouchableOpacity
-                        style={styles.carouselCardContent}
-                        onPress={() => handleOptionSelect('recipes')}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[styles.carouselIconContainer, styles.carouselIconContainerRecipes]}>
-                          <ChefHat size={44} color="#FF9800" strokeWidth={2.5} />
-                        </View>
-                        <Text style={styles.carouselCardTitle}>מתכונים</Text>
-                        <Text style={styles.carouselCardSubtitle}>מתכונים מותאמים אישית</Text>
-                      </TouchableOpacity>
+                      <View style={styles.carouselCardContentSingle}>
+                        <TouchableOpacity
+                          style={styles.singleOptionButton}
+                          onPress={() => handleOptionSelect('recipes')}
+                          activeOpacity={0.7}
+                        >
+                          <View style={[styles.singleIconContainer, styles.singleIconContainerRecipes]}>
+                            <ChefHat size={52} color="#FF9800" strokeWidth={2.5} />
+                          </View>
+                          <Text style={styles.singleCardTitle}>מתכונים</Text>
+                          <Text style={styles.singleCardSubtitle}>מתכונים מותאמים אישית</Text>
+                        </TouchableOpacity>
+                      </View>
                     </CarouselItem>
                   </Carousel>
                 </View>
@@ -1518,25 +1520,93 @@ const styles = StyleSheet.create({
   },
   carouselContainer: {
     marginTop: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   carouselCard: {
-    backgroundColor: "transparent",
-    borderRadius: 20,
-    padding: 0,
-    minHeight: 200,
-    shadowColor: "transparent",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0,
-    shadowRadius: 0,
-    elevation: 0,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 20,
+    minHeight: 240,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   carouselCardContent: {
     flex: 1,
+    flexDirection: "row-reverse" as any,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 20,
-    paddingHorizontal: 12,
+    gap: 16,
+  },
+  carouselCardContentSingle: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  groupedOptionButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     gap: 12,
+  },
+  singleOptionButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 16,
+  },
+  groupedIconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: `${colors.primary}15`,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2.5,
+    borderColor: colors.primary,
+  },
+  groupedIconContainerFavorites: {
+    backgroundColor: "#FF6B6B15",
+    borderColor: "#FF6B6B",
+  },
+  singleIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: `${colors.primary}15`,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: colors.primary,
+  },
+  singleIconContainerRecipes: {
+    backgroundColor: "#FF980015",
+    borderColor: "#FF9800",
+  },
+  groupedCardTitle: {
+    fontSize: 15,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "center",
+  },
+  singleCardTitle: {
+    fontSize: 22,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "center",
+  },
+  singleCardSubtitle: {
+    fontSize: 13,
+    fontWeight: "500" as const,
+    color: "#718096",
+    textAlign: "center",
+  },
+  groupDivider: {
+    width: 1,
+    height: "80%",
+    backgroundColor: "#E2E8F0",
   },
   carouselIconContainer: {
     width: 80,
