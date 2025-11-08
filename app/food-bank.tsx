@@ -706,6 +706,45 @@ export default function FoodBankScreen() {
         duration: 3000,
       });
 
+      // Check for macro goal warnings and alerts
+      const macrosToCheck = [
+        { name: 'חלבון', oldValue: proteinIntake, newValue: newProtein, goal: goals.protein, units: proteinUnits },
+        { name: 'פחמימות', oldValue: carbIntake, newValue: newCarb, goal: goals.carb, units: carbUnits },
+        { name: 'שומן', oldValue: fatIntake, newValue: newFat, goal: goals.fat, units: fatUnits },
+        { name: 'ירקות', oldValue: vegIntake, newValue: newVeg, goal: goals.veg || 0, units: vegUnits },
+        { name: 'פירות', oldValue: fruitIntake, newValue: newFruit, goal: goals.fruit || 0, units: fruitUnits },
+      ];
+
+      macrosToCheck.forEach(macro => {
+        if (macro.units > 0 && macro.goal > 0) {
+          const wasUnderGoal = macro.oldValue < macro.goal;
+          const isAtGoal = macro.newValue >= macro.goal && macro.newValue < macro.goal + (macro.units * 0.1);
+          const isOverGoal = macro.newValue > macro.goal;
+
+          if (wasUnderGoal && isAtGoal) {
+            // Just reached the goal
+            setTimeout(() => {
+              toast({
+                title: `הגעת ליעד ה${macro.name}`,
+                description: 'מצויין. רק לא לחרוג.',
+                variant: 'warning',
+                duration: 4000,
+              });
+            }, 500);
+          } else if (isOverGoal && wasUnderGoal) {
+            // Exceeded the goal
+            setTimeout(() => {
+              toast({
+                title: `חרגת מיעד ה${macro.name}`,
+                description: 'אני אומרת לאיוון.',
+                variant: 'error',
+                duration: 4000,
+              });
+            }, 500);
+          }
+        }
+      });
+
       closeSheet();
       setQuantity("1");
     } catch (error) {
