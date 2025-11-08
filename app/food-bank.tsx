@@ -883,10 +883,10 @@ export default function FoodBankScreen() {
             </View>
 
             {subCategories.length > 0 && (
-              <View style={styles.subCategoriesContainer}>
+              <View style={styles.subCategoriesCard}>
                 <ScrollView
                   horizontal
-                  showsHorizontalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={true}
                   contentContainerStyle={styles.subCategoriesScroll}
                 >
                   {subCategories.map((subCategory) => {
@@ -2091,26 +2091,48 @@ const styles = StyleSheet.create({
   subCategoriesContainer: {
     marginTop: 4,
   },
+  subCategoriesCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    paddingVertical: 12,
+  },
   subCategoriesScroll: {
-    gap: 8,
-    paddingRight: 4,
+    gap: 12,
+    paddingHorizontal: 16,
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
   },
   subCategoryChip: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: "#DDD",
+    backgroundColor: "#F5F5F5",
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderWidth: 0,
+    minWidth: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   subCategoryChipActive: {
     backgroundColor: colors.primary,
-    borderColor: colors.primary,
   },
   subCategoryText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "600" as const,
-    color: "#666",
+    color: "#2d3748",
+    textAlign: "center",
   },
   subCategoryTextActive: {
     color: "#FFFFFF",
