@@ -199,9 +199,9 @@ export default function UserDashboardScreen() {
 
         <View style={styles.chartCard}>
           <View style={styles.chartContainer}>
-            {data?.weekData.map((day, index) => {
+            {data?.weekData.slice().reverse().map((day, index) => {
               const heightPercent = maxCalories > 0 ? (day.calories / maxCalories) * 100 : 0;
-              const isToday = index === 6;
+              const isToday = index === 0;
               
               return (
                 <View key={day.date} style={styles.barContainer}>
