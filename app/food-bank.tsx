@@ -13,9 +13,10 @@ import {
   Pressable,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Weight, Coffee, Soup, Hash, Heart, Beef, Fish, Egg, Drumstick, Milk, Package } from "lucide-react-native";
+import { ChevronLeft, Weight, Coffee, Soup, Hash, Heart, Beef, Fish, Egg, Drumstick, Milk, Package, UtensilsCrossed, Beer, Wine, Martini } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SearchBar } from "@/components/ui/searchbar";
+import { Picker, PickerOption } from "@/components/ui/picker";
 
 import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
@@ -492,6 +493,39 @@ export default function FoodBankScreen() {
         return <Package size={iconSize} color={iconColor} />;
     }
   };
+
+  const getPickerIconForSubCategory = (subCategory: string) => {
+    if (selectedMainCategory === "מסעדות") {
+      return UtensilsCrossed;
+    }
+    
+    if (selectedMainCategory === "אלכוהול") {
+      switch (subCategory.toLowerCase()) {
+        case "בירה":
+          return Beer;
+        case "יין":
+          return Wine;
+        case "משקאות חריפים":
+        case "קוקטיילים":
+          return Martini;
+        default:
+          return Beer;
+      }
+    }
+    
+    return Package;
+  };
+
+  const pickerOptions: PickerOption[] = useMemo(() => {
+    if (selectedMainCategory === "מסעדות" || selectedMainCategory === "אלכוהול") {
+      return subCategories.map((subCat) => ({
+        label: subCat,
+        value: subCat,
+        icon: getPickerIconForSubCategory(subCat),
+      }));
+    }
+    return [];
+  }, [subCategories, selectedMainCategory]);
 
   const clearSearch = () => {
     setSearchQuery("");
@@ -983,45 +1017,56 @@ export default function FoodBankScreen() {
             </View>
 
             {subCategories.length > 0 && (
-              <View style={styles.subCategoriesCard}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.subCategoriesScroll}
-                >
-                  {subCategories.map((subCategory) => {
-                    const isSelected = selectedSubCategory === subCategory;
-                    const subCategoryIcon = getSubCategoryIcon(subCategory);
-                    return (
-                      <TouchableOpacity
-                        key={subCategory}
-                        style={[
-                          styles.subCategoryChip,
-                          isSelected && styles.subCategoryChipActive,
-                        ]}
-                        onPress={() => handleSubCategoryPress(subCategory)}
-                        activeOpacity={0.7}
-                      >
-                        <View style={styles.subCategoryContent}>
-                          {subCategoryIcon && (
-                            <View style={styles.subCategoryIconWrapper}>
-                              {subCategoryIcon}
-                            </View>
-                          )}
-                          <Text
-                            style={[
-                              styles.subCategoryText,
-                              isSelected && styles.subCategoryTextActive,
-                            ]}
-                          >
-                            {subCategory}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
+              (selectedMainCategory === "מסעדות" || selectedMainCategory === "אלכוהול") ? (
+                <Picker
+                  options={pickerOptions}
+                  value={selectedSubCategory || ''}
+                  onValueChange={setSelectedSubCategory}
+                  placeholder={`בחר ${selectedMainCategory === "מסעדות" ? "מסעדה" : "סוג משקה"}...`}
+                  variant="outline"
+                  style={{ marginTop: 0 }}
+                />
+              ) : (
+                <View style={styles.subCategoriesCard}>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.subCategoriesScroll}
+                  >
+                    {subCategories.map((subCategory) => {
+                      const isSelected = selectedSubCategory === subCategory;
+                      const subCategoryIcon = getSubCategoryIcon(subCategory);
+                      return (
+                        <TouchableOpacity
+                          key={subCategory}
+                          style={[
+                            styles.subCategoryChip,
+                            isSelected && styles.subCategoryChipActive,
+                          ]}
+                          onPress={() => handleSubCategoryPress(subCategory)}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.subCategoryContent}>
+                            {subCategoryIcon && (
+                              <View style={styles.subCategoryIconWrapper}>
+                                {subCategoryIcon}
+                              </View>
+                            )}
+                            <Text
+                              style={[
+                                styles.subCategoryText,
+                                isSelected && styles.subCategoryTextActive,
+                              ]}
+                            >
+                              {subCategory}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )
             )}
 
             <View style={styles.searchContainer}>
