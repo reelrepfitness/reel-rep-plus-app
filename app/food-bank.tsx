@@ -13,8 +13,9 @@ import {
   Pressable,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Search, X, Weight, Coffee, Soup, Hash, Heart } from "lucide-react-native";
+import { ChevronLeft, Weight, Coffee, Soup, Hash, Heart } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SearchBar } from "@/components/ui/searchbar";
 
 import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
@@ -916,21 +917,12 @@ export default function FoodBankScreen() {
             )}
 
             <View style={styles.searchContainer}>
-              <View style={styles.searchInputContainer}>
-                <Search color="#999" size={20} />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="חיפוש..."
-                  placeholderTextColor="#999"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                />
-                {searchQuery.length > 0 && (
-                  <TouchableOpacity onPress={clearSearch} activeOpacity={0.7}>
-                    <X color="#999" size={20} />
-                  </TouchableOpacity>
-                )}
-              </View>
+              <SearchBar
+                placeholder="חיפוש..."
+                onSearch={setSearchQuery}
+                loading={false}
+                value={searchQuery}
+              />
             </View>
 
             {selectedMainCategory && (() => {
