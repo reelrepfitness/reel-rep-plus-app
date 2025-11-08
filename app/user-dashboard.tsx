@@ -172,14 +172,20 @@ export default function UserDashboardScreen() {
         }}
       />
       <View style={styles.stickyNotch}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft color="#FFFFFF" size={24} />
-        </TouchableOpacity>
-        <Text style={styles.notchText}>{userName || "משתמש"}</Text>
+        <View style={styles.notchRow1}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+            activeOpacity={0.7}
+          >
+            <ArrowLeft color="#FFFFFF" size={24} />
+          </TouchableOpacity>
+          <User color="#FFFFFF" size={28} />
+          <View style={styles.backButton} />
+        </View>
+        <View style={styles.notchRow2}>
+          <Text style={styles.notchText}>{userName || "משתמש"}</Text>
+        </View>
       </View>
       <ScrollView
         style={styles.scrollView}
@@ -1175,29 +1181,39 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: "#000000",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
     zIndex: 1000,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 10,
-    flexDirection: "row" as any,
+    elevation: 8,
+  },
+  notchRow1: {
+    flexDirection: "row-reverse" as any,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  notchRow2: {
     alignItems: "center",
     justifyContent: "center",
+    paddingBottom: 4,
   },
   backButton: {
-    position: "absolute" as any,
-    left: 24,
-    padding: 4,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   notchText: {
-    color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700" as const,
+    color: "#FFFFFF",
     textAlign: "center",
   },
 });
