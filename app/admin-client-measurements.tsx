@@ -100,8 +100,8 @@ export default function AdminClientMeasurementsScreen() {
     : 0;
 
   const renderBodyCompositionChart = (measurement: BodyMeasurement) => {
-    const leanMass = measurement.body_fat_mass || 0;
-    const fatMass = measurement.lean_mass || 0;
+    const leanMass = measurement.lean_mass || 0;
+    const fatMass = measurement.body_fat_mass || 0;
     const total = leanMass + fatMass;
 
     if (total === 0) {
