@@ -17,17 +17,17 @@ export default function TabLayout() {
       tintColor={tintColor}
       labelStyle={{ color: labelColor }}
     >
-      <NativeTabs.Trigger name="home">
+      <NativeTabs.Trigger name="profile">
         <Icon 
           src={
-            <Home 
+            <User 
               size={24} 
               color={tintColor as any}
               strokeWidth={2.5}
             />
           }
         />
-        <Label>ראשי</Label>
+        <Label>פרופיל</Label>
       </NativeTabs.Trigger>
       
       <NativeTabs.Trigger name="add">
@@ -43,17 +43,17 @@ export default function TabLayout() {
         <Label>הוסף</Label>
       </NativeTabs.Trigger>
       
-      <NativeTabs.Trigger name="profile">
+      <NativeTabs.Trigger name="home">
         <Icon 
           src={
-            <User 
+            <Home 
               size={24} 
               color={tintColor as any}
               strokeWidth={2.5}
             />
           }
         />
-        <Label>פרופיל</Label>
+        <Label>ראשי</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
