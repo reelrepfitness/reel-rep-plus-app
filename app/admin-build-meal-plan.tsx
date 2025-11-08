@@ -291,11 +291,16 @@ export default function AdminBuildMealPlanScreen() {
     const ageNum = parseInt(age, 10);
     if (isNaN(ageNum)) return null;
 
+    let heightInCm = height;
+    if (height < 50) {
+      heightInCm = height * 100;
+    }
+
     let rmr = 0;
     if (gender === "male") {
-      rmr = (10 * weight) + (6.25 * height) - (5 * ageNum) + 5;
+      rmr = (10 * weight) + (6.25 * heightInCm) - (5 * ageNum) + 5;
     } else if (gender === "female") {
-      rmr = (10 * weight) + (6.25 * height) - (5 * ageNum) - 161;
+      rmr = (10 * weight) + (6.25 * heightInCm) - (5 * ageNum) - 161;
     } else {
       return null;
     }
