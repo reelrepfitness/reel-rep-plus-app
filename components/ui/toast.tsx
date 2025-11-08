@@ -11,7 +11,7 @@ import {
 import { CheckCircle, AlertCircle, Info, X } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
 
-type ToastVariant = 'success' | 'error' | 'info' | 'warning';
+type ToastVariant = 'success' | 'error' | 'info' | 'warning' | 'danger';
 
 type ToastAction = {
   label: string;
@@ -150,6 +150,7 @@ function ToastItem({
       case 'success':
         return '#43A047';
       case 'error':
+      case 'danger':
         return '#E53935';
       case 'warning':
         return '#FB8C00';

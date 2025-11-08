@@ -728,7 +728,11 @@ export default function FoodBankScreen() {
                 title: `הגעת ליעד ה${macro.name}`,
                 description: 'מצויין. רק לא לחרוג.',
                 variant: 'warning',
-                duration: 4000,
+                duration: 6000,
+                action: {
+                  label: 'סגור',
+                  onPress: () => {},
+                },
               });
             }, 500);
           } else if (isOverGoal && wasUnderGoal) {
@@ -738,7 +742,11 @@ export default function FoodBankScreen() {
                 title: `חרגת מיעד ה${macro.name}`,
                 description: 'אני אומרת לאיוון.',
                 variant: 'error',
-                duration: 4000,
+                duration: 6000,
+                action: {
+                  label: 'סגור',
+                  onPress: () => {},
+                },
               });
             }, 500);
           }
