@@ -683,27 +683,17 @@ export default function MealsScreen() {
                     activeIndicatorColor={colors.primary}
                   >
                     <CarouselItem style={styles.carouselCard}>
-                      <View style={styles.carouselCardContent}>
+                      <View style={styles.carouselCardContentSingle}>
                         <TouchableOpacity
-                          style={styles.groupedOptionButton}
-                          onPress={() => handleOptionSelect('favorites')}
+                          style={styles.singleOptionButton}
+                          onPress={() => handleOptionSelect('recipes')}
                           activeOpacity={0.7}
                         >
-                          <View style={[styles.groupedIconContainer, styles.groupedIconContainerFavorites]}>
-                            <Heart size={32} color="#FF6B6B" strokeWidth={2.5} />
+                          <View style={[styles.singleIconContainer, styles.singleIconContainerRecipes]}>
+                            <ChefHat size={32} color="#FF9800" strokeWidth={2.5} />
                           </View>
-                          <Text style={styles.groupedCardTitle}>מועדפים</Text>
-                        </TouchableOpacity>
-                        
-                        <TouchableOpacity
-                          style={styles.groupedOptionButton}
-                          onPress={() => handleOptionSelect('food-bank')}
-                          activeOpacity={0.7}
-                        >
-                          <View style={styles.groupedIconContainer}>
-                            <ShoppingBasket size={32} color={colors.primary} strokeWidth={2.5} />
-                          </View>
-                          <Text style={styles.groupedCardTitle}>בנק מזון</Text>
+                          <Text style={styles.singleCardTitle}>מתכונים</Text>
+                          <Text style={styles.singleCardSubtitle}>מתכונים מותאמים אישית</Text>
                         </TouchableOpacity>
                       </View>
                     </CarouselItem>
@@ -735,17 +725,27 @@ export default function MealsScreen() {
                     </CarouselItem>
                     
                     <CarouselItem style={styles.carouselCard}>
-                      <View style={styles.carouselCardContentSingle}>
+                      <View style={styles.carouselCardContent}>
                         <TouchableOpacity
-                          style={styles.singleOptionButton}
-                          onPress={() => handleOptionSelect('recipes')}
+                          style={styles.groupedOptionButton}
+                          onPress={() => handleOptionSelect('favorites')}
                           activeOpacity={0.7}
                         >
-                          <View style={[styles.singleIconContainer, styles.singleIconContainerRecipes]}>
-                            <ChefHat size={32} color="#FF9800" strokeWidth={2.5} />
+                          <View style={[styles.groupedIconContainer, styles.groupedIconContainerFavorites]}>
+                            <Heart size={32} color="#FF6B6B" strokeWidth={2.5} />
                           </View>
-                          <Text style={styles.singleCardTitle}>מתכונים</Text>
-                          <Text style={styles.singleCardSubtitle}>מתכונים מותאמים אישית</Text>
+                          <Text style={styles.groupedCardTitle}>מועדפים</Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity
+                          style={styles.groupedOptionButton}
+                          onPress={() => handleOptionSelect('food-bank')}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.groupedIconContainer}>
+                            <ShoppingBasket size={32} color={colors.primary} strokeWidth={2.5} />
+                          </View>
+                          <Text style={styles.groupedCardTitle}>בנק מזון</Text>
                         </TouchableOpacity>
                       </View>
                     </CarouselItem>
