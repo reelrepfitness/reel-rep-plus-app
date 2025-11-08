@@ -220,10 +220,6 @@ export default function HomeScreen() {
 
   const waterGlasses = dailyLog?.water_glasses || 0;
 
-  const handleWaterReset = () => {
-    updateWater(0);
-  };
-
   const handleCupToggle = (cupIndex: number) => {
     if (cupIndex === waterGlasses) {
       updateWater(waterGlasses + 1);
@@ -580,12 +576,6 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
-
-          <View style={styles.waterResetContainer}>
-            <TouchableOpacity onPress={handleWaterReset} activeOpacity={0.7}>
-              <Text style={styles.waterResetText}>איפוס</Text>
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -1377,15 +1367,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: 50,
   },
-  waterResetContainer: {
-    alignItems: "center",
-    marginTop: 16,
-  },
-  waterResetText: {
-    fontSize: 14,
-    color: "#2d3748",
-    fontWeight: "600" as const,
-  },
+
   activitySection: {
     flexDirection: "row-reverse" as any,
     gap: 12,
