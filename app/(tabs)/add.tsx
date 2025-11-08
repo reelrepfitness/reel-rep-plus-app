@@ -11,9 +11,11 @@ import {
   TextInput,
   Keyboard,
   InputAccessoryView,
+  Dimensions,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2, UtensilsCrossed, Sparkles, Heart } from "lucide-react-native";
+import { Plus, Apple, Barcode, Camera, Edit3, X, Trash2, UtensilsCrossed, Sparkles, Heart, ShoppingBasket } from "lucide-react-native";
+import { Carousel, CarouselItem } from "@/components/ui/carousel";
 import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -658,54 +660,70 @@ export default function MealsScreen() {
                 <View style={styles.sheetHandle} />
                 <Text style={styles.sheetTitle}>הוסף מזון</Text>
                 
-                <View style={styles.optionsGrid}>
-                  <View style={styles.optionsRow}>
-                    <TouchableOpacity
-                      style={styles.optionButtonLarge}
-                      onPress={() => handleOptionSelect('favorites')}
-                      activeOpacity={0.7}
-                    >
-                      <View style={[styles.optionIconContainerLarge, styles.optionIconContainerFavorites]}>
-                        <Heart size={48} color="#FF6B6B" strokeWidth={2.5} />
-                      </View>
-                      <Text style={styles.optionTextLarge}>מועדפים</Text>
-                    </TouchableOpacity>
+                <View style={styles.carouselContainer}>
+                  <Carousel
+                    itemWidth={Dimensions.get('window').width * 0.65}
+                    spacing={16}
+                    showIndicators={true}
+                    indicatorColor="#CBD5E0"
+                    activeIndicatorColor={colors.primary}
+                  >
+                    <CarouselItem style={styles.carouselCard}>
+                      <TouchableOpacity
+                        style={styles.carouselCardContent}
+                        onPress={() => handleOptionSelect('favorites')}
+                        activeOpacity={0.7}
+                      >
+                        <View style={[styles.carouselIconContainer, styles.carouselIconContainerFavorites]}>
+                          <Heart size={56} color="#FF6B6B" strokeWidth={2.5} />
+                        </View>
+                        <Text style={styles.carouselCardTitle}>מועדפים</Text>
+                        <Text style={styles.carouselCardSubtitle}>המזונות האהובים עליך</Text>
+                      </TouchableOpacity>
+                    </CarouselItem>
                     
-                    <TouchableOpacity
-                      style={styles.optionButtonLarge}
-                      onPress={() => handleOptionSelect('food-bank')}
-                      activeOpacity={0.7}
-                    >
-                      <View style={styles.optionIconContainerLarge}>
-                        <Apple size={48} color={colors.primary} strokeWidth={2.5} />
-                      </View>
-                      <Text style={styles.optionTextLarge}>בנק מזון</Text>
-                    </TouchableOpacity>
-                  </View>
-                  
-                  <View style={styles.optionsRow}>
-                    <TouchableOpacity
-                      style={styles.optionButtonLarge}
-                      onPress={() => handleOptionSelect('ai')}
-                      activeOpacity={0.7}
-                    >
-                      <View style={styles.optionIconContainerLarge}>
-                        <Sparkles size={48} color={colors.primary} strokeWidth={2.5} />
-                      </View>
-                      <Text style={styles.optionTextLarge}>AI</Text>
-                    </TouchableOpacity>
+                    <CarouselItem style={styles.carouselCard}>
+                      <TouchableOpacity
+                        style={styles.carouselCardContent}
+                        onPress={() => handleOptionSelect('food-bank')}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.carouselIconContainer}>
+                          <ShoppingBasket size={56} color={colors.primary} strokeWidth={2.5} />
+                        </View>
+                        <Text style={styles.carouselCardTitle}>בנק מזון</Text>
+                        <Text style={styles.carouselCardSubtitle}>אלפי מזונות</Text>
+                      </TouchableOpacity>
+                    </CarouselItem>
                     
-                    <TouchableOpacity
-                      style={styles.optionButtonLarge}
-                      onPress={() => handleOptionSelect('barcode')}
-                      activeOpacity={0.7}
-                    >
-                      <View style={styles.optionIconContainerLarge}>
-                        <Barcode size={48} color={colors.primary} strokeWidth={2.5} />
-                      </View>
-                      <Text style={styles.optionTextLarge}>ברקוד</Text>
-                    </TouchableOpacity>
-                  </View>
+                    <CarouselItem style={styles.carouselCard}>
+                      <TouchableOpacity
+                        style={styles.carouselCardContent}
+                        onPress={() => handleOptionSelect('barcode')}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.carouselIconContainer}>
+                          <Barcode size={56} color={colors.primary} strokeWidth={2.5} />
+                        </View>
+                        <Text style={styles.carouselCardTitle}>ברקוד</Text>
+                        <Text style={styles.carouselCardSubtitle}>סרוק ברקוד</Text>
+                      </TouchableOpacity>
+                    </CarouselItem>
+                    
+                    <CarouselItem style={styles.carouselCard}>
+                      <TouchableOpacity
+                        style={styles.carouselCardContent}
+                        onPress={() => handleOptionSelect('ai')}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.carouselIconContainer}>
+                          <Sparkles size={56} color={colors.primary} strokeWidth={2.5} />
+                        </View>
+                        <Text style={styles.carouselCardTitle}>AI</Text>
+                        <Text style={styles.carouselCardSubtitle}>צלם וזהה</Text>
+                      </TouchableOpacity>
+                    </CarouselItem>
+                  </Carousel>
                 </View>
               </Animated.View>
             </TouchableOpacity>
@@ -1469,5 +1487,53 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600" as const,
+  },
+  carouselContainer: {
+    marginTop: 8,
+  },
+  carouselCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 0,
+    minHeight: 220,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  carouselCardContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    gap: 16,
+  },
+  carouselIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: `${colors.primary}15`,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: colors.primary,
+  },
+  carouselIconContainerFavorites: {
+    backgroundColor: "#FF6B6B15",
+    borderColor: "#FF6B6B",
+  },
+  carouselCardTitle: {
+    fontSize: 24,
+    fontWeight: "700" as const,
+    color: "#2d3748",
+    textAlign: "center",
+  },
+  carouselCardSubtitle: {
+    fontSize: 14,
+    fontWeight: "500" as const,
+    color: "#718096",
+    textAlign: "center",
   },
 });
