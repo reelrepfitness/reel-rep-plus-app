@@ -483,70 +483,72 @@ export default function AdminBuildMealPlanScreen() {
 
         <BottomSheet isVisible={isVisible} onClose={handleCloseSheet} snapPoints={[0.85]}>
           <View style={styles.bottomSheetContent}>
-            <View style={styles.sheetHeader}>
-              <TouchableOpacity
-                style={styles.closeSheetButton}
-                onPress={handleCloseSheet}
-                activeOpacity={0.7}
-              >
-                <X size={24} color="#2d3748" />
-              </TouchableOpacity>
-              <Text style={styles.sheetTitle}>
-                {selectedCategory ? `הוספה ל${selectedCategory}` : "בחר מזון"}
-              </Text>
-              <View style={{ width: 40 }} />
-            </View>
-
             {!selectedFood ? (
               <>
-                <View style={styles.searchSection}>
-                  <SearchBar
-                    placeholder="חיפוש..."
-                    onSearch={setSearchQuery}
-                    loading={false}
-                    value={searchQuery}
-                  />
-                </View>
+                <View style={styles.stickyHeaderSection}>
+                  <View style={styles.sheetHeader}>
+                    <TouchableOpacity
+                      style={styles.closeSheetButton}
+                      onPress={handleCloseSheet}
+                      activeOpacity={0.7}
+                    >
+                      <X size={24} color="#2d3748" />
+                    </TouchableOpacity>
+                    <Text style={styles.sheetTitle}>
+                      {selectedCategory ? `הוספה ל${selectedCategory}` : "בחר מזון"}
+                    </Text>
+                    <View style={{ width: 40 }} />
+                  </View>
 
-                <View style={styles.categorySection}>
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.categoryScroll}
-                  >
-                    {mainCategories.map((cat) => {
-                      const isSelected = filterCategory === cat;
-                      const icon = categoryIcons[cat as keyof typeof categoryIcons];
-                      
-                      return (
-                        <TouchableOpacity
-                          key={cat}
-                          style={[
-                            styles.categoryChip,
-                            isSelected && styles.categoryChipActive,
-                          ]}
-                          onPress={() => handleCategoryPress(cat)}
-                          activeOpacity={0.7}
-                        >
-                          {icon && (
-                            <Image
-                              source={{ uri: icon }}
-                              style={styles.categoryChipIcon}
-                              resizeMode="contain"
-                            />
-                          )}
-                          <Text
+                  <View style={styles.searchSection}>
+                    <SearchBar
+                      placeholder="חיפוש..."
+                      onSearch={setSearchQuery}
+                      loading={false}
+                      value={searchQuery}
+                    />
+                  </View>
+
+                  <View style={styles.categorySection}>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.categoryScroll}
+                    >
+                      {mainCategories.map((cat) => {
+                        const isSelected = filterCategory === cat;
+                        const icon = categoryIcons[cat as keyof typeof categoryIcons];
+                        
+                        return (
+                          <TouchableOpacity
+                            key={cat}
                             style={[
-                              styles.categoryChipText,
-                              isSelected && styles.categoryChipTextActive,
+                              styles.categoryChip,
+                              isSelected && styles.categoryChipActive,
                             ]}
+                            onPress={() => handleCategoryPress(cat)}
+                            activeOpacity={0.7}
                           >
-                            {cat}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
+                            {icon && (
+                              <Image
+                                source={{ uri: icon }}
+                                style={styles.categoryChipIcon}
+                                resizeMode="contain"
+                              />
+                            )}
+                            <Text
+                              style={[
+                                styles.categoryChipText,
+                                isSelected && styles.categoryChipTextActive,
+                              ]}
+                            >
+                              {cat}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+                  </View>
                 </View>
 
                 <ScrollView
@@ -644,7 +646,22 @@ export default function AdminBuildMealPlanScreen() {
                 </ScrollView>
               </>
             ) : (
-              <View style={styles.selectedFoodSection}>
+              <>
+                <View style={styles.sheetHeader}>
+                  <TouchableOpacity
+                    style={styles.closeSheetButton}
+                    onPress={handleCloseSheet}
+                    activeOpacity={0.7}
+                  >
+                    <X size={24} color="#2d3748" />
+                  </TouchableOpacity>
+                  <Text style={styles.sheetTitle}>
+                    {selectedCategory ? `הוספה ל${selectedCategory}` : "בחר מזון"}
+                  </Text>
+                  <View style={{ width: 40 }} />
+                </View>
+                
+                <View style={styles.selectedFoodSection}>
                 {selectedFood.img_url && (
                   <Image
                     source={{ uri: selectedFood.img_url }}
@@ -782,7 +799,8 @@ export default function AdminBuildMealPlanScreen() {
                     <Text style={styles.backToListButtonText}>חזור לרשימה</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+                </View>
+              </>
             )}
           </View>
         </BottomSheet>
@@ -945,13 +963,19 @@ const styles = StyleSheet.create({
   },
   bottomSheetContent: {
     flex: 1,
-    gap: 16,
+  },
+  stickyHeaderSection: {
+    backgroundColor: "#FFFFFF",
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+    zIndex: 10,
   },
   sheetHeader: {
     flexDirection: "row-reverse" as any,
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 8,
+    paddingBottom: 12,
   },
   sheetTitle: {
     fontSize: 20,
@@ -969,9 +993,10 @@ const styles = StyleSheet.create({
   },
   searchSection: {
     paddingHorizontal: 0,
+    paddingBottom: 8,
   },
   categorySection: {
-    marginTop: 8,
+    paddingBottom: 8,
   },
   categoryScroll: {
     paddingHorizontal: 4,
@@ -1084,6 +1109,7 @@ const styles = StyleSheet.create({
   selectedFoodSection: {
     gap: 24,
     alignItems: "center",
+    paddingTop: 16,
   },
   selectedFoodImage: {
     width: 200,
