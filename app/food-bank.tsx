@@ -99,6 +99,26 @@ export default function FoodBankScreen() {
     },
   });
 
+  const { data: alcoholItems = [] } = useQuery({
+    queryKey: ["alcoholItems"],
+    queryFn: async () => {
+      console.log("[FoodBank] Fetching alcohol items");
+      
+      const { data, error } = await supabase
+        .from("alcohol")
+        .select("*")
+        .order("name", { ascending: true });
+
+      if (error) {
+        console.error("[FoodBank] Error fetching alcohol:", error);
+        throw error;
+      }
+
+      console.log(`[FoodBank] Loaded ${data?.length || 0} alcohol items`);
+      return data as any[];
+    },
+  });
+
   const { data: restaurants = [] } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
@@ -183,16 +203,26 @@ export default function FoodBankScreen() {
 
   const subCategories = useMemo(() => {
     if (!selectedMainCategory) return [];
+    
+    if (selectedMainCategory === "אלכוהול") {
+      const subs = new Set(
+        alcoholItems
+          .filter(item => item.drink_type)
+          .map(item => item.drink_type)
+      );
+      return Array.from(subs).filter(Boolean) as string[];
+    }
+    
     const subs = new Set(
       foodItems
         .filter(item => item.category === selectedMainCategory && item.sub_category)
         .map(item => item.sub_category)
     );
     return Array.from(subs).filter(Boolean) as string[];
-  }, [foodItems, selectedMainCategory]);
+  }, [foodItems, alcoholItems, selectedMainCategory]);
 
   const filteredItems = useMemo(() => {
-    if (selectedMainCategory === "מסעדות") {
+    if (selectedMainCategory === "מסעדות" || selectedMainCategory === "אלכוהול") {
       return [];
     }
 
@@ -217,6 +247,26 @@ export default function FoodBankScreen() {
     return filtered;
   }, [foodItems, searchQuery, selectedMainCategory, selectedSubCategory]);
 
+  const filteredAlcoholItems = useMemo(() => {
+    if (selectedMainCategory !== "אלכוהול") return [];
+    
+    let filtered = alcoholItems;
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(query)
+      );
+    } else {
+      if (selectedSubCategory) {
+        filtered = filtered.filter(item => item.drink_type === selectedSubCategory);
+      }
+    }
+
+    console.log(`[FoodBank] Filtered ${filtered.length} alcohol items (search: "${searchQuery}", sub: ${selectedSubCategory})`);
+    return filtered;
+  }, [alcoholItems, searchQuery, selectedSubCategory, selectedMainCategory]);
+
   const filteredRestaurants = useMemo(() => {
     if (selectedMainCategory !== "מסעדות") return [];
     
@@ -229,6 +279,7 @@ export default function FoodBankScreen() {
   }, [restaurants, selectedMainCategory, searchQuery]);
 
   const showRestaurantsList = selectedMainCategory === "מסעדות";
+  const showAlcoholList = selectedMainCategory === "אלכוהול";
 
   const formatUnit = (value: number) => {
     return value % 1 === 0 ? value.toString() : value.toFixed(1);
@@ -988,6 +1039,85 @@ export default function FoodBankScreen() {
           ) : showRestaurantsList && filteredRestaurants.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>אין מסעדות זמינות</Text>
+            </View>
+          ) : showAlcoholList && filteredAlcoholItems.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>אין פריטי אלכוהול זמינים</Text>
+            </View>
+          ) : showAlcoholList ? (
+            <View style={styles.foodGrid}>
+              {filteredAlcoholItems.map((item) => {
+                return (
+                  <Pressable
+                    key={item.id}
+                    style={styles.foodCard}
+                    onPress={() => {
+                      console.log("[FoodBank] Selected alcohol item:", item.name);
+                    }}
+                  >
+                    <View style={styles.foodImageContainer}>
+                      {item.img_url ? (
+                        <Image
+                          source={{ uri: item.img_url }}
+                          style={styles.foodImage}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View style={styles.foodImagePlaceholder}>
+                          <Text style={styles.foodImagePlaceholderText}>
+                            {item.name.charAt(0)}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    <View style={styles.foodInfo}>
+                      <Text style={styles.foodName} numberOfLines={2}>
+                        {item.name}
+                      </Text>
+                      
+                      {item.measurement_method && (
+                        <Text style={styles.servingText} numberOfLines={2}>
+                          {formatUnit(item.amount)} {item.measurement_method} שווים למנה אחת
+                        </Text>
+                      )}
+                      
+                      <View style={styles.foodNutrition}>
+                        {item.protein_units > 0 && (
+                          <View style={[styles.nutritionBadge, { backgroundColor: `${colors.protein}30` }]}>
+                            <Image
+                              source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984871/steak_5_sp4m3p.webp" }}
+                              style={styles.nutritionIcon}
+                              resizeMode="contain"
+                            />
+                            <Text style={styles.nutritionText}>{formatUnit(item.protein_units)}</Text>
+                          </View>
+                        )}
+                        {item.carbs_units > 0 && (
+                          <View style={[styles.nutritionBadge, { backgroundColor: `${colors.carb}30` }]}>
+                            <Image
+                              source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984845/bread-slice_5_ghymvi.webp" }}
+                              style={styles.nutritionIcon}
+                              resizeMode="contain"
+                            />
+                            <Text style={styles.nutritionText}>{formatUnit(item.carbs_units)}</Text>
+                          </View>
+                        )}
+                        {item.fats_units > 0 && (
+                          <View style={[styles.nutritionBadge, { backgroundColor: `${colors.fat}30` }]}>
+                            <Image
+                              source={{ uri: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984844/avocado_4_bncwv5.webp" }}
+                              style={styles.nutritionIcon}
+                              resizeMode="contain"
+                            />
+                            <Text style={styles.nutritionText}>{formatUnit(item.fats_units)}</Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </Pressable>
+                );
+              })}
             </View>
           ) : showRestaurantsList ? (
             <View style={styles.foodGrid}>
