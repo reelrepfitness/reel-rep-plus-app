@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/auth";
 import { formatDate } from "@/lib/utils";
 import { useWorkoutLogs } from "@/lib/useWorkoutLogs";
 import { ProgressRingChart } from "@/components/charts/progress-ring-chart";
+import { Popover, PopoverTrigger, PopoverContent, PopoverClose } from "@/components/ui/popover";
 
 
 
