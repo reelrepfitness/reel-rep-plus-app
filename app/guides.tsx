@@ -11,7 +11,7 @@ import {
 import { Stack, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { 
-  ChevronLeft, 
+  ChevronRight, 
   BookOpen, 
   Utensils, 
   Calendar, 
@@ -30,7 +30,7 @@ import {
   Fish,
   Wheat,
   Candy,
-  ArrowLeft
+  ArrowRight
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
@@ -279,7 +279,7 @@ export default function GuidesScreen() {
       const cleanedLine = removeEmojis(line);
 
       return (
-        <View key={index} style={[styles.contentLineContainer, { flexDirection: "row-reverse" as const }]}>
+        <View key={index} style={styles.contentLineContainer}>
           {emojisInLine.map((emoji, emojiIndex) => (
             <View key={emojiIndex} style={styles.iconWrapper}>
               {getIconForEmoji(emoji)}
@@ -289,7 +289,7 @@ export default function GuidesScreen() {
           style={[
             styles.contentLine,
             isHeader && styles.contentHeader,
-            { writingDirection: "rtl" as const, textAlign: "right" as const, flex: 1 }
+            { flex: 1 }
           ]}
         >
           {cleanedLine}
@@ -312,7 +312,7 @@ export default function GuidesScreen() {
             onPress={handleBack}
             style={styles.backButton}
           >
-            <ChevronLeft color={colors.white} size={24} />
+            <ChevronRight color={colors.white} size={24} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{selectedGuide.title}</Text>
           <View style={{ width: 40 }} />
@@ -323,10 +323,7 @@ export default function GuidesScreen() {
           </View>
           {selectedGuide.short_description && (
             <View style={styles.descriptionCard}>
-              <Text style={[
-                styles.guideDescription,
-                { writingDirection: "rtl" as const, textAlign: "right" as const }
-              ]}>
+              <Text style={styles.guideDescription}>
                 {selectedGuide.short_description}
               </Text>
             </View>
@@ -349,7 +346,7 @@ export default function GuidesScreen() {
       <View style={[styles.customHeader, { paddingTop: insets.top }]}>
         <View style={styles.headerRow1}>
           <TouchableOpacity onPress={handleBack} style={styles.backButtonNew}>
-            <ArrowLeft color={colors.white} size={24} />
+            <ArrowRight color={colors.white} size={24} />
           </TouchableOpacity>
           <BookOpen color={colors.white} size={28} />
           <View style={styles.backButtonNew} />
@@ -390,20 +387,14 @@ export default function GuidesScreen() {
                         <Text style={styles.importantBadgeText}>חשוב במיוחד</Text>
                       </View>
                       <View style={styles.importantContent}>
-                        <ChevronLeft color={colors.white} size={24} />
+                        <ChevronRight color={colors.white} size={24} />
                         <View style={styles.guideInfo}>
-                          <Text style={[
-                            styles.importantGuideTitle,
-                            { writingDirection: "rtl" as const, textAlign: "right" as const }
-                          ]}>
+                          <Text style={styles.importantGuideTitle}>
                             {guide.title}
                           </Text>
                           {guide.short_description && (
                             <Text 
-                              style={[
-                                styles.importantGuideDescription,
-                                { writingDirection: "rtl" as const, textAlign: "right" as const }
-                              ]} 
+                              style={styles.importantGuideDescription} 
                               numberOfLines={2}
                             >
                               {guide.short_description}
@@ -432,20 +423,14 @@ export default function GuidesScreen() {
                   style={styles.guideCard}
                   onPress={() => setSelectedGuide(guide)}
                 >
-                  <ChevronLeft color={colors.gray} size={20} />
+                  <ChevronRight color={colors.gray} size={20} />
                   <View style={styles.guideInfo}>
-                    <Text style={[
-                      styles.guideTitle,
-                      { writingDirection: "rtl" as const, textAlign: "right" as const }
-                    ]}>
+                    <Text style={styles.guideTitle}>
                       {guide.title}
                     </Text>
                     {guide.short_description && (
                       <Text 
-                        style={[
-                          styles.guideDescriptionShort,
-                          { writingDirection: "rtl" as const, textAlign: "right" as const }
-                        ]} 
+                        style={styles.guideDescriptionShort} 
                         numberOfLines={2}
                       >
                         {guide.short_description}
@@ -514,9 +499,10 @@ export default function GuidesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    direction: 'rtl' as const,
   },
   header: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
@@ -534,6 +520,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: colors.white,
+    textAlign: 'right' as const,
   },
   customHeader: {
     backgroundColor: "#000000",
@@ -548,7 +535,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   headerRow1: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 12,
@@ -569,7 +556,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: colors.white,
-    textAlign: "center",
+    textAlign: 'right' as const,
   },
   scrollView: {
     flex: 1,
@@ -591,14 +578,14 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 16,
     color: colors.white,
-    textAlign: "center",
+    textAlign: 'right' as const,
   },
   guideCard: {
     backgroundColor: colors.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    flexDirection: "row-reverse" as const,
+    flexDirection: "row",
     alignItems: "center",
     gap: 12,
     shadowColor: "#000",
@@ -626,10 +613,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700" as const,
     color: colors.text,
+    textAlign: 'right' as const,
   },
   guideDescriptionShort: {
     fontSize: 14,
     color: "#666",
+    textAlign: 'right' as const,
   },
 
   emptyContainer: {
@@ -642,7 +631,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: colors.gray,
-    textAlign: "center",
+    textAlign: 'right' as const,
   },
   detailIconContainer: {
     width: 80,
@@ -667,6 +656,7 @@ const styles = StyleSheet.create({
     color: "#333",
     lineHeight: 26,
     fontWeight: "600" as const,
+    textAlign: 'right' as const,
   },
   contentCard: {
     backgroundColor: colors.white,
@@ -683,6 +673,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     lineHeight: 26,
     marginBottom: 4,
+    textAlign: 'right' as const,
   },
   contentHeader: {
     fontSize: 17,
@@ -691,13 +682,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   contentLineContainer: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: 4,
     gap: 8,
   },
   iconWrapper: {
     marginTop: 4,
+    marginStart: 4,
   },
   importantGuideCard: {
     borderRadius: 20,
@@ -714,23 +706,24 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   importantBadge: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    alignSelf: "flex-end",
+    alignSelf: "flex-start",
     marginBottom: 12,
   },
   importantBadgeText: {
     color: "#FFF",
     fontSize: 14,
     fontWeight: "700" as const,
+    textAlign: 'right' as const,
   },
   importantContent: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
@@ -739,10 +732,12 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
     color: colors.white,
     marginBottom: 4,
+    textAlign: 'right' as const,
   },
   importantGuideDescription: {
     fontSize: 15,
     color: "rgba(255, 255, 255, 0.9)",
+    textAlign: 'right' as const,
   },
   importantIconContainer: {
     width: 80,
@@ -788,21 +783,21 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
     color: colors.white,
     marginBottom: 12,
-    textAlign: "center",
+    textAlign: 'right' as const,
   },
   modalDescription: {
     fontSize: 18,
     fontWeight: "600" as const,
     color: colors.white,
     marginBottom: 16,
-    textAlign: "center",
+    textAlign: 'right' as const,
     writingDirection: "rtl" as const,
   },
   modalSubtext: {
     fontSize: 15,
     color: "rgba(255, 255, 255, 0.9)",
     marginBottom: 32,
-    textAlign: "center",
+    textAlign: 'right' as const,
     lineHeight: 24,
     writingDirection: "rtl" as const,
   },
@@ -823,7 +818,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700" as const,
     color: "#FFA500",
-    textAlign: "center",
+    textAlign: 'right' as const,
   },
   modalSecondaryButton: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -836,6 +831,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: colors.white,
-    textAlign: "center",
+    textAlign: 'right' as const,
   },
 });
