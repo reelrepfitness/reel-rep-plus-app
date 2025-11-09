@@ -21,6 +21,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { colors } from "@/constants/colors";
 import { useAuth } from "@/contexts/auth";
+import { isRTL } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -567,7 +568,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   macroTarget: {
-    flexDirection: "row-reverse",
+    flexDirection: isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 8,
@@ -580,7 +581,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
     fontWeight: "600" as const,
-    textAlign: "left",
+    textAlign: isRTL ? "right" : "left",
   },
   quickActions: {
     flexDirection: "row",
@@ -649,7 +650,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   sheetHeader: {
-    flexDirection: "row-reverse",
+    flexDirection: isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,

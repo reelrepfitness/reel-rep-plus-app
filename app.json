@@ -35,7 +35,9 @@
         "WRITE_EXTERNAL_STORAGE",
         "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission/SCHEDULE_EXACT_ALARM",
-        "android.permission/REQUEST_INSTALL_PACKAGES"
+        "android.permission/REQUEST_INSTALL_PACKAGES",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.REQUEST_INSTALL_PACKAGES"
       ]
     },
     "web": {
@@ -88,9 +90,13 @@
       "fallbackToCacheTimeout": 0,
       "useEmbeddedUpdate": true,
       "assetPatternsToBeBundled": [],
-      "disableAntiBrickingMeasures": false
+      "disableAntiBrickingMeasures": false,
+      "codeSigningCertificate": "<UNKNOWN>",
+      "codeSigningMetadata": "<UNKNOWN>"
     },
-    "runtimeVersion": { "policy": "sdkVersion" },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
     "extra": {
       "router": {
         "origin": "https://rork.com/"

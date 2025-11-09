@@ -10,7 +10,7 @@ import { colors } from "@/constants/colors";
 import { useHomeData } from "@/lib/useHomeData";
 import { useMemo, useRef, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth";
-import { formatDate } from "@/lib/utils";
+import { formatDate, isRTL } from "@/lib/utils";
 import { useWorkoutLogs } from "@/lib/useWorkoutLogs";
 import { ProgressRingChart } from "@/components/charts/progress-ring-chart";
 import { MacroPopover } from "@/components/MacroPopover";
@@ -1053,7 +1053,7 @@ const styles = StyleSheet.create({
   },
 
   greetingHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     zIndex: 1,
@@ -1201,7 +1201,7 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.7)",
   },
   calorieLabels: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     justifyContent: "space-around",
     zIndex: 1,
   },
@@ -1234,12 +1234,12 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   macroRingsRowTop: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     justifyContent: "space-evenly",
     marginBottom: 4,
   },
   macroRingsRowBottom: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     justifyContent: "center",
     gap: 50,
   },
@@ -1333,13 +1333,13 @@ const styles = StyleSheet.create({
     }),
   },
   waterHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 20,
   },
   waterHeaderRight: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     alignItems: "center",
     gap: 6,
   },
@@ -1357,7 +1357,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   waterCupsRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     gap: 8,
   },
@@ -1369,7 +1369,7 @@ const styles = StyleSheet.create({
   },
 
   activitySection: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     gap: 12,
     marginBottom: 20,
   },
@@ -1493,7 +1493,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   logItem: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     alignItems: "center",
     paddingVertical: 6,
     paddingHorizontal: 8,
@@ -1547,7 +1547,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sheetHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 24,
@@ -1594,7 +1594,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3FCDD1",
     borderRadius: 12,
     paddingVertical: 16,
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -1609,7 +1609,7 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
   },
   dateButtonsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     gap: 12,
     marginBottom: 12,
   },
@@ -1644,7 +1644,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   weekStripContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: isRTL ? "row-reverse" : "row",
     gap: 4,
     justifyContent: "space-between",
   },

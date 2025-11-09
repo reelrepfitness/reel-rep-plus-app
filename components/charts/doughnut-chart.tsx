@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 import { colors } from '@/constants/colors';
+import { isRTL } from '@/lib/utils';
 
 interface DoughnutChartData {
   label: string;
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   legendItem: {
-    flexDirection: 'row-reverse',
+    flexDirection: isRTL ? 'row-reverse' : 'row',
     alignItems: 'center',
     gap: 10,
   },

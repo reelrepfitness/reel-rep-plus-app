@@ -4,7 +4,7 @@ import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/auth';
-import { formatDate } from '@/lib/utils';
+import { formatDate, isRTL } from '@/lib/utils';
 
 interface MacroItem {
   id: string;
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     maxHeight: 250,
   },
   itemRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: isRTL ? 'row-reverse' : 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10,

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react-native';
 import { SheetRoot, SheetContent } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/auth';
+import { isRTL } from '@/lib/utils';
 
 interface AdminMenuSheetProps {
   open: boolean;
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   drawerHeaderContent: {
-    flexDirection: 'row-reverse' as any,
+    flexDirection: isRTL ? 'row-reverse' : 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   adminInfo: {
-    flexDirection: 'row-reverse' as any,
+    flexDirection: isRTL ? 'row-reverse' : 'row',
     alignItems: 'center',
     gap: 12,
   },
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     borderLeftColor: '#3FCDD1',
   },
   menuItemContent: {
-    flexDirection: 'row-reverse' as any,
+    flexDirection: isRTL ? 'row-reverse' : 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
