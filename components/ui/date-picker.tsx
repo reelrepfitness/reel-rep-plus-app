@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Calendar } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
+import { isRTL } from '@/lib/utils';
 
 type DatePickerProps = {
   label?: string;
@@ -175,13 +176,13 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: colors.text,
     marginBottom: 8,
-    textAlign: 'right',
+    textAlign: (isRTL ? 'right' : 'left'),
   },
   pickerButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.43)',
     borderRadius: 24,
     padding: 16,
-    flexDirection: 'row-reverse' as any,
+    flexDirection: (isRTL ? 'row-reverse' : 'row') as any,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   datePickerHeader: {
-    flexDirection: 'row-reverse' as any,
+    flexDirection: (isRTL ? 'row-reverse' : 'row') as any,
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   datePickerButtons: {
-    flexDirection: 'row-reverse' as any,
+    flexDirection: (isRTL ? 'row-reverse' : 'row') as any,
     gap: 12,
     paddingHorizontal: 20,
     paddingTop: 20,
@@ -261,11 +262,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600' as const,
     color: colors.text,
-    textAlign: 'right',
+    textAlign: (isRTL ? 'right' : 'left'),
     marginBottom: 12,
   },
   dateInputRow: {
-    flexDirection: 'row-reverse' as any,
+    flexDirection: 'row' as any,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,

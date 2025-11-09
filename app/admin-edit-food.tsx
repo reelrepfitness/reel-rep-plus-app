@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { Edit, Save, X, Search, Trash2 } from "lucide-react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FoodBankItem } from "@/lib/types";
+import { isRTL } from '@/lib/utils';
 
 export default function AdminEditFoodScreen() {
   const { user } = useAuth();
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   searchInputContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
@@ -378,7 +379,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   foodList: {
     gap: 12,
@@ -395,7 +396,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   foodCardContent: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -428,7 +429,7 @@ const styles = StyleSheet.create({
     maxHeight: "80%",
   },
   sheetHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 24,
@@ -445,14 +446,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   formRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
   },
   label: {
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   input: {
     backgroundColor: "#F9FAFB",
@@ -461,18 +462,18 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
   sheetActions: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginTop: 16,
   },
   saveButton: {
     flex: 1,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -491,7 +492,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   deleteButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

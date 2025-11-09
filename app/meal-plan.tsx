@@ -18,6 +18,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth";
 import { useHomeData } from "@/lib/useHomeData";
 import { FoodBankItem } from "@/lib/types";
+import { isRTL } from '@/lib/utils';
 
 interface MealPlanItem {
   id: string;
@@ -528,7 +529,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
   },
   headerContent: {
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -586,7 +587,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: "#FFFFFF",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   mealTitleInactive: {
     color: "#000000",
@@ -596,7 +597,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   foodItemCard: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "flex-start",
     gap: 12,
     backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -622,7 +623,7 @@ const styles = StyleSheet.create({
   },
   foodItemContent: {
     flex: 1,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
   },
   foodItemImage: {
@@ -638,10 +639,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#FFFFFF",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   foodItemDetails: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 12,
   },
@@ -657,12 +658,12 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   foodItemMacros: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 4,
   },
   nutritionBadge: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 6,
@@ -679,7 +680,7 @@ const styles = StyleSheet.create({
     color: "#2d3748",
   },
   mealMacroCardsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 6,
     flexWrap: "wrap",
   },

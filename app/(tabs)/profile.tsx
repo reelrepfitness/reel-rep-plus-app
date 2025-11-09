@@ -405,7 +405,7 @@ export default function ProfileScreen() {
                   value={editName}
                   onChangeText={setEditName}
                   placeholder="הזן שם מלא"
-                  textAlign="right"
+                  textAlign={isRTL ? "right" : "left"}
                   returnKeyType="next"
                 />
               </View>
@@ -419,7 +419,7 @@ export default function ProfileScreen() {
                   placeholder="הזן אימייל"
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  textAlign="right"
+                  textAlign={isRTL ? "right" : "left"}
                   returnKeyType="next"
                 />
               </View>
@@ -434,7 +434,7 @@ export default function ProfileScreen() {
                   onChangeText={setEditPassword}
                   placeholder="השאר ריק כדי לא לשנות"
                   secureTextEntry
-                  textAlign="right"
+                  textAlign={isRTL ? "right" : "left"}
                   returnKeyType="next"
                 />
               </View>
@@ -447,7 +447,7 @@ export default function ProfileScreen() {
                   onChangeText={setEditPasswordConfirm}
                   placeholder="הזן סיסמה שוב"
                   secureTextEntry
-                  textAlign="right"
+                  textAlign={isRTL ? "right" : "left"}
                   returnKeyType="done"
                   onSubmitEditing={handleSaveProfile}
                 />
@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
     textAlign: isRTL ? "right" : "left",
   },
   quickActions: {
-    flexDirection: "row",
+    flexDirection: (isRTL ? "row-reverse" : "row"),
     gap: 12,
     marginBottom: 24,
   },
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   logoutButton: {
-    flexDirection: "row",
+    flexDirection: (isRTL ? "row-reverse" : "row"),
     backgroundColor: colors.brown,
     borderRadius: 12,
     paddingVertical: 16,
@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: colors.text,
     marginBottom: 8,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   editInput: {
     borderWidth: 1,

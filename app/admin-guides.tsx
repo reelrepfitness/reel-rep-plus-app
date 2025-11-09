@@ -7,6 +7,7 @@ import { BookOpen, Plus, FileText } from "lucide-react-native";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isRTL } from '@/lib/utils';
 
 export default function AdminGuidesScreen() {
   const { user } = useAuth();
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   inputHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 8,
   },
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     borderWidth: 2,
     borderColor: "#E5E7EB",
     shadowColor: "#000",
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
     paddingTop: 14,
   },
   createButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   viewGuidesButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

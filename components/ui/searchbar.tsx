@@ -8,6 +8,7 @@ import {
   Text,
 } from 'react-native';
 import { Search, X } from 'lucide-react-native';
+import { isRTL } from '@/lib/utils';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     position: 'relative' as const,
   },
   searchBar: {
-    flexDirection: 'row-reverse' as const,
+    flexDirection: (isRTL ? 'row-reverse' : 'row') as const,
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2d3748',
-    textAlign: 'right' as const,
+    textAlign: (isRTL ? 'right' : 'left') as const,
   },
   suggestionsContainer: {
     position: 'absolute' as const,
@@ -206,6 +207,6 @@ const styles = StyleSheet.create({
   suggestionText: {
     fontSize: 14,
     color: '#2d3748',
-    textAlign: 'right' as const,
+    textAlign: (isRTL ? 'right' : 'left') as const,
   },
 });

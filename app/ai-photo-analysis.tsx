@@ -16,6 +16,7 @@ import { useHomeData } from "@/lib/useHomeData";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import * as ImagePicker from "expo-image-picker";
+import { isRTL } from '@/lib/utils';
 
 interface FoodItem {
   name: string;
@@ -552,7 +553,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -611,13 +612,13 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   buttonRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginTop: 32,
   },
   cameraButton: {
     flex: 1,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -638,7 +639,7 @@ const styles = StyleSheet.create({
   },
   galleryButton: {
     flex: 1,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -691,11 +692,11 @@ const styles = StyleSheet.create({
     position: "absolute" as const,
     bottom: 16,
     right: 16,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 8,
   },
   retakeButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -729,7 +730,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   gridContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 12,
     justifyContent: "space-between",
@@ -748,7 +749,7 @@ const styles = StyleSheet.create({
     position: "relative" as const,
   },
   foodItemTopRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
   },
@@ -777,7 +778,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 8,
   },
   foodItemQuantity: {
@@ -785,12 +786,12 @@ const styles = StyleSheet.create({
     color: "#718096",
   },
   foodItemMacros: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 12,
   },
   macroItem: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
     backgroundColor: "#F7FAFC",
@@ -801,7 +802,7 @@ const styles = StyleSheet.create({
     borderColor: "#E2E8F0",
   },
   macroItemColored: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
     paddingVertical: 6,
@@ -923,7 +924,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   summaryMacros: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-evenly",
     gap: 24,
   },

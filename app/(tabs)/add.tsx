@@ -25,6 +25,7 @@ import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/auth";
 import { AvoidKeyboard } from "@/components/ui/avoid-keyboard";
+import { isRTL } from '@/lib/utils';
 
 type MealType = "breakfast" | "snack" | "lunch" | "dinner";
 
@@ -925,7 +926,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
   },
   macroCardsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     paddingHorizontal: 16,
     paddingBottom: 16,
     gap: 12,
@@ -1021,7 +1022,7 @@ const styles = StyleSheet.create({
     position: "absolute" as const,
     top: "50%",
     left: "50%",
-    marginLeft: -6,
+    marginStart: -6,
     marginTop: -6,
   },
   confettiText: {
@@ -1039,7 +1040,7 @@ const styles = StyleSheet.create({
     paddingVertical: 28,
     paddingHorizontal: 20,
     marginBottom: 16,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
@@ -1073,13 +1074,13 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   mealHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
   },
   mealHeaderButtons: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 8,
     alignItems: "center",
   },
@@ -1100,7 +1101,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   editFoodButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     paddingHorizontal: 12,
     height: 36,
     borderRadius: 18,
@@ -1119,7 +1120,7 @@ const styles = StyleSheet.create({
   },
   foodListContent: {
     gap: 12,
-    paddingRight: 4,
+    paddingStart: 4,
   },
   foodItem: {
     alignItems: "center",
@@ -1153,7 +1154,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   macroGrid: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 8,
   },
@@ -1182,7 +1183,7 @@ const styles = StyleSheet.create({
     tintColor: "rgba(255, 255, 255, 0.3)",
   },
   mealMacroCardsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 6,
     flexWrap: "wrap",
   },
@@ -1290,7 +1291,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   optionsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     gap: 12,
   },
@@ -1300,13 +1301,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   optionsRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 16,
     width: "100%",
     justifyContent: "space-evenly",
   },
   optionsRowCentered: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
@@ -1377,7 +1378,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   editSheetHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 24,
@@ -1417,7 +1418,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   editItemInfo: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     alignItems: "center",
   },
@@ -1434,10 +1435,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   editItemQuantityRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: "row" as any,
     alignItems: "center",
     gap: 12,
   },
@@ -1469,7 +1470,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   itemActionsRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -1488,7 +1489,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600" as const,
     color: colors.primary,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   modalBackdrop: {
     position: "absolute" as const,
@@ -1503,7 +1504,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#D1D5DB",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "flex-end",
   },
   keyboardDoneButton: {
@@ -1530,7 +1531,7 @@ const styles = StyleSheet.create({
   },
   carouselCardContent: {
     flex: 1,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 16,

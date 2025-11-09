@@ -9,6 +9,7 @@ import {
   TextInputProps,
 } from 'react-native';
 import { Eye, EyeOff, LucideIcon } from 'lucide-react-native';
+import { isRTL } from '@/lib/utils';
 
 interface InputProps extends Omit<TextInputProps, 'onChangeText'> {
   label?: string;
@@ -55,7 +56,7 @@ export function Input({
           keyboardType={keyboardType}
           autoCapitalize="none"
           secureTextEntry={inputSecure}
-          textAlign="right"
+          textAlign={isRTL ? "right" : "left"}
           {...rest}
         />
 
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: -0.14,
     color: '#111827',
-    textAlign: 'right' as const,
+    textAlign: (isRTL ? 'right' : 'left') as const,
   },
   inputWrapper: {
     height: 46,
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
     borderColor: '#EDF1F3',
     borderRadius: 10,
     paddingHorizontal: 14,
-    flexDirection: 'row' as const,
+    flexDirection: (isRTL ? 'row-reverse' : 'row') as const,
     alignItems: 'center' as const,
     gap: 10,
     shadowColor: '#E4E5E7',
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: -0.14,
     color: '#1A1C1E',
-    textAlign: 'right' as const,
+    textAlign: (isRTL ? 'right' : 'left') as const,
     paddingVertical: 0,
     textAlignVertical: 'center' as const,
   },
@@ -130,6 +131,6 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     letterSpacing: -0.12,
     color: '#FF5252',
-    textAlign: 'right' as const,
+    textAlign: (isRTL ? 'right' : 'left') as const,
   },
 });

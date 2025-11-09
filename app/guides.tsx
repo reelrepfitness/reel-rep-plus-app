@@ -39,6 +39,7 @@ import { supabase } from "@/lib/supabase";
 import { Guide } from "@/lib/types";
 import { useState, ReactElement, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { isRTL } from '@/lib/utils';
 
 export default function GuidesScreen() {
   const insets = useSafeAreaInsets();

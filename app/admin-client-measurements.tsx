@@ -18,6 +18,7 @@ import { BodyMeasurement } from "@/lib/types";
 import { DoughnutChart } from '@/components/charts/doughnut-chart';
 import { LineChart } from '@/components/charts/line-chart';
 import { ChartContainer } from '@/components/charts/chart-container';
+import { isRTL } from '@/lib/utils';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -404,7 +405,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 16,
     paddingHorizontal: 16,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -441,7 +442,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   summaryRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginBottom: 16,
   },
@@ -494,7 +495,7 @@ const styles = StyleSheet.create({
     }),
   },
   cardHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 8,
     marginBottom: 16,

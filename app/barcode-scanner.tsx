@@ -21,6 +21,7 @@ import { supabase } from "@/lib/supabase";
 import { FoodBankItem } from "@/lib/types";
 import { useHomeData } from "@/lib/useHomeData";
 import { useQueryClient } from "@tanstack/react-query";
+import { isRTL } from '@/lib/utils';
 
 export default function BarcodeScannerScreen() {
   const router = useRouter();
@@ -761,7 +762,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -921,7 +922,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   counterSection: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 32,
@@ -953,13 +954,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   macrosContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "center",
     gap: 12,
     flexWrap: "wrap",
   },
   macroCard: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 12,
     backgroundColor: "#F7FAFC",
@@ -979,7 +980,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   sheetActions: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginTop: 8,
   },
@@ -1031,7 +1032,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700" as const,
     color: "#FFFFFF",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   previousProductsList: {
     paddingHorizontal: 20,
@@ -1057,7 +1058,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600" as const,
     color: "#FFFFFF",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   addProductSheet: {
     backgroundColor: "#FFFFFF",
@@ -1098,7 +1099,7 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: "#2d3748",
     marginBottom: 8,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   formInput: {
     backgroundColor: "#F7FAFC",
@@ -1109,7 +1110,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   nutritionHeader: {
     backgroundColor: colors.primary,
@@ -1126,7 +1127,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   addProductActions: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginTop: 24,
   },

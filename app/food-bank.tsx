@@ -26,6 +26,7 @@ import { FoodBankItem, Restaurant, RestaurantMenuItem } from "@/lib/types";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/auth";
 import { useToast } from "@/components/ui/toast";
+import { isRTL } from '@/lib/utils';
 
 const categoryIcons = {
   "מסעדות": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984906/hamburger_rdbysh.webp",
@@ -2219,7 +2220,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
   },
   headerContent: {
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -2242,7 +2243,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   macroCardsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     paddingHorizontal: 16,
     paddingBottom: 16,
     gap: 12,
@@ -2374,7 +2375,7 @@ const styles = StyleSheet.create({
   categoriesScroll: {
     paddingHorizontal: 12,
     gap: 16,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
   },
   categoryItem: {
     alignItems: "center",
@@ -2428,7 +2429,7 @@ const styles = StyleSheet.create({
   subCategoriesScroll: {
     gap: 12,
     paddingHorizontal: 16,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
   },
   subCategoryChip: {
@@ -2447,7 +2448,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   subCategoryContent: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
   },
@@ -2471,7 +2472,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   searchInputContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
@@ -2488,14 +2489,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   loadingContainer: {
     paddingVertical: 60,
     alignItems: "center",
   },
   foodGrid: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 12,
   },
@@ -2562,14 +2563,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     minHeight: 36,
   },
   servingText: {
     fontSize: 9,
     fontWeight: "500" as const,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 4,
     lineHeight: 13,
   },
@@ -2577,17 +2578,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "600" as const,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 4,
     lineHeight: 15,
   },
   foodNutrition: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 4,
   },
   nutritionBadge: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 6,
@@ -2607,7 +2608,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600" as const,
     color: colors.primary,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   emptyContainer: {
     paddingVertical: 60,
@@ -2664,7 +2665,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   counterSection: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 32,
@@ -2703,13 +2704,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   calculationSection: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "center",
     gap: 12,
     flexWrap: "wrap",
   },
   calcCard: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 12,
     backgroundColor: "#F7FAFC",
@@ -2729,7 +2730,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   sheetActions: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginTop: 8,
   },
@@ -2774,7 +2775,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 20,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 12,
     shadowColor: "#000",
@@ -2793,7 +2794,7 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: "#FFFFFF",
     flex: 1,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   confettiParticle: {
     position: "absolute" as const,
@@ -2838,7 +2839,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   measurementOptions: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 12,
     justifyContent: "center",
@@ -2856,7 +2857,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   measurementButtonContent: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
   },
@@ -2930,7 +2931,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   restaurantMenuItemContent: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 12,
@@ -2943,10 +2944,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   restaurantMenuItemMacros: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     flexWrap: "wrap",
     gap: 6,
   },

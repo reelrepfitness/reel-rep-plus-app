@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/auth";
 import { colors } from "@/constants/colors";
 import { useState } from "react";
 import { MessageCircle, AlertCircle, Lightbulb, Bug, Send, CheckCircle } from "lucide-react-native";
+import { isRTL } from '@/lib/utils';
 
 type SupportTicket = {
   id: string;
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   tabsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     padding: 16,
     gap: 8,
   },
@@ -276,13 +277,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   ticketHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
   },
   ticketType: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
   },
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
     color: "#4B5563",
   },
   statusBadge: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 10,
@@ -319,18 +320,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 8,
   },
   ticketDescription: {
     fontSize: 14,
     color: "#4B5563",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     lineHeight: 22,
     marginBottom: 12,
   },
   ticketFooter: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     paddingTop: 12,
     borderTopWidth: 1,
@@ -357,13 +358,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 14,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     borderWidth: 1,
     borderColor: "#E5E7EB",
     minHeight: 80,
   },
   sendButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
@@ -377,7 +378,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   replyButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 6,

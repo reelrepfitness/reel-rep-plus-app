@@ -7,6 +7,7 @@ import { colors } from "@/constants/colors";
 import { useMemo } from "react";
 import { User, Edit, Activity, ChefHat, ArrowLeft } from "lucide-react-native";
 import Svg, { Circle } from "react-native-svg";
+import { isRTL } from '@/lib/utils';
 
 export default function UserDashboardScreen() {
   const { userId, userName } = useLocalSearchParams<{ userId: string; userName: string }>();
@@ -452,13 +453,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   chartCard: {
     backgroundColor: "#212121",
@@ -471,7 +472,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   chartContainer: {
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "flex-end",
     height: 220,
@@ -531,7 +532,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   legend: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "center",
     gap: 20,
     marginBottom: 20,
@@ -540,7 +541,7 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(42, 36, 57, 0.15)",
   },
   legendItem: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
   },
@@ -555,7 +556,7 @@ const styles = StyleSheet.create({
     fontWeight: "500" as const,
   },
   statsRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     gap: 12,
   },
@@ -578,7 +579,7 @@ const styles = StyleSheet.create({
     fontWeight: "500" as const,
   },
   actionCardsRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginTop: 24,
   },
@@ -619,7 +620,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   summaryRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginBottom: 16,
   },
@@ -672,7 +673,7 @@ const styles = StyleSheet.create({
     }),
   },
   cardHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 8,
     marginBottom: 16,
@@ -698,7 +699,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   legendRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 10,
   },
@@ -741,7 +742,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   workoutCardsRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginTop: 16,
   },
@@ -835,7 +836,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   notchRow1: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 12,

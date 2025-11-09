@@ -19,6 +19,7 @@ import { supabase } from "@/lib/supabase";
 import { useState, useRef } from "react";
 import { useHomeData } from "@/lib/useHomeData";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { isRTL } from '@/lib/utils';
 
 interface BarcodeItem {
   id: number;
@@ -497,7 +498,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   headerRow1: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 12,
@@ -537,7 +538,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 20,
     paddingHorizontal: 24,
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
@@ -560,13 +561,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 14,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   emptyContainer: {
     flex: 1,
@@ -599,7 +600,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   itemHeader: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     marginBottom: 12,
     gap: 12,
@@ -618,25 +619,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   itemBrand: {
     fontSize: 14,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   itemPer100: {
     fontSize: 12,
     color: "#A0AEC0",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   macrosRow: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     gap: 8,
     flexWrap: "wrap",
   },
   macroCard: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     gap: 6,
     backgroundColor: "#F7FAFC",
@@ -690,7 +691,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   quantityControls: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     justifyContent: "center",
     gap: 24,
@@ -719,13 +720,13 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   sheetMacrosRow: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     justifyContent: "center",
     gap: 12,
     flexWrap: "wrap",
   },
   sheetMacroCard: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     gap: 10,
     backgroundColor: "#F7FAFC",
@@ -745,7 +746,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   sheetActions: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     gap: 12,
     marginTop: 8,
   },

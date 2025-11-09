@@ -7,6 +7,7 @@ import { colors } from "@/constants/colors";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Save } from "lucide-react-native";
+import { isRTL } from '@/lib/utils';
 
 export default function AdminEditClientScreen() {
   const { userId, userName } = useLocalSearchParams<{ userId: string; userName: string }>();
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginTop: 16,
     marginBottom: 16,
   },
@@ -346,7 +347,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 8,
   },
   input: {
@@ -362,7 +363,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 20,
     paddingVertical: 16,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
