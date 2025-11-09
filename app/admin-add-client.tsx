@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { UserPlus } from "lucide-react-native";
 import { RadioButton } from "@/components/ui/radio";
 import { Picker } from "@/components/ui/picker";
+import { isRTL } from '@/lib/utils';
 
 interface Template {
   id: string;
@@ -664,7 +665,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginTop: 16,
     marginBottom: 16,
   },
@@ -675,7 +676,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 8,
   },
   input: {
@@ -691,7 +692,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 20,
     paddingVertical: 16,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -744,13 +745,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700" as const,
     color: "#FF6B35",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   rmrCardBody: {
     gap: 12,
   },
   rmrValueContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "baseline",
     justifyContent: "center",
     gap: 8,
@@ -772,7 +773,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   rmrDetailRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 4,

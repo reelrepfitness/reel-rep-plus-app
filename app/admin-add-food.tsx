@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Plus, Search, Edit, Database } from "lucide-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { isRTL } from '@/lib/utils';
 
 type FoodManagementTab = "food_bank" | "restaurants" | "barcodes";
 
@@ -378,13 +379,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   tabsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     padding: 16,
     gap: 8,
   },
   tab: {
     flex: 1,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
@@ -406,7 +407,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   searchContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -419,20 +420,20 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   searchIcon: {
-    marginLeft: 8,
+    marginStart: 8,
   },
   searchInput: {
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   mainSection: {
     paddingBottom: 24,
   },
   headerRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
@@ -443,7 +444,7 @@ const styles = StyleSheet.create({
     color: "#2d3748",
   },
   addButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
     paddingVertical: 10,
@@ -476,18 +477,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 8,
   },
   infoText: {
     fontSize: 14,
     color: "#4B5563",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     lineHeight: 22,
     marginBottom: 16,
   },
   statsRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
   },
   statBox: {
@@ -511,7 +512,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   actionCard: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,
@@ -528,7 +529,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 16,
+    marginStart: 16,
   },
   actionContent: {
     flex: 1,

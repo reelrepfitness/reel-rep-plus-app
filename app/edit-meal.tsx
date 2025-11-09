@@ -17,6 +17,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useState } from "react";
 import { useHomeData } from "@/lib/useHomeData";
+import { isRTL } from '@/lib/utils';
 
 interface DailyItem {
   id: string;
@@ -428,7 +429,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#000000",
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -494,7 +495,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   itemHeader: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 12,
@@ -504,8 +505,8 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: "#2d3748",
     flex: 1,
-    textAlign: "right",
-    marginRight: 12,
+    textAlign: isRTL ? "right" : "left",
+    marginEnd: 12,
   },
   deleteButton: {
     padding: 8,
@@ -514,7 +515,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   quantityControls: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     justifyContent: "center",
     gap: 20,
@@ -545,13 +546,13 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   nutritionInfo: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     flexWrap: "wrap",
     gap: 12,
     justifyContent: "center",
   },
   nutritionRow: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     gap: 6,
     backgroundColor: "#F7FAFC",
@@ -569,7 +570,7 @@ const styles = StyleSheet.create({
     color: "#2d3748",
   },
   itemHeaderRight: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     flex: 1,
     gap: 12,

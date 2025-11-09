@@ -30,6 +30,7 @@ import {
 import { DatePicker } from '@/components/ui/date-picker';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from '@/components/ui/toast';
+import { isRTL } from '@/lib/utils';
 
 type MeasurementData = {
   bodyWeight: string;
@@ -794,7 +795,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -862,7 +863,7 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   sectionHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 10,
     marginBottom: 18,
@@ -874,7 +875,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   genderContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
     marginBottom: 16,
   },
@@ -909,7 +910,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 18,
     marginBottom: 14,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 16,
     shadowColor: "#000",
@@ -939,7 +940,7 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: colors.text,
     marginBottom: 10,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   input: {
     backgroundColor: "#F8F9FA",
@@ -948,13 +949,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     color: colors.text,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     borderWidth: 2,
     borderColor: "transparent",
     fontWeight: "500" as const,
   },
   skinfoldNote: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 8,
     backgroundColor: "rgba(251, 192, 45, 0.1)",
@@ -966,7 +967,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     color: "#F57C00",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     fontWeight: "500" as const,
   },
   resultsSection: {
@@ -978,7 +979,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     marginTop: 16,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 20,
     borderWidth: 2,
@@ -1017,7 +1018,7 @@ const styles = StyleSheet.create({
   resultError: {
     fontSize: 15,
     color: "#E53935",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     fontWeight: "600" as const,
   },
   submitButton: {
@@ -1025,7 +1026,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingVertical: 20,
     paddingHorizontal: 36,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 14,
@@ -1069,7 +1070,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#D1D5DB",
     paddingHorizontal: 16,
     paddingVertical: 10,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "flex-end",
   },
   keyboardDoneButton: {
@@ -1087,13 +1088,13 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   labelRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
   },
   historyToggle: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 4,
     paddingVertical: 4,
@@ -1120,13 +1121,13 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
     color: colors.text,
     marginBottom: 12,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   historyTable: {
     gap: 8,
   },
   historyRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 8,
@@ -1139,13 +1140,13 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: colors.gray,
     flex: 1,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   historyValue: {
     fontSize: 15,
     fontWeight: "700" as const,
     color: colors.text,
-    marginLeft: 12,
+    marginStart: 12,
   },
   diffContainer: {
     paddingHorizontal: 8,
@@ -1185,7 +1186,7 @@ const styles = StyleSheet.create({
     }),
   },
   bmiRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
   },

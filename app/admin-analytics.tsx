@@ -8,6 +8,7 @@ import { colors } from "@/constants/colors";
 import { useMemo } from "react";
 import { TrendingUp, Users, Flame, Target, Calendar, Activity } from "lucide-react-native";
 import { LineChart, BarChart } from "react-native-chart-kit";
+import { isRTL } from '@/lib/utils';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -287,16 +288,16 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   statsGrid: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap" as any,
     gap: 12,
     marginBottom: 24,
@@ -340,7 +341,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 12,
   },
   chartCard: {
@@ -364,11 +365,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 16,
   },
   insightCard: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,
@@ -386,7 +387,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 12,
+    marginStart: 12,
   },
   insightContent: {
     flex: 1,
@@ -401,6 +402,6 @@ const styles = StyleSheet.create({
   insightText: {
     fontSize: 14,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
 });

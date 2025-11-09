@@ -7,6 +7,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Plus, Save, X } from "lucide-react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isRTL } from '@/lib/utils';
 
 export default function AdminAddFoodNewScreen() {
   const { user } = useAuth();
@@ -393,14 +394,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   formRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 12,
   },
   label: {
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -409,7 +410,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
@@ -417,7 +418,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
   categoryGrid: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 8,
   },
@@ -451,11 +452,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 8,
   },
   saveButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

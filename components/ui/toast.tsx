@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { CheckCircle, AlertCircle, Info, X } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
+import { isRTL } from '@/lib/utils';
 
 type ToastVariant = 'success' | 'error' | 'info' | 'warning' | 'danger';
 
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
     maxWidth: screenWidth - 32,
   },
   toastContent: {
-    flexDirection: 'row-reverse' as any,
+    flexDirection: (isRTL ? 'row-reverse' : 'row') as any,
     alignItems: 'center',
     gap: 12,
   },
@@ -253,13 +254,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700' as const,
     color: colors.white,
-    textAlign: 'right',
+    textAlign: (isRTL ? 'right' : 'left'),
     marginBottom: 2,
   },
   toastDescription: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'right',
+    textAlign: (isRTL ? 'right' : 'left'),
     lineHeight: 18,
   },
   closeButton: {
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 10,
-    alignSelf: 'flex-end',
+    alignSelf: (isRTL ? 'flex-end' : 'flex-start'),
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },

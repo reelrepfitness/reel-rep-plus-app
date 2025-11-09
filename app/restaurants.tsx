@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Restaurant } from "@/lib/types";
 import { colors } from "@/constants/colors";
+import { isRTL } from '@/lib/utils';
 
 export default function RestaurantsScreen() {
   const router = useRouter();
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#000000",
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   restaurantGrid: {
-    flexDirection: "row-reverse" as const,
+    flexDirection: (isRTL ? "row-reverse" : "row") as const,
     flexWrap: "wrap",
     gap: 12,
   },
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     minHeight: 40,
   },
 });

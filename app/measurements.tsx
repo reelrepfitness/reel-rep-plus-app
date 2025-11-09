@@ -25,6 +25,7 @@ import { DoughnutChart } from '@/components/charts/doughnut-chart';
 import { LineChart } from '@/components/charts/line-chart';
 import { AreaChart } from '@/components/charts/area-chart';
 import { ChartContainer } from '@/components/charts/chart-container';
+import { isRTL } from '@/lib/utils';
 
 export default function MeasurementsScreen() {
   const { user } = useAuth();
@@ -938,7 +939,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#D1D5DB",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "flex-end",
   },
   keyboardDoneButton: {

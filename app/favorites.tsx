@@ -18,7 +18,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth";
 import { FoodBankItem } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { formatDate } from "@/lib/utils";
+import { formatDate, isRTL } from "@/lib/utils";
 
 export default function FavoritesScreen() {
   const { user } = useAuth();
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   foodGrid: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap",
     gap: 12,
   },
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700" as const,
     color: colors.text,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   foodCalories: {
     fontSize: 12,

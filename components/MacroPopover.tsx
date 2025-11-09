@@ -231,19 +231,19 @@ const styles = StyleSheet.create({
   },
   itemInfo: {
     flex: 1,
-    marginLeft: 12,
+    marginStart: 12,
   },
   itemName: {
     fontSize: 14,
     fontWeight: '600',
     color: '#2d3748',
-    textAlign: 'right',
+    textAlign: isRTL ? 'right' : 'left',
     marginBottom: 2,
   },
   itemDetails: {
     fontSize: 12,
     color: '#718096',
-    textAlign: 'right',
+    textAlign: isRTL ? 'right' : 'left',
   },
   itemBadge: {
     paddingHorizontal: 10,

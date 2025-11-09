@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { isRTL } from '@/lib/utils';
 
 interface RadioOption {
   label: string;
@@ -33,7 +34,7 @@ export function RadioButton({ option, selected, onPress }: RadioButtonProps) {
 
 const styles = StyleSheet.create({
   radioContainer: {
-    flexDirection: 'row-reverse' as const,
+    flexDirection: (isRTL ? 'row-reverse' : 'row') as const,
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
     borderColor: '#3FCDD1',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 12,
+    marginStart: 12,
   },
   radioSelected: {
     width: 12,
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#2d3748',
     flex: 1,
-    textAlign: 'right' as const,
+    textAlign: (isRTL ? 'right' : 'left') as const,
   },
   disabled: {
     opacity: 0.5,

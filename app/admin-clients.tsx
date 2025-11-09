@@ -10,6 +10,7 @@ import { useMemo, useState } from "react";
 import { Droplet, UserPlus, Menu, X, MessageSquare } from "lucide-react-native";
 import { Image } from "expo-image";
 import { AdminMenuSheet } from "@/components/AdminMenuSheet";
+import { isRTL } from '@/lib/utils';
 
 export default function AdminClientsScreen() {
   const { user } = useAuth();
@@ -386,13 +387,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   clientsGrid: {
     gap: 12,
@@ -409,13 +410,13 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   clientHeader: {
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "flex-start",
     justifyContent: "space-between",
     marginBottom: 16,
   },
   clientInfo: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     flex: 1,
   },
@@ -426,7 +427,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 12,
+    marginStart: 12,
   },
   clientAvatarText: {
     fontSize: 24,
@@ -455,7 +456,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   progressLabelRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
   },
@@ -485,12 +486,12 @@ const styles = StyleSheet.create({
     borderTopColor: "#E5E7EB",
   },
   waterProgressHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
   },
   waterProgressLabel: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 4,
   },
@@ -515,7 +516,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 16,
     paddingHorizontal: 24,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -556,7 +557,7 @@ const styles = StyleSheet.create({
     minHeight: 400,
   },
   sheetHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
@@ -569,7 +570,7 @@ const styles = StyleSheet.create({
   sheetSubtitle: {
     fontSize: 14,
     color: "#718096",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 16,
   },
   messageInput: {
@@ -579,14 +580,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     borderWidth: 1,
     borderColor: "#E5E7EB",
     minHeight: 120,
     marginBottom: 16,
   },
   sendWhatsappButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

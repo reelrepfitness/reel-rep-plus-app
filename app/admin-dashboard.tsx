@@ -10,6 +10,7 @@ import { colors } from "@/constants/colors";
 import { useMemo, useState } from "react";
 import { AlertTriangle, Clock, Flame, TrendingUp, Activity, Database, Zap, Menu } from "lucide-react-native";
 import { AdminMenuSheet } from "@/components/AdminMenuSheet";
+import { isRTL } from '@/lib/utils';
 
 export default function AdminDashboardScreen() {
   const { user } = useAuth();
@@ -585,17 +586,17 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700" as const,
     color: "#1a202c",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 4,
   },
   dateText: {
     fontSize: 14,
     color: "#4a5568",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     fontWeight: "500" as const,
   },
   statsGrid: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap" as any,
     gap: 12,
     marginBottom: 24,
@@ -637,13 +638,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   notificationHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
   },
   notificationHeaderActions: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 12,
   },
@@ -675,7 +676,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   noAlertsCard: {
     backgroundColor: "#FFFFFF",
@@ -701,7 +702,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   alertCard: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,
@@ -790,7 +791,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   systemCardHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     marginBottom: 16,
     gap: 12,
@@ -812,7 +813,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   metricRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 8,

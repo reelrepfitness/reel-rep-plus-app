@@ -1066,7 +1066,7 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
     color: "#FFFFFF",
     marginBottom: 4,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   dateText: {
     fontSize: 14,
@@ -1506,7 +1506,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "600" as const,
     flex: 1,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   deleteButton: {
     padding: 4,
@@ -1567,7 +1567,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#000",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   input: {
     borderWidth: 1,
@@ -1576,7 +1576,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     backgroundColor: "#F9FAFB",
   },
   dateInput: {
@@ -1586,7 +1586,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     backgroundColor: "#F3F4F6",
     color: "#6B7280",
   },
@@ -1696,7 +1696,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#D1D5DB",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    flexDirection: "row" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "flex-end",
   },
   keyboardDoneButton: {

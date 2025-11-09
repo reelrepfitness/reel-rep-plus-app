@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Bell, Plus, Clock, Target, TrendingUp, Save, Trash2, Send, Users, UserCheck } from "lucide-react-native";
 import { supabase } from "@/lib/supabase";
 import { sendToUsers, sendToAllUsers } from "@/lib/sendPushNotifications";
+import { isRTL } from '@/lib/utils';
 
 type NotificationTrigger = "time" | "goal_reached" | "goal_missed" | "inactive";
 
@@ -626,13 +627,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   tabsContainer: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     padding: 16,
     gap: 12,
   },
   tab: {
     flex: 1,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -657,7 +658,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 16,
   },
   templatesSection: {
@@ -675,7 +676,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   templateHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     marginBottom: 12,
   },
@@ -683,7 +684,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   templateTitleRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 8,
     marginBottom: 8,
@@ -697,10 +698,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#4B5563",
     marginBottom: 8,
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   templateMeta: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 8,
   },
   templateMetaText: {
@@ -711,7 +712,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   deleteButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
@@ -746,7 +747,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 8,
   },
   formInput: {
@@ -756,7 +757,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
@@ -764,12 +765,12 @@ const styles = StyleSheet.create({
     height: 100,
   },
   triggerOptions: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     flexWrap: "wrap" as any,
     gap: 8,
   },
   triggerOption: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 6,
     paddingVertical: 10,
@@ -792,7 +793,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   saveButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -815,12 +816,12 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   recipientOptions: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     gap: 8,
   },
   recipientOption: {
     flex: 1,
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
@@ -850,7 +851,7 @@ const styles = StyleSheet.create({
     borderColor: "#E5E7EB",
   },
   userItem: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     justifyContent: "space-between",
     alignItems: "center",
     padding: 12,
@@ -867,13 +868,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#2d3748",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
     marginBottom: 2,
   },
   userEmail: {
     fontSize: 13,
     color: "#6B7280",
-    textAlign: "right",
+    textAlign: isRTL ? "right" : "left",
   },
   checkmark: {
     width: 24,
@@ -889,7 +890,7 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
   },
   sendButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

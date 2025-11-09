@@ -17,6 +17,7 @@ import { useAuth } from "@/contexts/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { Input } from "@/components/ui/input";
 import { Mail, Lock } from "lucide-react-native";
+import { isRTL } from '@/lib/utils';
 
 // Enable RTL
 I18nManager.forceRTL(true);

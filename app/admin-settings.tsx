@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/auth";
 import { colors } from "@/constants/colors";
 import { useState } from "react";
 import { Settings, Bell, Database, Key, Shield, Save } from "lucide-react-native";
+import { isRTL } from '@/lib/utils';
 
 export default function AdminSettingsScreen() {
   const { user } = useAuth();
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionHeader: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     gap: 12,
     marginBottom: 16,
@@ -236,14 +237,14 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   settingRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
   },
   settingInfo: {
     flex: 1,
     alignItems: "flex-end",
-    marginRight: 16,
+    marginEnd: 16,
   },
   settingTitle: {
     fontSize: 16,
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     color: "#718096",
   },
   inputRow: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     color: "#2d3748",
   },
   actionButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "flex-end",
     gap: 12,
@@ -295,7 +296,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   saveButton: {
-    flexDirection: "row-reverse" as any,
+    flexDirection: (isRTL ? "row-reverse" : "row") as any,
     alignItems: "center",
     justifyContent: "center",
     gap: 12,

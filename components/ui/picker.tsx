@@ -8,6 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { LucideIcon } from 'lucide-react-native';
+import { isRTL } from '@/lib/utils';
 
 export type PickerOption = {
   label: string;
@@ -146,7 +147,7 @@ export function Picker({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row-reverse',
+    flexDirection: (isRTL ? 'row-reverse' : 'row'),
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2d3748',
     marginBottom: 8,
-    textAlign: 'right',
+    textAlign: (isRTL ? 'right' : 'left'),
   },
   iconContainer: {
     justifyContent: 'center',
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   selectedContent: {
-    flexDirection: 'row-reverse',
+    flexDirection: (isRTL ? 'row-reverse' : 'row'),
     alignItems: 'center',
     gap: 8,
   },
@@ -194,12 +195,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#2d3748',
-    textAlign: 'right',
+    textAlign: (isRTL ? 'right' : 'left'),
   },
   placeholderText: {
     fontSize: 16,
     color: '#A0AEC0',
-    textAlign: 'right',
+    textAlign: (isRTL ? 'right' : 'left'),
   },
   chevron: {
     fontSize: 12,
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     maxHeight: 400,
   },
   optionItem: {
-    flexDirection: 'row-reverse',
+    flexDirection: (isRTL ? 'row-reverse' : 'row'),
     alignItems: 'center',
     paddingVertical: 14,
     paddingHorizontal: 20,
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#2d3748',
-    textAlign: 'right',
+    textAlign: (isRTL ? 'right' : 'left'),
     flex: 1,
   },
   optionTextSelected: {
