@@ -3,6 +3,10 @@ import * as Device from "expo-device";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { supabase } from "@/lib/supabase";
+import { handleNotificationNavigation, NotificationData } from "@/lib/deepLinking";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger('PushNotifications');
 
 type TokenCallback = (token: string, userId?: string) => void | Promise<void>;
 
@@ -47,7 +51,7 @@ export async function registerForPushNotificationsAsync(
     }
 
     if (finalStatus !== "granted") {
-      console.log("❌ Failed to get push token - permission denied");
+      logger.warn("Failed to get push token - permission denied");
       return;
     }
 
@@ -56,7 +60,7 @@ export async function registerForPushNotificationsAsync(
       Constants?.easConfig?.projectId;
 
     if (!projectId) {
-      console.error("❌ Project ID not found in app config");
+      logger.error("Project ID not found in app config");
       return;
     }
 
@@ -65,21 +69,21 @@ export async function registerForPushNotificationsAsync(
         projectId,
       });
       token = pushTokenData.data;
-      console.log("✅ Push token obtained:", token);
+      logger.info("Push token obtained:", token);
 
       if (token && userId) {
         await savePushToken(token, userId);
       }
 
       if (tokenCallback && token) {
-        console.log("📤 Sending token to callback");
+        logger.info("Sending token to callback");
         await tokenCallback(token, userId);
       }
     } catch (error) {
-      console.error("❌ Error getting push token:", error);
+      logger.error("Error getting push token:", error);
     }
   } else {
-    console.log("⚠️ Must use physical device for Push Notifications");
+    logger.warn("Must use physical device for Push Notifications");
   }
 
   return token;
@@ -88,44 +92,53 @@ export async function registerForPushNotificationsAsync(
 export function setupNotificationListeners() {
   notificationListeners.received =
     Notifications.addNotificationReceivedListener((notification) => {
-      console.log("📩 Notification received:", notification);
-      console.log("📩 Title:", notification.request.content.title);
-      console.log("📩 Body:", notification.request.content.body);
-      console.log("📩 Data:", notification.request.content.data);
+      logger.info("Notification received", {
+        title: notification.request.content.title,
+        body: notification.request.content.body,
+        data: notification.request.content.data
+      });
     });
 
   notificationListeners.response =
     Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log("👆 Notification tapped:", response);
-      console.log("👆 Action:", response.actionIdentifier);
-      console.log("👆 Data:", response.notification.request.content.data);
+      const data = response.notification.request.content.data as NotificationData;
+
+      logger.info("Notification tapped", {
+        action: response.actionIdentifier,
+        data
+      });
+
+      // Handle navigation when notification is tapped
+      if (response.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
+        handleNotificationNavigation(data);
+      }
     });
 
-  console.log("✅ Notification listeners setup complete");
+  logger.info("Notification listeners setup complete");
 }
 
 export function removeNotificationListeners() {
   if (notificationListeners.received) {
     notificationListeners.received.remove();
-    console.log("🗑️ Removed notification received listener");
+    logger.info("Removed notification received listener");
   }
 
   if (notificationListeners.response) {
     notificationListeners.response.remove();
-    console.log("🗑️ Removed notification response listener");
+    logger.info("Removed notification response listener");
   }
 
   notificationListeners = {};
 }
 
 export function setTokenCallback(callback: TokenCallback) {
-  console.log("📝 Token callback registered");
+  logger.info("Token callback registered");
   tokenCallback = callback;
 }
 
 export async function savePushToken(token: string, userId: string) {
   try {
-    console.log("💾 Saving push token to Supabase...");
+    logger.info("Saving push token to Supabase...");
 
     const deviceType = Platform.select({
       ios: "ios",
@@ -148,12 +161,12 @@ export async function savePushToken(token: string, userId: string) {
     );
 
     if (error) {
-      console.error("❌ Error saving push token:", error.message);
+      logger.error("Error saving push token:", error.message);
     } else {
-      console.log("✅ Push token saved successfully");
+      logger.info("Push token saved successfully");
     }
   } catch (error) {
-    console.error("❌ Error saving push token:", error);
+    logger.error("Error saving push token:", error);
   }
 }
 
@@ -161,7 +174,7 @@ export async function initializeNotifications(
   userId?: string,
   onTokenReceived?: TokenCallback
 ) {
-  console.log("🚀 Initializing push notifications...");
+  logger.info("Initializing push notifications...");
 
   if (onTokenReceived) {
     setTokenCallback(onTokenReceived);
@@ -175,7 +188,7 @@ export async function initializeNotifications(
 }
 
 export function cleanupNotifications() {
-  console.log("🧹 Cleaning up notifications...");
+  logger.info("Cleaning up notifications...");
   removeNotificationListeners();
   tokenCallback = null;
 }

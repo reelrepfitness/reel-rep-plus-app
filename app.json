@@ -5,7 +5,7 @@
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "rork-app",
+    "scheme": "reelrepplus",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "splash": {
@@ -18,10 +18,14 @@
       "bundleIdentifier": "com.reelrepplus.ios",
       "buildNumber": "2",
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
-        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone",
-        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos"
-      }
+        "NSCameraUsageDescription": "האפליקציה צריכה גישה למצלמה כדי לצלם תמונות התקדמות",
+        "NSMicrophoneUsageDescription": "האפליקציה צריכה גישה למיקרופון",
+        "NSPhotoLibraryUsageDescription": "האפליקציה צריכה גישה לתמונות כדי לשמור תמונות התקדמות",
+        "NSUserTrackingUsageDescription": "האפליקציה משתמשת בנתונים לשיפור החוויה שלך"
+      },
+      "associatedDomains": [
+        "applinks:reelrepplus.com"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -76,7 +80,7 @@
           "sounds": [
             "./local/assets/notification_sound.wav"
           ],
-          "enableBackgroundRemoteNotifications": false
+          "enableBackgroundRemoteNotifications": true
         }
       ]
     ],
@@ -100,7 +104,9 @@
       },
       "eas": {
         "projectId": "d008d4d4-399d-4a34-84c4-4402d18c5b75"
-      }
+      },
+      "supabaseUrl": process.env.EXPO_PUBLIC_SUPABASE_URL,
+      "supabaseAnonKey": process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
     }
   }
 }
