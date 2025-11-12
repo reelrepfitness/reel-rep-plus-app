@@ -57,5 +57,14 @@ target 'reelrepplus' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => ccache_enabled?(podfile_properties),
     )
+
+    # Force modular headers for GoogleUtilities and its dependencies
+    installer.pods_project.targets.each do |target|
+      if target.name == 'GoogleUtilities' || target.name.start_with?('Firebase')
+        target.build_configurations.each do |config|
+          config.build_settings['DEFINES_MODULE'] = 'YES'
+        end
+      end
+    end
   end
 end
