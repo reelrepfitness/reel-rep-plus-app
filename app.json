@@ -2,7 +2,7 @@
   "expo": {
     "name": "reel rep plus",
     "slug": "reelrep-plus",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rork-app",
@@ -16,6 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.reelrepplus.ios",
+      "buildNumber": "2",
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
         "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone",
@@ -90,13 +91,9 @@
       "fallbackToCacheTimeout": 0,
       "useEmbeddedUpdate": true,
       "assetPatternsToBeBundled": [],
-      "disableAntiBrickingMeasures": false,
-      "codeSigningCertificate": "<UNKNOWN>",
-      "codeSigningMetadata": "<UNKNOWN>"
+      "disableAntiBrickingMeasures": false
     },
-    "runtimeVersion": {
-      "policy": "sdkVersion"
-    },
+    "runtimeVersion":"1.0.0",
     "extra": {
       "router": {
         "origin": "https://rork.com/"
