@@ -100,9 +100,7 @@
       },
       "eas": {
         "projectId": "d008d4d4-399d-4a34-84c4-4402d18c5b75"
-      },
-      "supabaseUrl": process.env.EXPO_PUBLIC_SUPABASE_URL,
-      "supabaseAnonKey": process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
+      }
     }
   }
 }
