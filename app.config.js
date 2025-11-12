@@ -32,7 +32,7 @@ module.exports = {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
       },
-      package: "com.reelrep.plus",
+      package: "com.reelrepplus.ios",
       intentFilters: [
         {
           action: "VIEW",

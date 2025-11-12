@@ -32,7 +32,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.reelrep.plus",
+      "package": "com.reelrepplus.ios",
       "permissions": [
         "CAMERA",
         "RECORD_AUDIO",
