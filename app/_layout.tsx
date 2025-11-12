@@ -1,31 +1,20 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { analyticsService } from "@/lib/analytics";
 import { Stack } from "expo-router";
-import { analyticsService } from "@/lib/analytics";
 import * as SplashScreen from "expo-splash-screen";
-import { analyticsService } from "@/lib/analytics";
 import React, { useEffect } from "react";
-import { analyticsService } from "@/lib/analytics";
 import { I18nManager, Platform } from "react-native";
-import { analyticsService } from "@/lib/analytics";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { analyticsService } from "@/lib/analytics";
 import { AuthProvider } from "@/contexts/auth";
-import { analyticsService } from "@/lib/analytics";
 import { ToastProvider } from "@/components/ui/toast";
-import { analyticsService } from "@/lib/analytics";
 import * as Updates from "expo-updates";
-import { analyticsService } from "@/lib/analytics";
 import {
-import { analyticsService } from "@/lib/analytics";
   initializeNotifications,
   cleanupNotifications,
 } from "@/lib/pushNotifications";
 import { enableConnectionMonitoring } from "@/lib/connectionHelper";
-import { analyticsService } from "@/lib/analytics";
 
 import { createLogger } from '@/lib/logger';
-import { analyticsService } from "@/lib/analytics";
 
 const logger = createLogger('Layout');
 // import { supabase } from "@/lib/supabase"; // enable when you wire saving token
