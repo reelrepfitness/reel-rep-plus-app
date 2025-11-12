@@ -19,6 +19,10 @@ import { useState } from "react";
 import { useHomeData } from "@/lib/useHomeData";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('EditMeal');
+
 interface DailyItem {
   id: string;
   food_id: number;
@@ -46,17 +50,17 @@ export default function EditMealScreen() {
   const [editingQuantity, setEditingQuantity] = useState<string>("");
   const [modifiedItems, setModifiedItems] = useState<Record<string, number>>({});
 
-  console.log("[EditMeal] Meal type:", mealType);
+  logger.info("[EditMeal] Meal type:", mealType);
 
   const { data: mealItems = [], isLoading } = useQuery({
     queryKey: ["mealItems", dailyLog?.id, mealType],
     queryFn: async () => {
       if (!dailyLog?.id || !mealType) {
-        console.log("[EditMeal] Missing dailyLog or mealType");
+        logger.info("[EditMeal] Missing dailyLog or mealType");
         return [];
       }
 
-      console.log("[EditMeal] Fetching items for meal:", mealType, "daily log:", dailyLog.id);
+      logger.info("[EditMeal] Fetching items for meal:", mealType, "daily log:", dailyLog.id);
 
       const { data, error } = await supabase
         .from("daily_items")
@@ -77,16 +81,16 @@ export default function EditMealScreen() {
         .order("created_at", { ascending: true });
 
       if (error) {
-        console.error("[EditMeal] Error fetching items:", error);
+        logger.error("[EditMeal] Error fetching items:", error);
         throw error;
       }
 
-      console.log(`[EditMeal] Found ${data?.length || 0} items`);
+      logger.info(`[EditMeal] Found ${data?.length || 0} items`);
 
       // Fetch food names and images
       const itemsWithNames = await Promise.all(
         (data || []).map(async (item) => {
-          console.log(`[EditMeal] Fetching food data for item ${item.id}, food_id: ${item.food_id}`);
+          logger.info(`[EditMeal] Fetching food data for item ${item.id}, food_id: ${item.food_id}`);
           
           // Try food_bank first
           const { data: foodData, error: foodError } = await supabase
@@ -96,7 +100,7 @@ export default function EditMealScreen() {
             .maybeSingle();
 
           if (foodData) {
-            console.log(`[EditMeal] Found in food_bank:`, foodData.name);
+            logger.info(`[EditMeal] Found in food_bank:`, foodData.name);
             return {
               ...item,
               food_name: foodData.name,
@@ -112,7 +116,7 @@ export default function EditMealScreen() {
             .maybeSingle();
 
           if (restaurantData) {
-            console.log(`[EditMeal] Found in restaurant_menu_items:`, restaurantData.name);
+            logger.info(`[EditMeal] Found in restaurant_menu_items:`, restaurantData.name);
             return {
               ...item,
               food_name: restaurantData.name,
@@ -120,7 +124,7 @@ export default function EditMealScreen() {
             } as DailyItem;
           }
 
-          console.warn(`[EditMeal] Food not found in any table for id ${item.food_id}`);
+          logger.warn(`[EditMeal] Food not found in any table for id ${item.food_id}`);
           return {
             ...item,
             food_name: "מוצר לא ידוע",
@@ -129,7 +133,7 @@ export default function EditMealScreen() {
         })
       );
 
-      console.log(`[EditMeal] Processed ${itemsWithNames.length} items with names`);
+      logger.info(`[EditMeal] Processed ${itemsWithNames.length} items with names`);
       return itemsWithNames;
     },
     enabled: !!dailyLog?.id && !!mealType,
@@ -137,7 +141,7 @@ export default function EditMealScreen() {
 
   const deleteMutation = useMutation({
     mutationFn: async (itemId: string) => {
-      console.log("[EditMeal] Deleting item:", itemId);
+      logger.info("[EditMeal] Deleting item:", itemId);
       const { error } = await supabase
         .from("daily_items")
         .delete()
@@ -146,7 +150,7 @@ export default function EditMealScreen() {
       if (error) throw error;
     },
     onSuccess: () => {
-      console.log("[EditMeal] Item deleted successfully");
+      logger.info("[EditMeal] Item deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["mealItems"] });
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
@@ -155,7 +159,7 @@ export default function EditMealScreen() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ itemId, newQuantity }: { itemId: string; newQuantity: number }) => {
-      console.log("[EditMeal] Updating item:", itemId, "new quantity:", newQuantity);
+      logger.info("[EditMeal] Updating item:", itemId, "new quantity:", newQuantity);
       
       // Get the item to calculate new values
       const item = mealItems.find(i => i.id === itemId);
@@ -179,7 +183,7 @@ export default function EditMealScreen() {
       if (error) throw error;
     },
     onSuccess: () => {
-      console.log("[EditMeal] Item updated successfully");
+      logger.info("[EditMeal] Item updated successfully");
       queryClient.invalidateQueries({ queryKey: ["mealItems"] });
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });

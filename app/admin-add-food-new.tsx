@@ -9,6 +9,10 @@ import { Plus, Save, X } from "lucide-react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminAddFoodNew');
+
 export default function AdminAddFoodNewScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -34,7 +38,7 @@ export default function AdminAddFoodNewScreen() {
 
   const addFoodMutation = useMutation({
     mutationFn: async () => {
-      console.log("[AdminAddFoodNew] Adding new food item:", name);
+      logger.info("[AdminAddFoodNew] Adding new food item:", name);
       
       const { data, error } = await supabase
         .from("food_bank")
@@ -58,21 +62,21 @@ export default function AdminAddFoodNewScreen() {
         .select();
 
       if (error) {
-        console.error("[AdminAddFoodNew] Error:", error);
+        logger.error("[AdminAddFoodNew] Error:", error);
         throw error;
       }
 
       return data;
     },
     onSuccess: () => {
-      console.log("[AdminAddFoodNew] Food item added successfully");
+      logger.info("[AdminAddFoodNew] Food item added successfully");
       queryClient.invalidateQueries({ queryKey: ["foodBank"] });
       Alert.alert("הצלחה", "פריט המזון נוסף בהצלחה", [
         { text: "אישור", onPress: () => router.back() }
       ]);
     },
     onError: (error: any) => {
-      console.error("[AdminAddFoodNew] Error:", error);
+      logger.error("[AdminAddFoodNew] Error:", error);
       Alert.alert("שגיאה", "אירעה שגיאה בהוספת פריט המזון");
     }
   });

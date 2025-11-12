@@ -5,6 +5,10 @@ import { Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatDate } from "@/lib/utils";
 import { registerForPushNotificationsAsync } from "@/lib/pushNotifications";
+import { createLogger } from "@/lib/logger";
+import { analyticsService } from "@/lib/analytics";
+
+const logger = createLogger('Auth');
 
 interface AuthContextValue {
   session: Session | null;
@@ -23,7 +27,7 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
   const ensureDailyLog = useCallback(async (userId: string) => {
     try {
       const today = formatDate(new Date());
-      console.log("[Auth] Ensuring daily log for:", today);
+      logger.info("Ensuring daily log for:", today);
 
       const { data: existingLog } = await supabase
         .from("daily_logs")
@@ -33,8 +37,8 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
         .single();
 
       if (!existingLog) {
-        console.log("[Auth] Creating daily log for today");
-        
+        logger.info("Creating daily log for today");
+
         const { error } = await supabase.from("daily_logs").insert([
           {
             user_id: userId,
@@ -43,15 +47,15 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
         ]);
 
         if (error) {
-          console.error("[Auth] Error creating daily log:", error.message || JSON.stringify(error));
+          logger.error("Error creating daily log:", error.message || JSON.stringify(error));
         } else {
-          console.log("[Auth] Daily log created");
+          logger.info("Daily log created");
         }
       } else {
-        console.log("[Auth] Daily log already exists");
+        logger.info("Daily log already exists");
       }
     } catch (error) {
-      console.error("[Auth] Error ensuring daily log:", error instanceof Error ? error.message : JSON.stringify(error));
+      logger.error("Error ensuring daily log:", error instanceof Error ? error.message : JSON.stringify(error));
     }
   }, []);
 
@@ -81,24 +85,24 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
         .single();
 
       if (error) {
-        console.error("[Auth] Error creating profile:", error.message || JSON.stringify(error));
+        logger.error("Error creating profile:", error.message || JSON.stringify(error));
         throw error;
       }
 
-      console.log("[Auth] Profile created");
+      logger.info("Profile created");
       setUser(data);
-      
+
       await ensureDailyLog(userId);
     } catch (error) {
-      console.error("[Auth] Failed to create profile:", error instanceof Error ? error.message : JSON.stringify(error));
+      logger.error("Failed to create profile:", error instanceof Error ? error.message : JSON.stringify(error));
       throw error;
     }
   }, [ensureDailyLog]);
 
   const loadUser = useCallback(async (userId: string) => {
     try {
-      console.log("[Auth] Loading user profile for:", userId);
-      
+      logger.info("Loading user profile for:", userId);
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -106,35 +110,35 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
         .single();
 
       if (error) {
-        console.error("[Auth] Error loading profile:", error.message);
-        console.error("[Auth] Error details:", {
+        logger.error("Error loading profile:", error.message);
+        logger.error("Error details:", {
           code: error.code,
           details: error.details,
           hint: error.hint,
           full: JSON.stringify(error)
         });
-        
+
         if (error.code === "PGRST116") {
-          console.log("[Auth] Profile not found, creating new profile");
+          logger.info("Profile not found, creating new profile");
           await createUserRecord(userId);
           return;
         }
-        
+
         throw error;
       }
 
-      console.log("[Auth] Profile loaded:", data.email);
+      logger.info("Profile loaded:", data.email);
       setUser(data);
-      
+
       await ensureDailyLog(userId);
-      
+
       await registerForPushNotificationsAsync(userId);
     } catch (error) {
-      console.error("[Auth] Failed to load profile:", error instanceof Error ? error.message : String(error));
+      logger.error("Failed to load profile:", error instanceof Error ? error.message : String(error));
       if (error && typeof error === 'object') {
-        console.error("[Auth] Error details:", JSON.stringify(error, null, 2));
+        logger.error("Error details:", JSON.stringify(error, null, 2));
       }
-      
+
       setUser(null);
     } finally {
       setLoading(false);
@@ -142,11 +146,11 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
   }, [createUserRecord, ensureDailyLog]);
 
   useEffect(() => {
-    console.log("[Auth] Initializing auth context");
-    
+    logger.info("Initializing auth context");
+
     supabase.auth.getSession()
       .then(({ data: { session: currentSession } }) => {
-        console.log("[Auth] Initial session:", currentSession?.user?.email || "none");
+        logger.info("Initial session:", currentSession?.user?.email || "none");
         setSession(currentSession);
         if (currentSession) {
           loadUser(currentSession.user.id);
@@ -155,7 +159,7 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
         }
       })
       .catch((error) => {
-        console.error("[Auth] Error getting initial session:", error);
+        logger.error("Error getting initial session:", error);
         setSession(null);
         setUser(null);
         setLoading(false);
@@ -164,7 +168,7 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      console.log("[Auth] Auth state changed:", _event, currentSession?.user?.email || "none");
+      logger.info("Auth state changed:", _event, currentSession?.user?.email || "none");
       setSession(currentSession);
       if (currentSession) {
         loadUser(currentSession.user.id);
@@ -178,22 +182,22 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
   }, [loadUser]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    console.log("[Auth] Signing in:", email);
+    logger.info("Signing in:", email);
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      console.error("[Auth] Sign in error:", error.message || JSON.stringify(error));
+      logger.error("Sign in error:", error.message || JSON.stringify(error));
       throw error;
     }
-    
-    console.log("[Auth] Sign in successful");
+
+    logger.info("Sign in successful");
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name: string) => {
-    console.log("[Auth] Signing up:", email);
+    logger.info("Signing up:", email);
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -205,23 +209,23 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
     });
 
     if (error) {
-      console.error("[Auth] Sign up error:", error.message || JSON.stringify(error));
+      logger.error("Sign up error:", error.message || JSON.stringify(error));
       throw error;
     }
-    
-    console.log("[Auth] Sign up successful");
+
+    logger.info("Sign up successful");
   }, []);
 
   const signOut = useCallback(async () => {
-    console.log("[Auth] Signing out");
+    logger.info("Signing out");
     const { error } = await supabase.auth.signOut();
-    
+
     if (error) {
-      console.error("[Auth] Sign out error:", error.message || JSON.stringify(error));
+      logger.error("Sign out error:", error.message || JSON.stringify(error));
       throw error;
     }
-    
-    console.log("[Auth] Sign out successful");
+
+    logger.info("Sign out successful");
   }, []);
 
   return useMemo(() => ({

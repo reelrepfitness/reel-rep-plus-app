@@ -10,6 +10,10 @@ import { TrendingUp, Users, Flame, Target, Calendar, Activity } from "lucide-rea
 import { LineChart, BarChart } from "react-native-chart-kit";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminAnalytics');
+
 const screenWidth = Dimensions.get("window").width;
 
 export default function AdminAnalyticsScreen() {
@@ -18,7 +22,7 @@ export default function AdminAnalyticsScreen() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-analytics", user?.user_id],
     queryFn: async () => {
-      console.log("[AdminAnalytics] Fetching analytics data");
+      logger.info("[AdminAnalytics] Fetching analytics data");
 
       const today = new Date();
       const last7Days: string[] = [];

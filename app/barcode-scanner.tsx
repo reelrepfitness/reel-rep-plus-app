@@ -23,6 +23,10 @@ import { useHomeData } from "@/lib/useHomeData";
 import { useQueryClient } from "@tanstack/react-query";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('BarcodeScanner');
+
 export default function BarcodeScannerScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -62,7 +66,7 @@ export default function BarcodeScannerScreen() {
 
   const loadPreviousProducts = useCallback(async () => {
     try {
-      console.log("[Barcode] Loading previous scanned products");
+      logger.info("[Barcode] Loading previous scanned products");
       
       const { data, error } = await supabase
         .from("daily_items")
@@ -75,7 +79,7 @@ export default function BarcodeScannerScreen() {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("[Barcode] Error loading previous products:", error.message);
+        logger.error("[Barcode] Error loading previous products:", error.message);
         return;
       }
 
@@ -87,10 +91,10 @@ export default function BarcodeScannerScreen() {
       });
 
       const products = Array.from(uniqueProducts.values());
-      console.log(`[Barcode] Loaded ${products.length} unique scanned products`);
+      logger.info(`[Barcode] Loaded ${products.length} unique scanned products`);
       setPreviousProducts(products);
     } catch (error) {
-      console.error("[Barcode] Error:", error instanceof Error ? error.message : String(error));
+      logger.error("[Barcode] Error:", error instanceof Error ? error.message : String(error));
     }
   }, [dailyLog?.id]);
 
@@ -105,7 +109,7 @@ export default function BarcodeScannerScreen() {
     
     setHasScanned(true);
     setIsSearching(true);
-    console.log("[Barcode] Scanned:", data.data);
+    logger.info("[Barcode] Scanned:", data.data);
     
     try {
       const { data: item, error } = await supabase
@@ -115,7 +119,7 @@ export default function BarcodeScannerScreen() {
         .single();
       
       if (error || !item) {
-        console.error("[Barcode] Item not found:", error ? error.message : "No item");
+        logger.error("[Barcode] Item not found:", error ? error.message : "No item");
         setIsSearching(false);
         setScannedBarcode(data.data);
         setShowAddProductSheet(true);
@@ -128,7 +132,7 @@ export default function BarcodeScannerScreen() {
         return;
       }
       
-      console.log("[Barcode] Found item:", item.name);
+      logger.info("[Barcode] Found item:", item.name);
       setScannedItem(item as FoodBankItem);
       setQuantity("1");
       setShowSheet(true);
@@ -140,7 +144,7 @@ export default function BarcodeScannerScreen() {
         stiffness: 90,
       }).start();
     } catch (error) {
-      console.error("[Barcode] Error:", error instanceof Error ? error.message : String(error));
+      logger.error("[Barcode] Error:", error instanceof Error ? error.message : String(error));
       setIsSearching(false);
       setTimeout(() => {
         setHasScanned(false);
@@ -208,7 +212,7 @@ export default function BarcodeScannerScreen() {
 
     try {
       setIsSubmitting(true);
-      console.log("[Barcode] Adding new product to database");
+      logger.info("[Barcode] Adding new product to database");
 
       const { error } = await supabase
         .from("barcode_items")
@@ -225,15 +229,15 @@ export default function BarcodeScannerScreen() {
         }]);
 
       if (error) {
-        console.error("[Barcode] Error inserting product:", error);
+        logger.error("[Barcode] Error inserting product:", error);
         throw error;
       }
 
-      console.log("[Barcode] Product added successfully");
+      logger.info("[Barcode] Product added successfully");
       alert("המוצר נוסף בהצלחה! תודה שעזרת לשאר המשתמשים 🎉");
       closeAddProductSheet();
     } catch (error) {
-      console.error("[Barcode] Failed to add product:", error instanceof Error ? error.message : String(error));
+      logger.error("[Barcode] Failed to add product:", error instanceof Error ? error.message : String(error));
       alert("שגיאה בהוספת המוצר");
     } finally {
       setIsSubmitting(false);
@@ -244,7 +248,7 @@ export default function BarcodeScannerScreen() {
     if (!scannedItem || !dailyLog?.id || !mealType) return;
 
     try {
-      console.log("[Barcode] Adding food:", scannedItem.name, "x", quantity, "to", mealType);
+      logger.info("[Barcode] Adding food:", scannedItem.name, "x", quantity, "to", mealType);
 
       const quantityNum = parseFloat(quantity) || 1;
       const caloriesPerUnit = scannedItem.caloreis_per_unit;
@@ -273,11 +277,11 @@ export default function BarcodeScannerScreen() {
         }]);
 
       if (itemError) {
-        console.error("[Barcode] Error inserting daily item:", itemError);
+        logger.error("[Barcode] Error inserting daily item:", itemError);
         throw itemError;
       }
 
-      console.log("[Barcode] Daily item inserted successfully");
+      logger.info("[Barcode] Daily item inserted successfully");
 
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
@@ -287,7 +291,7 @@ export default function BarcodeScannerScreen() {
       closeSheet();
       router.back();
     } catch (error) {
-      console.error("[Barcode] Failed to add food:", error instanceof Error ? error.message : String(error));
+      logger.error("[Barcode] Failed to add food:", error instanceof Error ? error.message : String(error));
       alert("שגיאה בהוספת הפריט");
     }
   };

@@ -20,6 +20,10 @@ import { FoodBankItem } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDate, isRTL } from "@/lib/utils";
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Favorites');
+
 export default function FavoritesScreen() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -57,7 +61,7 @@ export default function FavoritesScreen() {
 
       setFavorites(favoriteFoods || []);
     } catch (error: any) {
-      console.error("Error loading favorites:", error);
+      logger.error("Error loading favorites:", error);
       setError(error?.message || "שגיאה בטעינת מועדפים");
     } finally {
       setLoading(false);
@@ -122,7 +126,7 @@ export default function FavoritesScreen() {
 
       router.back();
     } catch (error: any) {
-      console.error("Error adding item to meal:", error);
+      logger.error("Error adding item to meal:", error);
       setError(error?.message || "שגיאה בהוספת פריט");
     } finally {
       setAddingItemId(null);

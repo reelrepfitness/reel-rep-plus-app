@@ -10,6 +10,10 @@ import { RadioButton } from "@/components/ui/radio";
 import { Picker } from "@/components/ui/picker";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminAddClient');
+
 interface Template {
   id: string;
   kcal_plan: number;
@@ -66,13 +70,13 @@ export default function AdminAddClientScreen() {
         .order("kcal_plan", { ascending: true });
 
       if (error) {
-        console.error("[AdminAddClient] Error fetching templates:", error);
+        logger.error("[AdminAddClient] Error fetching templates:", error);
         Alert.alert("שגיאה", "לא ניתן לטעון תבניות");
       } else {
         setTemplates(data || []);
       }
     } catch (error) {
-      console.error("[AdminAddClient] Error:", error);
+      logger.error("[AdminAddClient] Error:", error);
     } finally {
       setIsLoadingTemplates(false);
     }
@@ -132,7 +136,7 @@ export default function AdminAddClientScreen() {
       });
 
       if (authError) {
-        console.error("[AdminAddClient] Auth error:", authError);
+        logger.error("[AdminAddClient] Auth error:", authError);
         Alert.alert("שגיאה", authError.message);
         return;
       }
@@ -168,7 +172,7 @@ export default function AdminAddClientScreen() {
           });
 
         if (profileError) {
-          console.error("[AdminAddClient] Profile error:", profileError);
+          logger.error("[AdminAddClient] Profile error:", profileError);
           Alert.alert("שגיאה", "נוצר משתמש אך לא ניתן לעדכן את הפרופיל");
         } else {
           Alert.alert("הצלחה", "לקוח חדש נוסף בהצלחה");
@@ -176,7 +180,7 @@ export default function AdminAddClientScreen() {
         }
       }
     } catch (error) {
-      console.error("[AdminAddClient] Error:", error);
+      logger.error("[AdminAddClient] Error:", error);
       Alert.alert("שגיאה", "אירעה שגיאה בהוספת הלקוח");
     } finally {
       setIsSubmitting(false);

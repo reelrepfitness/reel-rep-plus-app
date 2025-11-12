@@ -9,13 +9,17 @@ import { User, Edit, Activity, ChefHat, ArrowLeft } from "lucide-react-native";
 import Svg, { Circle } from "react-native-svg";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('UserDashboard');
+
 export default function UserDashboardScreen() {
   const { userId, userName } = useLocalSearchParams<{ userId: string; userName: string }>();
 
   const { data, isLoading } = useQuery({
     queryKey: ["user-calories-7days", userId],
     queryFn: async () => {
-      console.log("[UserDashboard] Fetching 7-day calorie data for user:", userId);
+      logger.info("[UserDashboard] Fetching 7-day calorie data for user:", userId);
 
       const today = new Date();
       const dates: string[] = [];
@@ -34,7 +38,7 @@ export default function UserDashboardScreen() {
         .in("date", dates);
 
       if (error) {
-        console.error("[UserDashboard] Error fetching logs:", error);
+        logger.error("[UserDashboard] Error fetching logs:", error);
         throw error;
       }
 
@@ -45,10 +49,10 @@ export default function UserDashboardScreen() {
         .single();
 
       if (profileError) {
-        console.error("[UserDashboard] Error fetching profile:", profileError);
+        logger.error("[UserDashboard] Error fetching profile:", profileError);
       }
 
-      console.log("[UserDashboard] Profile data:", profile);
+      logger.info("[UserDashboard] Profile data:", profile);
 
       const logsMap = new Map(logs?.map(log => [log.date, log]) || []);
       
@@ -65,7 +69,7 @@ export default function UserDashboardScreen() {
         };
       });
 
-      console.log("[UserDashboard] Week data:", weekData);
+      logger.info("[UserDashboard] Week data:", weekData);
 
       const lastLog = logsMap.get(dates[dates.length - 1]);
 
@@ -76,7 +80,7 @@ export default function UserDashboardScreen() {
         .order("measurement_date", { ascending: true });
 
       if (measurementsError) {
-        console.error("[UserDashboard] Error fetching measurements:", measurementsError);
+        logger.error("[UserDashboard] Error fetching measurements:", measurementsError);
       }
 
       const getCurrentWeekRange = () => {

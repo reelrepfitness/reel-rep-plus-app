@@ -1,5 +1,9 @@
 import { supabase } from "@/lib/supabase";
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Sendpushnotifications');
+
 const EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
 
 export interface PushMessage {
@@ -34,7 +38,7 @@ export async function sendPushNotification(
   message: PushMessage
 ): Promise<PushResponse> {
   try {
-    console.log("📤 Sending push notification:", message);
+    logger.info("📤 Sending push notification:", message);
 
     const response = await fetch(EXPO_PUSH_URL, {
       method: "POST",
@@ -47,7 +51,7 @@ export async function sendPushNotification(
     });
 
     const data = await response.json();
-    console.log("📥 Push response:", data);
+    logger.info("📥 Push response:", data);
 
     if (data.data && data.data[0]) {
       return data.data[0];
@@ -55,7 +59,7 @@ export async function sendPushNotification(
 
     return data;
   } catch (error) {
-    console.error("❌ Error sending push notification:", error);
+    logger.error("❌ Error sending push notification:", error);
     return {
       status: "error",
       message: error instanceof Error ? error.message : "Unknown error",
@@ -67,7 +71,7 @@ export async function sendPushNotifications(
   messages: PushMessage[]
 ): Promise<PushResponse[]> {
   try {
-    console.log(`📤 Sending ${messages.length} push notifications`);
+    logger.info(`📤 Sending ${messages.length} push notifications`);
 
     const response = await fetch(EXPO_PUSH_URL, {
       method: "POST",
@@ -80,7 +84,7 @@ export async function sendPushNotifications(
     });
 
     const data = await response.json();
-    console.log("📥 Push responses:", data);
+    logger.info("📥 Push responses:", data);
 
     if (data.data) {
       return data.data;
@@ -88,7 +92,7 @@ export async function sendPushNotifications(
 
     return [data];
   } catch (error) {
-    console.error("❌ Error sending push notifications:", error);
+    logger.error("❌ Error sending push notifications:", error);
     return messages.map(() => ({
       status: "error" as const,
       message: error instanceof Error ? error.message : "Unknown error",
@@ -104,7 +108,7 @@ export async function sendToUsers(
   sentBy?: string
 ): Promise<SendResult[]> {
   try {
-    console.log(`🎯 Sending notifications to ${userIds.length} users`);
+    logger.info(`🎯 Sending notifications to ${userIds.length} users`);
 
     const { data: tokens, error } = await supabase
       .from("push_tokens")
@@ -112,16 +116,16 @@ export async function sendToUsers(
       .in("user_id", userIds);
 
     if (error) {
-      console.error("❌ Error fetching push tokens:", error);
+      logger.error("❌ Error fetching push tokens:", error);
       throw error;
     }
 
     if (!tokens || tokens.length === 0) {
-      console.log("⚠️ No push tokens found for selected users");
+      logger.info("⚠️ No push tokens found for selected users");
       return [];
     }
 
-    console.log(`✅ Found ${tokens.length} push tokens`);
+    logger.info(`✅ Found ${tokens.length} push tokens`);
 
     const messages: PushMessage[] = tokens.map((t) => ({
       to: t.token,
@@ -169,17 +173,17 @@ export async function sendToUsers(
       });
 
       if (error === "DeviceNotRegistered") {
-        console.log(`🗑️ Removing invalid token for user ${token.user_id}`);
+        logger.info(`🗑️ Removing invalid token for user ${token.user_id}`);
         await supabase.from("push_tokens").delete().eq("token", token.token);
       }
     }
 
     const successCount = results.filter((r) => r.success).length;
-    console.log(`✅ Successfully sent ${successCount}/${results.length} notifications`);
+    logger.info(`✅ Successfully sent ${successCount}/${results.length} notifications`);
 
     return results;
   } catch (error) {
-    console.error("❌ Error in sendToUsers:", error);
+    logger.error("❌ Error in sendToUsers:", error);
     throw error;
   }
 }
@@ -191,26 +195,26 @@ export async function sendToAllUsers(
   sentBy?: string
 ): Promise<SendResult[]> {
   try {
-    console.log("🌐 Sending notifications to all users");
+    logger.info("🌐 Sending notifications to all users");
 
     const { data: tokens, error } = await supabase
       .from("push_tokens")
       .select("token, user_id");
 
     if (error) {
-      console.error("❌ Error fetching push tokens:", error);
+      logger.error("❌ Error fetching push tokens:", error);
       throw error;
     }
 
     if (!tokens || tokens.length === 0) {
-      console.log("⚠️ No push tokens found");
+      logger.info("⚠️ No push tokens found");
       return [];
     }
 
     const userIds = tokens.map((t) => t.user_id);
     return sendToUsers(userIds, title, body, data, sentBy);
   } catch (error) {
-    console.error("❌ Error in sendToAllUsers:", error);
+    logger.error("❌ Error in sendToAllUsers:", error);
     throw error;
   }
 }

@@ -28,6 +28,10 @@ import { useAuth } from "@/contexts/auth";
 import { useToast } from "@/components/ui/toast";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('FoodBank');
+
 const categoryIcons = {
   "מסעדות": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984906/hamburger_rdbysh.webp",
   "פחמימה": "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984887/bread-slice_1_cjf894.webp",
@@ -85,7 +89,7 @@ export default function FoodBankScreen() {
   const { data: foodItems = [], isLoading } = useQuery({
     queryKey: ["foodBank"],
     queryFn: async () => {
-      console.log("[FoodBank] Fetching all food items");
+      logger.info("[FoodBank] Fetching all food items");
       
       const { data, error } = await supabase
         .from("food_bank")
@@ -93,12 +97,12 @@ export default function FoodBankScreen() {
         .order("name", { ascending: true });
 
       if (error) {
-        console.error("[FoodBank] Error fetching:", error);
+        logger.error("[FoodBank] Error fetching:", error);
         throw error;
       }
 
-      console.log(`[FoodBank] Loaded ${data?.length || 0} items`);
-      console.log("[FoodBank] Sample items:", data?.slice(0, 3));
+      logger.info(`[FoodBank] Loaded ${data?.length || 0} items`);
+      logger.info("[FoodBank] Sample items:", data?.slice(0, 3));
       return data as FoodBankItem[];
     },
   });
@@ -106,7 +110,7 @@ export default function FoodBankScreen() {
   const { data: alcoholItems = [] } = useQuery({
     queryKey: ["alcoholItems"],
     queryFn: async () => {
-      console.log("[FoodBank] Fetching alcohol items");
+      logger.info("[FoodBank] Fetching alcohol items");
       
       const { data, error } = await supabase
         .from("alcohol")
@@ -114,11 +118,11 @@ export default function FoodBankScreen() {
         .order("name", { ascending: true });
 
       if (error) {
-        console.error("[FoodBank] Error fetching alcohol:", error);
+        logger.error("[FoodBank] Error fetching alcohol:", error);
         throw error;
       }
 
-      console.log(`[FoodBank] Loaded ${data?.length || 0} alcohol items`);
+      logger.info(`[FoodBank] Loaded ${data?.length || 0} alcohol items`);
       return data as any[];
     },
   });
@@ -126,7 +130,7 @@ export default function FoodBankScreen() {
   const { data: restaurantItems = [] } = useQuery({
     queryKey: ["restaurantItems"],
     queryFn: async () => {
-      console.log("[FoodBank] Fetching restaurant items");
+      logger.info("[FoodBank] Fetching restaurant items");
       
       const { data, error } = await supabase
         .from("restaurants")
@@ -134,11 +138,11 @@ export default function FoodBankScreen() {
         .order("name", { ascending: true });
 
       if (error) {
-        console.error("[FoodBank] Error fetching restaurant items:", error);
+        logger.error("[FoodBank] Error fetching restaurant items:", error);
         throw error;
       }
 
-      console.log(`[FoodBank] Loaded ${data?.length || 0} restaurant items`);
+      logger.info(`[FoodBank] Loaded ${data?.length || 0} restaurant items`);
       return data as any[];
     },
   });
@@ -148,7 +152,7 @@ export default function FoodBankScreen() {
     queryFn: async () => {
       if (!user?.user_id) return [];
       
-      console.log("[FoodBank] Fetching user favorites");
+      logger.info("[FoodBank] Fetching user favorites");
       
       const { data, error } = await supabase
         .from("favorites")
@@ -156,12 +160,12 @@ export default function FoodBankScreen() {
         .eq("user_id", user.user_id);
 
       if (error) {
-        console.error("[FoodBank] Error fetching favorites:", error);
+        logger.error("[FoodBank] Error fetching favorites:", error);
         return [];
       }
 
       const foodIds = data?.map(f => f.food_id) || [];
-      console.log(`[FoodBank] Loaded ${foodIds.length} favorites`);
+      logger.info(`[FoodBank] Loaded ${foodIds.length} favorites`);
       return foodIds;
     },
     enabled: !!user?.user_id,
@@ -172,7 +176,7 @@ export default function FoodBankScreen() {
     queryFn: async () => {
       if (!selectedRestaurant) return [];
       
-      console.log("[FoodBank] Fetching menu items for restaurant:", selectedRestaurant.name);
+      logger.info("[FoodBank] Fetching menu items for restaurant:", selectedRestaurant.name);
       
       const { data, error } = await supabase
         .from("restaurant_menu_items")
@@ -181,11 +185,11 @@ export default function FoodBankScreen() {
         .order("name", { ascending: true });
 
       if (error) {
-        console.error("[FoodBank] Error fetching menu items:", error);
+        logger.error("[FoodBank] Error fetching menu items:", error);
         throw error;
       }
 
-      console.log(`[FoodBank] Loaded ${data?.length || 0} menu items`);
+      logger.info(`[FoodBank] Loaded ${data?.length || 0} menu items`);
       return data as RestaurantMenuItem[];
     },
     enabled: !!selectedRestaurant,
@@ -256,7 +260,7 @@ export default function FoodBankScreen() {
       }
     }
 
-    console.log(`[FoodBank] Filtered ${filtered.length} items (total: ${foodItems.length}, search: "${searchQuery}", category: ${selectedMainCategory}, sub: ${selectedSubCategory})`);
+    logger.info(`[FoodBank] Filtered ${filtered.length} items (total: ${foodItems.length}, search: "${searchQuery}", category: ${selectedMainCategory}, sub: ${selectedSubCategory})`);
     return filtered;
   }, [foodItems, searchQuery, selectedMainCategory, selectedSubCategory]);
 
@@ -276,7 +280,7 @@ export default function FoodBankScreen() {
       }
     }
 
-    console.log(`[FoodBank] Filtered ${filtered.length} alcohol items (search: "${searchQuery}", sub: ${selectedSubCategory})`);
+    logger.info(`[FoodBank] Filtered ${filtered.length} alcohol items (search: "${searchQuery}", sub: ${selectedSubCategory})`);
     return filtered;
   }, [alcoholItems, searchQuery, selectedSubCategory, selectedMainCategory]);
 
@@ -535,7 +539,7 @@ export default function FoodBankScreen() {
   };
 
   const handleFoodPress = (item: FoodBankItem) => {
-    console.log("[FoodBank] Selected food:", item.name);
+    logger.info("[FoodBank] Selected food:", item.name);
     if (item.category === "ירק" || item.category === "פרי") {
       setSelectedFood(item);
       setQuantity("1");
@@ -559,7 +563,7 @@ export default function FoodBankScreen() {
   };
 
   const handleRestaurantPress = (restaurant: Restaurant) => {
-    console.log("[FoodBank] Selected restaurant:", restaurant.name);
+    logger.info("[FoodBank] Selected restaurant:", restaurant.name);
     setSelectedRestaurant(restaurant);
     setShowRestaurantSheet(true);
     Animated.spring(restaurantSheetAnimation, {
@@ -571,7 +575,7 @@ export default function FoodBankScreen() {
   };
 
   const handleRestaurantItemPress = (item: RestaurantMenuItem) => {
-    console.log("[FoodBank] Selected restaurant item:", item.name);
+    logger.info("[FoodBank] Selected restaurant item:", item.name);
     setSelectedRestaurantItem(item);
     setQuantity("1");
   };
@@ -646,7 +650,7 @@ export default function FoodBankScreen() {
     if (!selectedFood || !dailyLog?.id || !mealType) return;
 
     try {
-      console.log("[FoodBank] Adding food:", selectedFood.name, "x", quantity, "to", mealType);
+      logger.info("[FoodBank] Adding food:", selectedFood.name, "x", quantity, "to", mealType);
 
       const quantityNum = parseFloat(quantity) || 1;
       const caloriesPerUnit = selectedFood.caloreis_per_unit;
@@ -676,11 +680,11 @@ export default function FoodBankScreen() {
         }]);
 
       if (itemError) {
-        console.error("[FoodBank] Error inserting daily item:", itemError);
+        logger.error("[FoodBank] Error inserting daily item:", itemError);
         throw itemError;
       }
 
-      console.log("[FoodBank] Daily item inserted successfully");
+      logger.info("[FoodBank] Daily item inserted successfully");
 
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
@@ -757,7 +761,7 @@ export default function FoodBankScreen() {
       closeSheet();
       setQuantity("1");
     } catch (error) {
-      console.error("[FoodBank] Failed to add food:", error);
+      logger.error("[FoodBank] Failed to add food:", error);
     }
   };
 
@@ -770,7 +774,7 @@ export default function FoodBankScreen() {
       if (!user?.user_id) throw new Error("User not authenticated");
 
       if (isFavorite) {
-        console.log("[FoodBank] Removing favorite:", foodId);
+        logger.info("[FoodBank] Removing favorite:", foodId);
         const { error } = await supabase
           .from("favorites")
           .delete()
@@ -779,7 +783,7 @@ export default function FoodBankScreen() {
         
         if (error) throw error;
       } else {
-        console.log("[FoodBank] Adding favorite:", foodId);
+        logger.info("[FoodBank] Adding favorite:", foodId);
         const { error } = await supabase
           .from("favorites")
           .insert({
@@ -796,7 +800,7 @@ export default function FoodBankScreen() {
       queryClient.invalidateQueries({ queryKey: ["userFavorites", user?.user_id] });
     },
     onError: (error) => {
-      console.error("[FoodBank] Error toggling favorite:", error);
+      logger.error("[FoodBank] Error toggling favorite:", error);
     },
   });
 
@@ -813,7 +817,7 @@ export default function FoodBankScreen() {
     const DOUBLE_TAP_DELAY = 300;
 
     if (now - lastTap < DOUBLE_TAP_DELAY) {
-      console.log("[FoodBank] Double tap detected on food:", foodId);
+      logger.info("[FoodBank] Double tap detected on food:", foodId);
       
       const anim = getHeartAnimation(foodId);
       anim.setValue(0);
@@ -1168,7 +1172,7 @@ export default function FoodBankScreen() {
                   key={item.id}
                   style={styles.foodCard}
                   onPress={() => {
-                    console.log("[FoodBank] Selected restaurant item:", item.name);
+                    logger.info("[FoodBank] Selected restaurant item:", item.name);
                   }}
                 >
                   <View style={styles.foodImageContainer}>
@@ -1236,7 +1240,7 @@ export default function FoodBankScreen() {
                     key={item.id}
                     style={styles.foodCard}
                     onPress={() => {
-                      console.log("[FoodBank] Selected alcohol item:", item.name);
+                      logger.info("[FoodBank] Selected alcohol item:", item.name);
                     }}
                   >
                     <View style={styles.foodImageContainer}>
@@ -2040,7 +2044,7 @@ export default function FoodBankScreen() {
 
     try {
       const quantityNum = parseFloat(quantity) || 1;
-      console.log("[FoodBank] Adding restaurant item:", selectedRestaurantItem.name, "x", quantityNum, "to", mealType);
+      logger.info("[FoodBank] Adding restaurant item:", selectedRestaurantItem.name, "x", quantityNum, "to", mealType);
 
       const proteinUnits = selectedRestaurantItem.protein_units * quantityNum;
       const carbUnits = selectedRestaurantItem.carb_units * quantityNum;
@@ -2065,11 +2069,11 @@ export default function FoodBankScreen() {
         }]);
 
       if (itemError) {
-        console.error("[FoodBank] Error inserting restaurant item:", itemError);
+        logger.error("[FoodBank] Error inserting restaurant item:", itemError);
         throw itemError;
       }
 
-      console.log("[FoodBank] Restaurant item inserted successfully");
+      logger.info("[FoodBank] Restaurant item inserted successfully");
 
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
@@ -2093,7 +2097,7 @@ export default function FoodBankScreen() {
       closeRestaurantSheet();
       setQuantity("1");
     } catch (error) {
-      console.error("[FoodBank] Failed to add restaurant item:", error);
+      logger.error("[FoodBank] Failed to add restaurant item:", error);
     }
   }
 
@@ -2102,7 +2106,7 @@ export default function FoodBankScreen() {
 
     try {
       const quantityNum = parseFloat(quantity) || 1;
-      console.log("[FoodBank] Adding macro food:", selectedFood.name, "x", quantityNum, selectedMeasurement, "to", mealType);
+      logger.info("[FoodBank] Adding macro food:", selectedFood.name, "x", quantityNum, selectedMeasurement, "to", mealType);
 
       let servings = 0;
       let totalGrams = 0;
@@ -2151,11 +2155,11 @@ export default function FoodBankScreen() {
         }]);
 
       if (itemError) {
-        console.error("[FoodBank] Error inserting daily item:", itemError);
+        logger.error("[FoodBank] Error inserting daily item:", itemError);
         throw itemError;
       }
 
-      console.log("[FoodBank] Daily item inserted successfully");
+      logger.info("[FoodBank] Daily item inserted successfully");
 
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
@@ -2180,7 +2184,7 @@ export default function FoodBankScreen() {
       closeSheet();
       setQuantity("1");
     } catch (error) {
-      console.error("[FoodBank] Failed to add food:", error);
+      logger.error("[FoodBank] Failed to add food:", error);
     }
   }
 }

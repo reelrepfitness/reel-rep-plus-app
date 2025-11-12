@@ -32,6 +32,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from '@/components/ui/toast';
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('UpdateMeasurements');
+
 type MeasurementData = {
   bodyWeight: string;
   height: string;
@@ -250,7 +254,7 @@ export default function UpdateMeasurementsScreen() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: MeasurementData) => {
-      console.log("[UpdateMeasurements] Updating measurements for user:", userId);
+      logger.info("[UpdateMeasurements] Updating measurements for user:", userId);
 
       const measurementData: any = {
         user_id: userId,
@@ -292,7 +296,7 @@ export default function UpdateMeasurementsScreen() {
       return measurementData;
     },
     onSuccess: () => {
-      console.log("[UpdateMeasurements] Measurements updated successfully");
+      logger.info("[UpdateMeasurements] Measurements updated successfully");
       queryClient.invalidateQueries({ queryKey: ["user-calories-7days", userId] });
       queryClient.invalidateQueries({ queryKey: ["previous-measurements", userId] });
       
@@ -318,7 +322,7 @@ export default function UpdateMeasurementsScreen() {
       }, 2000);
     },
     onError: (error: any) => {
-      console.error("[UpdateMeasurements] Error updating measurements:", error);
+      logger.error("[UpdateMeasurements] Error updating measurements:", error);
     },
   });
 

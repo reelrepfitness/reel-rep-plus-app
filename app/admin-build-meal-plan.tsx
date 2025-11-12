@@ -22,6 +22,10 @@ import { SearchBar } from "@/components/ui/searchbar";
 import { useState, useMemo } from "react";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminBuildMealPlan');
+
 interface MealPlanItem {
   id: string;
   food_id: number;
@@ -70,7 +74,7 @@ export default function AdminBuildMealPlanScreen() {
     queryFn: async () => {
       if (!userId) return null;
 
-      console.log("[AdminMealPlan] Fetching user profile:", userId);
+      logger.info("[AdminMealPlan] Fetching user profile:", userId);
 
       const { data, error } = await supabase
         .from("profiles")
@@ -79,11 +83,11 @@ export default function AdminBuildMealPlanScreen() {
         .single();
 
       if (error) {
-        console.error("[AdminMealPlan] Error fetching user profile:", error);
+        logger.error("[AdminMealPlan] Error fetching user profile:", error);
         throw error;
       }
 
-      console.log("[AdminMealPlan] User profile loaded");
+      logger.info("[AdminMealPlan] User profile loaded");
       return data as User;
     },
     enabled: !!userId,
@@ -94,7 +98,7 @@ export default function AdminBuildMealPlanScreen() {
     queryFn: async () => {
       if (!userId) return [];
 
-      console.log("[AdminMealPlan] Fetching meal plan for user:", userId);
+      logger.info("[AdminMealPlan] Fetching meal plan for user:", userId);
 
       const { data, error } = await supabase
         .from("meal_plan_items")
@@ -110,11 +114,11 @@ export default function AdminBuildMealPlanScreen() {
         .order("meal_category", { ascending: true });
 
       if (error) {
-        console.error("[AdminMealPlan] Error fetching meal plan:", error);
+        logger.error("[AdminMealPlan] Error fetching meal plan:", error);
         throw error;
       }
 
-      console.log(`[AdminMealPlan] Loaded ${data?.length || 0} items`);
+      logger.info(`[AdminMealPlan] Loaded ${data?.length || 0} items`);
       return data as MealPlanItem[];
     },
     enabled: !!userId,
@@ -123,7 +127,7 @@ export default function AdminBuildMealPlanScreen() {
   const { data: foodBankItems = [] } = useQuery({
     queryKey: ["foodBank"],
     queryFn: async () => {
-      console.log("[AdminMealPlan] Fetching food bank items");
+      logger.info("[AdminMealPlan] Fetching food bank items");
       
       const { data, error } = await supabase
         .from("food_bank")
@@ -131,11 +135,11 @@ export default function AdminBuildMealPlanScreen() {
         .order("name", { ascending: true });
 
       if (error) {
-        console.error("[AdminMealPlan] Error fetching food bank:", error);
+        logger.error("[AdminMealPlan] Error fetching food bank:", error);
         throw error;
       }
 
-      console.log(`[AdminMealPlan] Loaded ${data?.length || 0} food items`);
+      logger.info(`[AdminMealPlan] Loaded ${data?.length || 0} food items`);
       return data as FoodBankItem[];
     },
   });
@@ -161,7 +165,7 @@ export default function AdminBuildMealPlanScreen() {
       }
     }
 
-    console.log(`[AdminMealPlan] Filtered ${filtered.length} items (category: ${filterCategory}, search: "${searchQuery}")`);
+    logger.info(`[AdminMealPlan] Filtered ${filtered.length} items (category: ${filterCategory}, search: "${searchQuery}")`);
     return filtered;
   }, [foodBankItems, searchQuery, filterCategory]);
 
@@ -178,14 +182,14 @@ export default function AdminBuildMealPlanScreen() {
       queryClient.invalidateQueries({ queryKey: ["adminMealPlan", userId] });
     },
     onError: (error) => {
-      console.error("[AdminMealPlan] Error deleting item:", error);
+      logger.error("[AdminMealPlan] Error deleting item:", error);
       Alert.alert("שגיאה", "אירעה שגיאה במחיקת הפריט");
     },
   });
 
   const addMutation = useMutation({
     mutationFn: async ({ food, mealCategory, qty }: { food: FoodBankItem; mealCategory: string; qty: number }) => {
-      console.log("[AdminMealPlan] Adding food to meal plan:", food.name, "x", qty, "to", mealCategory);
+      logger.info("[AdminMealPlan] Adding food to meal plan:", food.name, "x", qty, "to", mealCategory);
 
       const { error } = await supabase
         .from("meal_plan_items")
@@ -214,7 +218,7 @@ export default function AdminBuildMealPlanScreen() {
       Alert.alert("הצלחה", "המזון נוסף לתפריט בהצלחה");
     },
     onError: (error) => {
-      console.error("[AdminMealPlan] Error adding item:", error);
+      logger.error("[AdminMealPlan] Error adding item:", error);
       Alert.alert("שגיאה", "אירעה שגיאה בהוספת הפריט");
     },
   });

@@ -9,6 +9,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Save } from "lucide-react-native";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminEditClient');
+
 export default function AdminEditClientScreen() {
   const { userId, userName } = useLocalSearchParams<{ userId: string; userName: string }>();
   const { user } = useAuth();
@@ -30,7 +34,7 @@ export default function AdminEditClientScreen() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile-edit", userId],
     queryFn: async () => {
-      console.log("[AdminEditClient] Fetching profile for:", userId);
+      logger.info("[AdminEditClient] Fetching profile for:", userId);
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -38,7 +42,7 @@ export default function AdminEditClientScreen() {
         .single();
 
       if (error) {
-        console.error("[AdminEditClient] Error fetching profile:", error);
+        logger.error("[AdminEditClient] Error fetching profile:", error);
         throw error;
       }
 
@@ -89,7 +93,7 @@ export default function AdminEditClientScreen() {
       router.back();
     },
     onError: (error) => {
-      console.error("[AdminEditClient] Update error:", error);
+      logger.error("[AdminEditClient] Update error:", error);
       Alert.alert("שגיאה", "אירעה שגיאה בעדכון הפרטים");
     },
   });

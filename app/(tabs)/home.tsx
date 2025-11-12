@@ -15,6 +15,10 @@ import { useWorkoutLogs } from "@/lib/useWorkoutLogs";
 import { ProgressRingChart } from "@/components/charts/progress-ring-chart";
 import { MacroPopover } from "@/components/MacroPopover";
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Home');
+
 
 
 export default function HomeScreen() {
@@ -125,7 +129,7 @@ export default function HomeScreen() {
   const remainingCalories = Math.max(0, goalCalories - consumedCalories);
   const calorieProgress = goalCalories > 0 ? Math.min(consumedCalories / goalCalories, 1) : 0;
 
-  console.log('[HomeScreen] Calorie Data:', {
+  logger.info('[HomeScreen] Calorie Data:', {
     consumed: consumedCalories,
     goal: goalCalories,
     remaining: remainingCalories,

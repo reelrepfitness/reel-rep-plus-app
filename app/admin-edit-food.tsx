@@ -10,6 +10,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FoodBankItem } from "@/lib/types";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminEditFood');
+
 export default function AdminEditFoodScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -56,7 +60,7 @@ export default function AdminEditFoodScreen() {
       setEditData({});
     },
     onError: (error: any) => {
-      console.error("[AdminEditFood] Error:", error);
+      logger.error("[AdminEditFood] Error:", error);
       Alert.alert("שגיאה", "אירעה שגיאה בעדכון פריט המזון");
     }
   });
@@ -76,7 +80,7 @@ export default function AdminEditFoodScreen() {
       setSelectedFood(null);
     },
     onError: (error: any) => {
-      console.error("[AdminEditFood] Error:", error);
+      logger.error("[AdminEditFood] Error:", error);
       Alert.alert("שגיאה", "אירעה שגיאה במחיקת פריט המזון");
     }
   });

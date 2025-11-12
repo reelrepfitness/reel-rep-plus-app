@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   I18nManager,
   Image,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
@@ -18,6 +19,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Input } from "@/components/ui/input";
 import { Mail, Lock } from "lucide-react-native";
 import { isRTL } from '@/lib/utils';
+import { signInWithApple } from "@/lib/socialAuth";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { createLogger } from "@/lib/logger";
+import { analyticsService } from "@/lib/analytics";
+
+const logger = createLogger('Login');
 
 // Enable RTL
 I18nManager.forceRTL(true);
@@ -25,9 +32,11 @@ I18nManager.allowRTL(true);
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
+  const { signInWithGoogle: googleSignIn } = useGoogleAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
   const [error, setError] = useState<string>("");
 
   const emailError = email && !email.includes('@') ? 'נא להזין כתובת אימייל תקינה' : '';
@@ -46,9 +55,9 @@ export default function LoginScreen() {
       await signIn(email.trim(), password);
       router.replace("/(tabs)/home");
     } catch (err: unknown) {
-      console.error("Login error:", err);
+      logger.error("Login error:", err);
       const errorMessage = err instanceof Error ? err.message : "שגיאה בהתחברות";
-      
+
       if (errorMessage.includes("Invalid login") || errorMessage.includes("Invalid")) {
         setError("אימייל או סיסמה שגויים");
       } else if (errorMessage.includes("Email not confirmed")) {
@@ -58,6 +67,46 @@ export default function LoginScreen() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError("");
+    setSocialLoading('google');
+
+    try {
+      logger.info("Starting Google Sign-In");
+      await googleSignIn();
+      logger.info("Google Sign-In successful, redirecting to home");
+      router.replace("/(tabs)/home");
+    } catch (err: unknown) {
+      logger.error("Google Sign-In error:", err);
+      const errorMessage = err instanceof Error ? err.message : "שגיאה בהתחברות עם Google";
+      setError(errorMessage.includes('cancel') ? "ההתחברות בוטלה" : "שגיאה בהתחברות עם Google. נסה שוב.");
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setError("");
+    setSocialLoading('apple');
+
+    try {
+      logger.info("Starting Apple Sign-In");
+      const result = await signInWithApple();
+
+      if (result.success) {
+        logger.info("Apple Sign-In successful, redirecting to home");
+        router.replace("/(tabs)/home");
+      } else {
+        setError(result.error || "שגיאה בהתחברות עם Apple");
+      }
+    } catch (err: unknown) {
+      logger.error("Apple Sign-In error:", err);
+      setError("שגיאה בהתחברות עם Apple. נסה שוב.");
+    } finally {
+      setSocialLoading(null);
     }
   };
 
@@ -145,19 +194,41 @@ export default function LoginScreen() {
                 </View>
 
                 <View style={styles.socialColumn}>
-                  <TouchableOpacity style={styles.socialButtonFull} activeOpacity={0.7}>
-                    <View style={styles.googleIcon}>
-                      <View style={[styles.googlePart, { backgroundColor: "#4285F4", left: "50.9%", right: "6.25%", top: "42.03%", bottom: "16.85%" }]} />
-                      <View style={[styles.googlePart, { backgroundColor: "#34A853", left: "11.01%", right: "19.54%", top: "58.65%", bottom: "6.25%" }]} />
-                      <View style={[styles.googlePart, { backgroundColor: "#FBBC05", left: "6.25%", right: "74.5%", top: "30.15%", bottom: "30.36%" }]} />
-                      <View style={[styles.googlePart, { backgroundColor: "#EB4335", left: "11.01%", right: "19.24%", top: "6.25%", bottom: "58.65%" }]} />
-                    </View>
-                    <Text style={styles.socialButtonText}>התחבר עם Google</Text>
+                  <TouchableOpacity
+                    style={styles.socialButtonFull}
+                    activeOpacity={0.7}
+                    onPress={handleGoogleSignIn}
+                    disabled={socialLoading !== null || loading}
+                  >
+                    {socialLoading === 'google' ? (
+                      <ActivityIndicator size="small" color="#4285F4" />
+                    ) : (
+                      <>
+                        <View style={styles.googleIcon}>
+                          <View style={[styles.googlePart, { backgroundColor: "#4285F4", left: "50.9%", right: "6.25%", top: "42.03%", bottom: "16.85%" }]} />
+                          <View style={[styles.googlePart, { backgroundColor: "#34A853", left: "11.01%", right: "19.54%", top: "58.65%", bottom: "6.25%" }]} />
+                          <View style={[styles.googlePart, { backgroundColor: "#FBBC05", left: "6.25%", right: "74.5%", top: "30.15%", bottom: "30.36%" }]} />
+                          <View style={[styles.googlePart, { backgroundColor: "#EB4335", left: "11.01%", right: "19.24%", top: "6.25%", bottom: "58.65%" }]} />
+                        </View>
+                        <Text style={styles.socialButtonText}>התחבר עם Google</Text>
+                      </>
+                    )}
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.socialButtonFull} activeOpacity={0.7}>
-                    <Ionicons name="logo-apple" size={18} color="#000000" />
-                    <Text style={styles.socialButtonText}>התחבר עם Apple</Text>
+                  <TouchableOpacity
+                    style={styles.socialButtonFull}
+                    activeOpacity={0.7}
+                    onPress={handleAppleSignIn}
+                    disabled={socialLoading !== null || loading}
+                  >
+                    {socialLoading === 'apple' ? (
+                      <ActivityIndicator size="small" color="#000000" />
+                    ) : (
+                      <>
+                        <Ionicons name="logo-apple" size={18} color="#000000" />
+                        <Text style={styles.socialButtonText}>התחבר עם Apple</Text>
+                      </>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>

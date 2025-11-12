@@ -4,6 +4,10 @@ import { formatDate } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { FoodBankItem } from "@/lib/types";
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Usemealsdata');
+
 export interface DailyItem {
   id: string;
   daily_log_id: string;
@@ -42,7 +46,7 @@ export function useMealsData() {
     queryFn: async () => {
       if (!user?.user_id) throw new Error("No user");
 
-      console.log("[Meals] Fetching daily items for:", today, "user_id:", user.user_id);
+      logger.info("[Meals] Fetching daily items for:", today, "user_id:", user.user_id);
 
       // First get the daily log for today
       const { data: dailyLog, error: logError } = await supabase
@@ -53,7 +57,7 @@ export function useMealsData() {
         .single();
 
       if (logError) {
-        console.log("[Meals] No daily log found");
+        logger.info("[Meals] No daily log found");
         return [];
       }
 
@@ -68,11 +72,11 @@ export function useMealsData() {
         .order("created_at", { ascending: true });
 
       if (error) {
-        console.error("[Meals] Error fetching daily items:", error);
+        logger.error("[Meals] Error fetching daily items:", error);
         throw error;
       }
 
-      console.log(`[Meals] Loaded ${data?.length || 0} items`);
+      logger.info(`[Meals] Loaded ${data?.length || 0} items`);
       return (data as DailyItem[]) || [];
     },
     enabled: !!user?.user_id,

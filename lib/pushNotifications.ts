@@ -5,6 +5,7 @@ import { Platform } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { handleNotificationNavigation, NotificationData } from "@/lib/deepLinking";
 import { createLogger } from "@/lib/logger";
+import { analyticsService } from "@/lib/analytics";
 
 const logger = createLogger('PushNotifications');
 

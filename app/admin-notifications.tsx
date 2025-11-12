@@ -9,6 +9,10 @@ import { supabase } from "@/lib/supabase";
 import { sendToUsers, sendToAllUsers } from "@/lib/sendPushNotifications";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminNotifications');
+
 type NotificationTrigger = "time" | "goal_reached" | "goal_missed" | "inactive";
 
 interface UserProfile {
@@ -104,7 +108,7 @@ export default function AdminNotificationsScreen() {
       if (error) throw error;
       setUsers(data || []);
     } catch (error) {
-      console.error("Error loading users:", error);
+      logger.error("Error loading users:", error);
       Alert.alert("שגיאה", "לא ניתן לטעון את רשימת המשתמשים");
     } finally {
       setLoadingUsers(false);
@@ -160,7 +164,7 @@ export default function AdminNotificationsScreen() {
       setSendMessage("");
       setSelectedUsers([]);
     } catch (error) {
-      console.error("Error sending notifications:", error);
+      logger.error("Error sending notifications:", error);
       Alert.alert("שגיאה", "לא ניתן לשלוח את ההתראות");
     } finally {
       setSending(false);

@@ -27,6 +27,10 @@ import { useAuth } from "@/contexts/auth";
 import { AvoidKeyboard } from "@/components/ui/avoid-keyboard";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Add');
+
 type MealType = "breakfast" | "snack" | "lunch" | "dinner";
 
 export default function MealsScreen() {
@@ -116,7 +120,7 @@ export default function MealsScreen() {
   
   const hasMealPlan = user?.["meal_plan?"] === true || (user as any)?.meal_plan === true;
   
-  console.log('[MealPlan] User meal plan status:', { 
+  logger.info('[MealPlan] User meal plan status:', { 
     'meal_plan?': user?.["meal_plan?"], 
     'meal_plan': (user as any)?.meal_plan,
     hasMealPlan 
@@ -157,22 +161,22 @@ export default function MealsScreen() {
   };
   
   const openEditSheet = (mealType: string) => {
-    console.log('[Edit] Opening edit sheet for:', mealType);
+    logger.info('[Edit] Opening edit sheet for:', mealType);
     const hebrewMealName = mealType;
     const mealData = getMealByHebrew(hebrewMealName);
-    console.log('[Edit] Found meal data:', mealData);
+    logger.info('[Edit] Found meal data:', mealData);
     
     if (!mealData) {
-      console.log('[Edit] No meal data found');
+      logger.info('[Edit] No meal data found');
       return;
     }
     
     if (mealData.items.length === 0) {
-      console.log('[Edit] No items in meal');
+      logger.info('[Edit] No items in meal');
       return;
     }
     
-    console.log('[Edit] Setting up edit sheet with', mealData.items.length, 'items');
+    logger.info('[Edit] Setting up edit sheet with', mealData.items.length, 'items');
     setEditingMealType(mealType);
     setEditingItems(mealData.items);
     
@@ -185,7 +189,7 @@ export default function MealsScreen() {
     setItemQuantities(initialQuantities);
     setOriginalQuantities(origQuantities);
     
-    console.log('[Edit] Showing edit sheet');
+    logger.info('[Edit] Showing edit sheet');
     setShowEditSheet(true);
     Animated.spring(editSheetAnimation, {
       toValue: 1,
@@ -223,7 +227,7 @@ export default function MealsScreen() {
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
     } catch (error) {
-      console.error('[Edit] Error deleting item:', error);
+      logger.error('[Edit] Error deleting item:', error);
     }
   };
   
@@ -273,7 +277,7 @@ export default function MealsScreen() {
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
     } catch (error) {
-      console.error('[Edit] Error updating quantity:', error);
+      logger.error('[Edit] Error updating quantity:', error);
     }
   };
   
@@ -300,7 +304,7 @@ export default function MealsScreen() {
       } else if (option === 'favorites') {
         router.push({ pathname: "/favorites", params: { mealType: selectedMealType || "" } });
       } else if (option === 'recipes') {
-        console.log('[Recipes] Navigating to recipes with mealType:', selectedMealType);
+        logger.info('[Recipes] Navigating to recipes with mealType:', selectedMealType);
       }
     }, 300);
   };
@@ -436,7 +440,7 @@ export default function MealsScreen() {
               <TouchableOpacity 
                 style={styles.editFoodButton}
                 onPress={() => {
-                  console.log('[Meal Card] Edit button pressed for:', mealNames[mealType]);
+                  logger.info('[Meal Card] Edit button pressed for:', mealNames[mealType]);
                   router.push({
                     pathname: '/edit-meal',
                     params: { mealType: mealNames[mealType] },
