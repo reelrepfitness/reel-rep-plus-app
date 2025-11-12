@@ -8,6 +8,10 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Connectionhelper');
+
 interface ConnectionStatus {
   method: 'tunnel' | 'lan' | 'localhost' | 'unknown';
   isConnected: boolean;
@@ -44,26 +48,26 @@ export function getConnectionStatus(): ConnectionStatus {
 export function logConnectionInfo() {
   const status = getConnectionStatus();
   
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('📡 Expo Connection Status');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`Platform: ${Platform.OS}`);
-  console.log(`Method: ${status.method.toUpperCase()}`);
-  console.log(`Connected: ${status.isConnected ? '✅' : '❌'}`);
-  console.log(`Debugger Host: ${status.debuggerHost}`);
-  console.log(`Project ID: ${Constants.expoConfig?.extra?.eas?.projectId || 'N/A'}`);
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  logger.info('📡 Expo Connection Status');
+  logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  logger.info(`Platform: ${Platform.OS}`);
+  logger.info(`Method: ${status.method.toUpperCase()}`);
+  logger.info(`Connected: ${status.isConnected ? '✅' : '❌'}`);
+  logger.info(`Debugger Host: ${status.debuggerHost}`);
+  logger.info(`Project ID: ${Constants.expoConfig?.extra?.eas?.projectId || 'N/A'}`);
+  logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
   if (status.method === 'tunnel' && !status.isConnected) {
-    console.warn('⚠️  TUNNEL CONNECTION FAILED');
-    console.warn('Solutions:');
-    console.warn('1. Stop the server (Ctrl+C)');
-    console.warn('2. Run: npx expo start --lan --clear');
-    console.warn('3. Or run: ./start-expo.sh (interactive)');
+    logger.warn('⚠️  TUNNEL CONNECTION FAILED');
+    logger.warn('Solutions:');
+    logger.warn('1. Stop the server (Ctrl+C)');
+    logger.warn('2. Run: npx expo start --lan --clear');
+    logger.warn('3. Or run: ./start-expo.sh (interactive)');
   }
 
   if (status.method === 'lan') {
-    console.log('✅ Using LAN connection (recommended)');
+    logger.info('✅ Using LAN connection (recommended)');
   }
 
   return status;
@@ -90,8 +94,8 @@ export function enableConnectionMonitoring() {
       const status = getConnectionStatus();
       
       if (!status.isConnected) {
-        console.error('❌ Connection lost!');
-        console.error('Recommended: ' + getRecommendedStartCommand());
+        logger.error('❌ Connection lost!');
+        logger.error('Recommended: ' + getRecommendedStartCommand());
         clearInterval(intervalId);
       }
       

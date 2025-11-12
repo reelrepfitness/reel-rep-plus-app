@@ -81,24 +81,17 @@ export function buildConversionText(conversions: FoodConversions): string {
   return parts.join(" | ");
 }
 
-export function formatDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-export function formatDateHebrew(date: Date): string {
-  const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-  const months = [
-    "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני",
-    "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"
-  ];
-  
-  const dayName = days[date.getDay()];
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-  
-  return `יום ${dayName}, ${day} ב${month} ${year}`;
-}
+// Re-export timezone-aware date functions from dateUtils
+// These handle Israel timezone (Asia/Jerusalem) properly
+export {
+  formatDate,
+  formatDateHebrew,
+  formatTime,
+  formatDateTime,
+  formatRelative,
+  nowInIsrael,
+  isToday,
+  parseISOInIsrael,
+  getHebrewDayName,
+  getHebrewMonthName
+} from './dateUtils';

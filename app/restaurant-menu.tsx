@@ -21,6 +21,10 @@ import { useState } from "react";
 import { useHomeData } from "@/lib/useHomeData";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('RestaurantMenu');
+
 const foodIcons: Record<string, string> = {
   hamburger: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984906/hamburger_rdbysh.webp",
   pizza: "https://res.cloudinary.com/dtffqhujt/image/upload/v1758984906/hamburger_rdbysh.webp",
@@ -61,7 +65,7 @@ export default function RestaurantMenuScreen() {
   const { data: menuItems = [], isLoading } = useQuery({
     queryKey: ["restaurantMenu", restaurantId],
     queryFn: async () => {
-      console.log("[RestaurantMenu] Fetching menu items for restaurant:", restaurantId);
+      logger.info("[RestaurantMenu] Fetching menu items for restaurant:", restaurantId);
       
       const { data, error } = await supabase
         .from("restaurant_menu_items")
@@ -70,11 +74,11 @@ export default function RestaurantMenuScreen() {
         .order("name", { ascending: true });
 
       if (error) {
-        console.error("[RestaurantMenu] Error fetching:", error);
+        logger.error("[RestaurantMenu] Error fetching:", error);
         throw error;
       }
 
-      console.log(`[RestaurantMenu] Loaded ${data?.length || 0} menu items`);
+      logger.info(`[RestaurantMenu] Loaded ${data?.length || 0} menu items`);
       return data as RestaurantMenuItem[];
     },
   });
@@ -84,7 +88,7 @@ export default function RestaurantMenuScreen() {
   };
 
   const handleItemPress = (item: RestaurantMenuItem) => {
-    console.log("[RestaurantMenu] Selected item:", item.name);
+    logger.info("[RestaurantMenu] Selected item:", item.name);
     setSelectedItem(item);
     setQuantity("0.5");
     Animated.spring(sheetAnimation, {
@@ -124,7 +128,7 @@ export default function RestaurantMenuScreen() {
     if (!selectedItem || !dailyLog?.id || !mealType) return;
 
     try {
-      console.log("[RestaurantMenu] Adding item:", selectedItem.name, "x", quantity, "to", mealType);
+      logger.info("[RestaurantMenu] Adding item:", selectedItem.name, "x", quantity, "to", mealType);
 
       const quantityNum = parseFloat(quantity) || 0.5;
       const totalCalories = selectedItem.calories_per_unit * quantityNum;
@@ -150,11 +154,11 @@ export default function RestaurantMenuScreen() {
         }]);
 
       if (itemError) {
-        console.error("[RestaurantMenu] Error inserting daily item:", itemError);
+        logger.error("[RestaurantMenu] Error inserting daily item:", itemError);
         throw itemError;
       }
 
-      console.log("[RestaurantMenu] Daily item inserted successfully");
+      logger.info("[RestaurantMenu] Daily item inserted successfully");
 
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });
       queryClient.invalidateQueries({ queryKey: ["dailyItems"] });
@@ -167,7 +171,7 @@ export default function RestaurantMenuScreen() {
         setQuantity("0.5");
       }, 2000);
     } catch (error) {
-      console.error("[RestaurantMenu] Failed to add item:", error);
+      logger.error("[RestaurantMenu] Failed to add item:", error);
     }
   };
 

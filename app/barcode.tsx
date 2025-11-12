@@ -21,6 +21,10 @@ import { useHomeData } from "@/lib/useHomeData";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Barcode');
+
 interface BarcodeItem {
   id: number;
   barcode: string;
@@ -57,7 +61,7 @@ export default function BarcodeScreen() {
   const { data: barcodeItems = [], isLoading } = useQuery({
     queryKey: ["barcodeItems"],
     queryFn: async () => {
-      console.log("[Barcode] Fetching barcode items");
+      logger.info("[Barcode] Fetching barcode items");
 
       const { data, error } = await supabase
         .from("barcode_items")
@@ -66,11 +70,11 @@ export default function BarcodeScreen() {
         .limit(50);
 
       if (error) {
-        console.error("[Barcode] Error fetching items:", error);
+        logger.error("[Barcode] Error fetching items:", error);
         throw error;
       }
 
-      console.log(`[Barcode] Found ${data?.length || 0} items`);
+      logger.info(`[Barcode] Found ${data?.length || 0} items`);
       return data as BarcodeItem[];
     },
   });
@@ -87,7 +91,7 @@ export default function BarcodeScreen() {
         throw new Error("Missing daily log or meal type");
       }
 
-      console.log("[Barcode] Adding to meal:", {
+      logger.info("[Barcode] Adding to meal:", {
         item: item.name,
         grams,
         mealType,
@@ -117,11 +121,11 @@ export default function BarcodeScreen() {
       ]);
 
       if (error) {
-        console.error("[Barcode] Error inserting daily item:", error);
+        logger.error("[Barcode] Error inserting daily item:", error);
         throw error;
       }
 
-      console.log("[Barcode] Daily item inserted successfully");
+      logger.info("[Barcode] Daily item inserted successfully");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dailyLog"] });

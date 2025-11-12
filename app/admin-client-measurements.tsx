@@ -20,6 +20,10 @@ import { LineChart } from '@/components/charts/line-chart';
 import { ChartContainer } from '@/components/charts/chart-container';
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminClientMeasurements');
+
 const screenWidth = Dimensions.get("window").width;
 
 export default function AdminClientMeasurementsScreen() {
@@ -43,7 +47,7 @@ export default function AdminClientMeasurementsScreen() {
       if (error) throw error;
       setMeasurements(data || []);
     } catch (error: any) {
-      console.error("[AdminClientMeasurements] Error loading measurements:", error);
+      logger.error("[AdminClientMeasurements] Error loading measurements:", error);
       setError(error?.message || JSON.stringify(error));
     } finally {
       setLoading(false);

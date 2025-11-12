@@ -5,7 +5,7 @@
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "rork-app",
+    "scheme": "reelrepplus",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "splash": {
@@ -18,17 +18,21 @@
       "bundleIdentifier": "com.reelrepplus.ios",
       "buildNumber": "2",
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
-        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone",
-        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos"
-      }
+        "NSCameraUsageDescription": "האפליקציה צריכה גישה למצלמה כדי לצלם תמונות התקדמות",
+        "NSMicrophoneUsageDescription": "האפליקציה צריכה גישה למיקרופון",
+        "NSPhotoLibraryUsageDescription": "האפליקציה צריכה גישה לתמונות כדי לשמור תמונות התקדמות",
+        "NSUserTrackingUsageDescription": "האפליקציה משתמשת בנתונים לשיפור החוויה שלך"
+      },
+      "associatedDomains": [
+        "applinks:reelrepplus.com"
+      ]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.reelrep.plus",
+      "package": "com.reelrepplus.ios",
       "permissions": [
         "CAMERA",
         "RECORD_AUDIO",
@@ -70,13 +74,9 @@
       [
         "expo-notifications",
         {
-          "icon": "./local/assets/notification_icon.png",
           "color": "#ffffff",
           "defaultChannel": "default",
-          "sounds": [
-            "./local/assets/notification_sound.wav"
-          ],
-          "enableBackgroundRemoteNotifications": false
+          "enableBackgroundRemoteNotifications": true
         }
       ]
     ],

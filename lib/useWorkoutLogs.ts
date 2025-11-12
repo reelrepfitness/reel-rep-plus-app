@@ -3,6 +3,10 @@ import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Useworkoutlogs');
+
 export interface WorkoutLog {
   id: string;
   user_id: string;
@@ -41,7 +45,7 @@ export function useWorkoutLogs() {
 
       const { start, end } = getCurrentWeekRange();
       
-      console.log("[WorkoutLogs] Fetching logs for week:", start, "to", end);
+      logger.info("[WorkoutLogs] Fetching logs for week:", start, "to", end);
 
       const { data, error } = await supabase
         .from("workout_logs")
@@ -52,11 +56,11 @@ export function useWorkoutLogs() {
         .order("log_date", { ascending: false });
 
       if (error) {
-        console.error("[WorkoutLogs] Error fetching logs:", error);
+        logger.error("[WorkoutLogs] Error fetching logs:", error);
         throw error;
       }
 
-      console.log("[WorkoutLogs] Loaded", data?.length || 0, "logs");
+      logger.info("[WorkoutLogs] Loaded", data?.length || 0, "logs");
       return data as WorkoutLog[];
     },
     enabled: !!user?.user_id,
@@ -74,7 +78,7 @@ export function useWorkoutLogs() {
     }) => {
       if (!user?.user_id) throw new Error("No user");
 
-      console.log("[WorkoutLogs] Adding log:", workoutType, amount, date);
+      logger.info("[WorkoutLogs] Adding log:", workoutType, amount, date);
 
       const { data, error } = await supabase
         .from("workout_logs")
@@ -90,11 +94,11 @@ export function useWorkoutLogs() {
         .single();
 
       if (error) {
-        console.error("[WorkoutLogs] Error adding log:", error);
+        logger.error("[WorkoutLogs] Error adding log:", error);
         throw error;
       }
 
-      console.log("[WorkoutLogs] Log added");
+      logger.info("[WorkoutLogs] Log added");
       return data as WorkoutLog;
     },
     onSuccess: () => {
@@ -104,7 +108,7 @@ export function useWorkoutLogs() {
 
   const deleteWorkoutLogMutation = useMutation({
     mutationFn: async (logId: string) => {
-      console.log("[WorkoutLogs] Deleting log:", logId);
+      logger.info("[WorkoutLogs] Deleting log:", logId);
 
       const { error } = await supabase
         .from("workout_logs")
@@ -112,11 +116,11 @@ export function useWorkoutLogs() {
         .eq("id", logId);
 
       if (error) {
-        console.error("[WorkoutLogs] Error deleting log:", error);
+        logger.error("[WorkoutLogs] Error deleting log:", error);
         throw error;
       }
 
-      console.log("[WorkoutLogs] Log deleted");
+      logger.info("[WorkoutLogs] Log deleted");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workoutLogs", user?.user_id] });

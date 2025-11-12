@@ -20,6 +20,10 @@ import { useHomeData } from "@/lib/useHomeData";
 import { FoodBankItem } from "@/lib/types";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('MealPlan');
+
 interface MealPlanItem {
   id: string;
   food_id: number;
@@ -65,7 +69,7 @@ export default function MealPlanScreen() {
     queryFn: async () => {
       if (!user?.user_id) return [];
 
-      console.log("[MealPlan] Fetching meal plan for user:", user.user_id);
+      logger.info("[MealPlan] Fetching meal plan for user:", user.user_id);
 
       const { data, error } = await supabase
         .from("meal_plan_items")
@@ -89,11 +93,11 @@ export default function MealPlanScreen() {
         .order("meal_category", { ascending: true });
 
       if (error) {
-        console.error("[MealPlan] Error fetching meal plan:", error);
+        logger.error("[MealPlan] Error fetching meal plan:", error);
         throw error;
       }
 
-      console.log(`[MealPlan] Loaded ${data?.length || 0} meal plan items`);
+      logger.info(`[MealPlan] Loaded ${data?.length || 0} meal plan items`);
       return data as MealPlanItem[];
     },
     enabled: !!user?.user_id,
@@ -132,7 +136,7 @@ export default function MealPlanScreen() {
     mutationFn: async (item: MealPlanItem) => {
       if (!dailyLog?.id) throw new Error("No daily log found");
 
-      console.log("[MealPlan] Adding item to daily intake:", item.food_item?.name);
+      logger.info("[MealPlan] Adding item to daily intake:", item.food_item?.name);
 
       const { error } = await supabase.from("daily_items").insert([
         {
@@ -169,7 +173,7 @@ export default function MealPlanScreen() {
       }, 2000);
     },
     onError: (error) => {
-      console.error("[MealPlan] Error adding to daily intake:", error);
+      logger.error("[MealPlan] Error adding to daily intake:", error);
     },
   });
 

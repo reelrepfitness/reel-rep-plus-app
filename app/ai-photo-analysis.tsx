@@ -18,6 +18,10 @@ import { supabase } from "@/lib/supabase";
 import * as ImagePicker from "expo-image-picker";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AiPhotoAnalysis');
+
 interface FoodItem {
   name: string;
   quantity: string;
@@ -107,7 +111,7 @@ export default function AIPhotoAnalysisScreen() {
     setIsAnalyzing(true);
     
     try {
-      console.log("[AI] Analyzing image...");
+      logger.info("[AI] Analyzing image...");
       
       const response = await fetch(imageUri);
       const blob = await response.blob();
@@ -120,7 +124,7 @@ export default function AIPhotoAnalysisScreen() {
         reader.readAsDataURL(blob);
       });
 
-      console.log("[AI] Sending image to API...");
+      logger.info("[AI] Sending image to API...");
       const apiResponse = await fetch("https://reelrep-ai-food.ivan-5c4.workers.dev", {
         method: "POST",
         headers: {
@@ -136,7 +140,7 @@ export default function AIPhotoAnalysisScreen() {
       }
 
       const data = await apiResponse.json();
-      console.log("[AI] Received API response:", data);
+      logger.info("[AI] Received API response:", data);
 
       if (data.description) {
         setPlateDescription(data.description);
@@ -171,7 +175,7 @@ export default function AIPhotoAnalysisScreen() {
       setCheckedItems(initialChecked);
       setShowResults(true);
     } catch (error) {
-      console.error("[AI] Error analyzing image:", error);
+      logger.error("[AI] Error analyzing image:", error);
       alert("שגיאה בניתוח התמונה. אנא נסה שוב.");
     } finally {
       setIsAnalyzing(false);
@@ -182,7 +186,7 @@ export default function AIPhotoAnalysisScreen() {
     if (!dailyLog?.id || !mealType || analyzedItems.length === 0) return;
 
     try {
-      console.log("[AI] Adding analyzed items to daily log");
+      logger.info("[AI] Adding analyzed items to daily log");
       
       for (let i = 0; i < analyzedItems.length; i++) {
         if (!checkedItems[i]) continue;
@@ -205,7 +209,7 @@ export default function AIPhotoAnalysisScreen() {
           }]);
 
         if (error) {
-          console.error("[AI] Error inserting item:", error);
+          logger.error("[AI] Error inserting item:", error);
         }
       }
 
@@ -214,7 +218,7 @@ export default function AIPhotoAnalysisScreen() {
 
       router.back();
     } catch (error) {
-      console.error("[AI] Failed to add items:", error);
+      logger.error("[AI] Failed to add items:", error);
       alert("שגיאה בהוספת הפריטים");
     }
   };

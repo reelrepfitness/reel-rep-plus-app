@@ -16,6 +16,10 @@ import { Restaurant } from "@/lib/types";
 import { colors } from "@/constants/colors";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Restaurants');
+
 export default function RestaurantsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -25,7 +29,7 @@ export default function RestaurantsScreen() {
   const { data: restaurants = [], isLoading } = useQuery({
     queryKey: ["restaurants"],
     queryFn: async () => {
-      console.log("[Restaurants] Fetching all restaurants");
+      logger.info("[Restaurants] Fetching all restaurants");
       
       const { data, error } = await supabase
         .from("restaurants")
@@ -33,17 +37,17 @@ export default function RestaurantsScreen() {
         .order("name", { ascending: true });
 
       if (error) {
-        console.error("[Restaurants] Error fetching:", error);
+        logger.error("[Restaurants] Error fetching:", error);
         throw error;
       }
 
-      console.log(`[Restaurants] Loaded ${data?.length || 0} restaurants`);
+      logger.info(`[Restaurants] Loaded ${data?.length || 0} restaurants`);
       return data as Restaurant[];
     },
   });
 
   const handleRestaurantPress = (restaurant: Restaurant) => {
-    console.log("[Restaurants] Selected restaurant:", restaurant.name);
+    logger.info("[Restaurants] Selected restaurant:", restaurant.name);
     router.push({
       pathname: "/restaurant-menu",
       params: {

@@ -27,6 +27,10 @@ import { AreaChart } from '@/components/charts/area-chart';
 import { ChartContainer } from '@/components/charts/chart-container';
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Measurements');
+
 export default function MeasurementsScreen() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -53,9 +57,9 @@ export default function MeasurementsScreen() {
       if (error) throw error;
       setMeasurements(data || []);
     } catch (error: any) {
-      console.error("Error loading measurements:", error);
+      logger.error("Error loading measurements:", error);
       const errorMessage = error?.message || JSON.stringify(error);
-      console.error("Error details:", errorMessage);
+      logger.error("Error details:", errorMessage);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -93,7 +97,7 @@ export default function MeasurementsScreen() {
       setNewWeight("");
       setShowWeightSheet(false);
     } catch (error: any) {
-      console.error("Error updating weight:", error);
+      logger.error("Error updating weight:", error);
       setError(error?.message || "שגיאה בעדכון המשקל");
     } finally {
       setUpdating(false);

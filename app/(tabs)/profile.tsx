@@ -26,6 +26,10 @@ import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Profile');
+
 export default function ProfileScreen() {
   const { user, signOut, loading } = useAuth();
   const insets = useSafeAreaInsets();
@@ -81,7 +85,7 @@ export default function ProfileScreen() {
       await signOut();
       router.replace("/login");
     } catch (error) {
-      console.error("Logout error:", error);
+      logger.error("Logout error:", error);
     }
   };
 
@@ -128,7 +132,7 @@ export default function ProfileScreen() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: { name?: string; email?: string; password?: string }) => {
-      console.log("[ProfileEdit] Updating profile:", { ...data, password: data.password ? "***" : undefined });
+      logger.info("[ProfileEdit] Updating profile:", { ...data, password: data.password ? "***" : undefined });
       
       if (data.name) {
         const { error: nameError } = await supabase
@@ -158,13 +162,13 @@ export default function ProfileScreen() {
       return data;
     },
     onSuccess: () => {
-      console.log("[ProfileEdit] Profile updated successfully");
+      logger.info("[ProfileEdit] Profile updated successfully");
       queryClient.invalidateQueries({ queryKey: ["user"] });
       closeEditSheet();
       Alert.alert("הצלחה", "הפרופיל עודכן בהצלחה");
     },
     onError: (error: any) => {
-      console.error("[ProfileEdit] Error updating profile:", error);
+      logger.error("[ProfileEdit] Error updating profile:", error);
       Alert.alert("שגיאה", error.message || "אירעה שגיאה בעדכון הפרופיל");
     },
   });

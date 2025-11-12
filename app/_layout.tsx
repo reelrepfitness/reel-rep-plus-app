@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { analyticsService } from "@/lib/analytics";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
@@ -12,13 +13,17 @@ import {
   cleanupNotifications,
 } from "@/lib/pushNotifications";
 import { enableConnectionMonitoring } from "@/lib/connectionHelper";
+
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Layout');
 // import { supabase } from "@/lib/supabase"; // enable when you wire saving token
 
 if (!I18nManager.isRTL && Platform.OS !== "web") {
   I18nManager.allowRTL(true);
   I18nManager.forceRTL(true);
   Updates.reloadAsync().catch((error) => {
-    console.log("[RTL] Could not reload app:", error);
+    logger.info("[RTL] Could not reload app:", error);
   });
 }
 
@@ -48,7 +53,7 @@ export default function RootLayout() {
     }
 
     initializeNotifications(undefined, async (token: string) => {
-      console.log("[Push] Expo push token:", token);
+      logger.info("[Push] Expo push token:", token);
     });
 
     return () => {

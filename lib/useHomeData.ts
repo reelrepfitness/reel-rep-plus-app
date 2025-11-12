@@ -3,6 +3,10 @@ import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Usehomedata');
+
 interface DailyLogData {
   id: string;
   total_kcal: number;
@@ -51,7 +55,7 @@ export function useHomeData(selectedDate?: string) {
     queryFn: async () => {
       if (!user?.user_id) throw new Error("No user");
 
-      console.log("[Home] Fetching profile for user_id:", user.user_id);
+      logger.info("[Home] Fetching profile for user_id:", user.user_id);
 
       const { data, error } = await supabase
         .from("profiles")
@@ -62,11 +66,11 @@ export function useHomeData(selectedDate?: string) {
         .single();
 
       if (error) {
-        console.error("[Home] Profile error:", error);
+        logger.error("[Home] Profile error:", error);
         throw error;
       }
 
-      console.log("[Home] Profile loaded:", data);
+      logger.info("[Home] Profile loaded:", data);
       return data as ProfileData;
     },
     enabled: !!user?.user_id,
@@ -77,7 +81,7 @@ export function useHomeData(selectedDate?: string) {
     queryFn: async () => {
       if (!profileQuery.data?.target_template_id) throw new Error("No template ID");
 
-      console.log("[Home] Fetching target template:", profileQuery.data.target_template_id);
+      logger.info("[Home] Fetching target template:", profileQuery.data.target_template_id);
 
       const { data, error } = await supabase
         .from("target_templates")
@@ -87,7 +91,7 @@ export function useHomeData(selectedDate?: string) {
 
       if (error) throw error;
 
-      console.log("[Home] Target template loaded:", data);
+      logger.info("[Home] Target template loaded:", data);
       return data as TargetTemplateData;
     },
     enabled: !!profileQuery.data?.target_template_id && !profileQuery.data?.targets_override,
@@ -98,7 +102,7 @@ export function useHomeData(selectedDate?: string) {
     queryFn: async () => {
       if (!user?.user_id) throw new Error("No user");
 
-      console.log("[Home] Fetching daily log for:", today, "user_id:", user.user_id);
+      logger.info("[Home] Fetching daily log for:", today, "user_id:", user.user_id);
 
       const { data, error } = await supabase
         .from("daily_logs")
@@ -111,7 +115,7 @@ export function useHomeData(selectedDate?: string) {
 
       if (error) {
         if (error.code === "PGRST116") {
-          console.log("[Home] No daily log found, creating one");
+          logger.info("[Home] No daily log found, creating one");
           const { data: newLog, error: createError } = await supabase
             .from("daily_logs")
             .insert([{ user_id: user.user_id, date: today }])
@@ -121,17 +125,17 @@ export function useHomeData(selectedDate?: string) {
             .single();
 
           if (createError) {
-            console.error("[Home] Daily log create error:", createError);
+            logger.error("[Home] Daily log create error:", createError);
             throw createError;
           }
-          console.log("[Home] Daily log created");
+          logger.info("[Home] Daily log created");
           return newLog as DailyLogData;
         }
-        console.error("[Home] Daily log error:", error);
+        logger.error("[Home] Daily log error:", error);
         throw error;
       }
 
-      console.log("[Home] Daily log loaded");
+      logger.info("[Home] Daily log loaded");
       return data as DailyLogData;
     },
     enabled: !!user?.user_id,

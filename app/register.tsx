@@ -19,6 +19,10 @@ import { Input } from "@/components/ui/input";
 import { Mail, Lock, User } from "lucide-react-native";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Register');
+
 I18nManager.forceRTL(true);
 I18nManager.allowRTL(true);
 
@@ -59,7 +63,7 @@ export default function RegisterScreen() {
       await signUp(email.trim(), password, name.trim());
       router.replace("/(tabs)/home");
     } catch (err: unknown) {
-      console.error("Register error:", err);
+      logger.error("Register error:", err);
       const errorMessage = err instanceof Error ? err.message : "שגיאה בהרשמה";
       
       if (errorMessage.includes("already registered") || errorMessage.includes("already exists")) {

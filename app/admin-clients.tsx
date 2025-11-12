@@ -12,6 +12,10 @@ import { Image } from "expo-image";
 import { AdminMenuSheet } from "@/components/AdminMenuSheet";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminClients');
+
 export default function AdminClientsScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -31,7 +35,7 @@ export default function AdminClientsScreen() {
   const { data: clientsData, isLoading } = useQuery({
     queryKey: ["admin-clients", user?.user_id, today],
     queryFn: async () => {
-      console.log("[AdminClients] Fetching clients and their daily logs");
+      logger.info("[AdminClients] Fetching clients and their daily logs");
       
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
@@ -40,7 +44,7 @@ export default function AdminClientsScreen() {
         .order("name", { ascending: true });
 
       if (profilesError) {
-        console.error("[AdminClients] Error fetching clients:", profilesError);
+        logger.error("[AdminClients] Error fetching clients:", profilesError);
         throw profilesError;
       }
 
@@ -50,11 +54,11 @@ export default function AdminClientsScreen() {
         .eq("date", today);
 
       if (logsError) {
-        console.error("[AdminClients] Error fetching daily logs:", logsError);
+        logger.error("[AdminClients] Error fetching daily logs:", logsError);
         throw logsError;
       }
 
-      console.log("[AdminClients] Clients fetched:", profiles?.length, "Daily logs:", dailyLogs?.length);
+      logger.info("[AdminClients] Clients fetched:", profiles?.length, "Daily logs:", dailyLogs?.length);
       
       return {
         profiles: profiles as User[],
@@ -192,7 +196,7 @@ export default function AdminClientsScreen() {
                   key={client.user_id} 
                   style={styles.clientCard}
                   onPress={() => {
-                    console.log("[AdminClients] Navigating to user dashboard:", client.user_id, client.name);
+                    logger.info("[AdminClients] Navigating to user dashboard:", client.user_id, client.name);
                     router.push({
                       pathname: "/user-dashboard",
                       params: { userId: client.user_id, userName: client.name || "משתמש" },

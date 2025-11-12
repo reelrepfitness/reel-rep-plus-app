@@ -12,6 +12,10 @@ import { AlertTriangle, Clock, Flame, TrendingUp, Activity, Database, Zap, Menu 
 import { AdminMenuSheet } from "@/components/AdminMenuSheet";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('AdminDashboard');
+
 export default function AdminDashboardScreen() {
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,7 +38,7 @@ export default function AdminDashboardScreen() {
   const { data: clientsData, isLoading } = useQuery({
     queryKey: ["admin-dashboard-data", user?.user_id, today],
     queryFn: async () => {
-      console.log("[AdminDashboard] Fetching dashboard data");
+      logger.info("[AdminDashboard] Fetching dashboard data");
       
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
@@ -43,7 +47,7 @@ export default function AdminDashboardScreen() {
         .order("name", { ascending: true });
 
       if (profilesError) {
-        console.error("[AdminDashboard] Error fetching clients:", profilesError);
+        logger.error("[AdminDashboard] Error fetching clients:", profilesError);
         throw profilesError;
       }
 
@@ -53,7 +57,7 @@ export default function AdminDashboardScreen() {
         .eq("date", today);
 
       if (logsError) {
-        console.error("[AdminDashboard] Error fetching daily logs:", logsError);
+        logger.error("[AdminDashboard] Error fetching daily logs:", logsError);
         throw logsError;
       }
 
@@ -66,10 +70,10 @@ export default function AdminDashboardScreen() {
         .order("measurement_date", { ascending: false });
 
       if (measurementsError) {
-        console.error("[AdminDashboard] Error fetching measurements:", measurementsError);
+        logger.error("[AdminDashboard] Error fetching measurements:", measurementsError);
       }
 
-      console.log("[AdminDashboard] Data fetched:", profiles?.length, "clients");
+      logger.info("[AdminDashboard] Data fetched:", profiles?.length, "clients");
       
       return {
         profiles: profiles as User[],

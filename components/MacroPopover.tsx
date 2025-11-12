@@ -6,6 +6,10 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/auth';
 import { formatDate, isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Macropopover');
+
 interface MacroItem {
   id: string;
   food_name: string;
@@ -55,7 +59,7 @@ export function MacroPopover({ children, macroName, macroType, macroColor, selec
     
     setIsLoading(true);
     try {
-      console.log('[MacroPopover] Fetching items for:', macroType, 'date:', today);
+      logger.info('[MacroPopover] Fetching items for:', macroType, 'date:', today);
       
       const { data: dailyLog, error: logError } = await supabase
         .from('daily_logs')
@@ -65,7 +69,7 @@ export function MacroPopover({ children, macroName, macroType, macroColor, selec
         .single();
 
       if (logError || !dailyLog) {
-        console.log('[MacroPopover] No daily log found');
+        logger.info('[MacroPopover] No daily log found');
         setItems([]);
         setIsLoading(false);
         return;
@@ -78,7 +82,7 @@ export function MacroPopover({ children, macroName, macroType, macroColor, selec
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('[MacroPopover] Error fetching items:', error);
+        logger.error('[MacroPopover] Error fetching items:', error);
         setItems([]);
       } else {
         const filteredItems = (data || []).filter((item) => {
@@ -86,11 +90,11 @@ export function MacroPopover({ children, macroName, macroType, macroColor, selec
           return value !== null && value !== undefined && value > 0;
         });
         
-        console.log('[MacroPopover] Filtered items:', filteredItems.length);
+        logger.info('[MacroPopover] Filtered items:', filteredItems.length);
         setItems(filteredItems);
       }
     } catch (error) {
-      console.error('[MacroPopover] Error:', error);
+      logger.error('[MacroPopover] Error:', error);
       setItems([]);
     } finally {
       setIsLoading(false);

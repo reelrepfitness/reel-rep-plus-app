@@ -41,6 +41,10 @@ import { useState, ReactElement, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Guides');
+
 export default function GuidesScreen() {
   const insets = useSafeAreaInsets();
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
@@ -59,7 +63,7 @@ export default function GuidesScreen() {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching guides:", error);
+        logger.error("Error fetching guides:", error);
         throw error;
       }
 
@@ -89,7 +93,7 @@ export default function GuidesScreen() {
           }
         }
       } catch (error) {
-        console.error("Error checking first time:", error);
+        logger.error("Error checking first time:", error);
       }
     };
 
@@ -155,7 +159,7 @@ export default function GuidesScreen() {
         setSelectedGuide(importantGuide);
       }
     } catch (error) {
-      console.error("Error saving acknowledgment:", error);
+      logger.error("Error saving acknowledgment:", error);
     }
   };
 
@@ -164,7 +168,7 @@ export default function GuidesScreen() {
       await AsyncStorage.setItem("important_guide_acknowledged", "true");
       setShowImportantGuideModal(false);
     } catch (error) {
-      console.error("Error saving acknowledgment:", error);
+      logger.error("Error saving acknowledgment:", error);
     }
   };
 

@@ -17,6 +17,10 @@ import { SheetRoot, SheetContent } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/auth';
 import { isRTL } from '@/lib/utils';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Adminmenusheet');
+
 interface AdminMenuSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -39,7 +43,7 @@ export function AdminMenuSheet({ open, onOpenChange, currentScreen }: AdminMenuS
   const { user } = useAuth();
 
   const handleMenuSelect = (menuItem: typeof menuItems[0]) => {
-    console.log('[AdminMenuSheet] Menu selected:', menuItem.id);
+    logger.info('[AdminMenuSheet] Menu selected:', menuItem.id);
     onOpenChange(false);
     
     if (menuItem.route) {
