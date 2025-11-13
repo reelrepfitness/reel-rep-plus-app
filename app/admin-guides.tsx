@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   inputHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     paddingTop: 14,
   },
   createButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   viewGuidesButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

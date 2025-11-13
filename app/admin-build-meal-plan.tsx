@@ -9,9 +9,10 @@ import {
   Image,
   TextInput,
   Keyboard,
+  I18nManager,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft, Plus, Trash2, X } from "lucide-react-native";
+import { ChevronLeft, ChevronRight, Plus, Trash2, X } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -367,7 +368,11 @@ export default function AdminBuildMealPlanScreen() {
               onPress={() => router.back()}
               activeOpacity={0.7}
             >
-              <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+              {I18nManager.isRTL ? (
+                <ChevronRight color="#FFFFFF" size={24} strokeWidth={2.5} />
+              ) : (
+                <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+              )}
             </TouchableOpacity>
 
             <View style={styles.headerTitleContainer}>
@@ -901,7 +906,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
   },
   headerContent: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -951,7 +956,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255, 255, 255, 0.15)",
   },
   mealHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 16,
@@ -974,7 +979,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   itemCard: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderRadius: 12,
@@ -1006,7 +1011,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   totalsRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 8,
     paddingTop: 12,
     borderTopWidth: 1,
@@ -1037,7 +1042,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   sheetHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingBottom: 12,
@@ -1066,10 +1071,10 @@ const styles = StyleSheet.create({
   categoryScroll: {
     paddingHorizontal: 4,
     gap: 8,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
   },
   categoryChip: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingHorizontal: 16,
@@ -1111,7 +1116,7 @@ const styles = StyleSheet.create({
     color: "#999",
   },
   foodItemCard: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     backgroundColor: "#F7FAFC",
     borderRadius: 16,
     padding: 12,
@@ -1150,12 +1155,12 @@ const styles = StyleSheet.create({
     textAlign: isRTL ? "right" : "left",
   },
   foodItemMacros: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     flexWrap: "wrap",
     gap: 4,
   },
   nutritionBadge: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 6,
@@ -1188,7 +1193,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   quantitySection: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 32,
@@ -1220,13 +1225,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   calculationPreview: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
     gap: 12,
   },
   calcPreviewCard: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 12,
     backgroundColor: "#F7FAFC",
@@ -1246,7 +1251,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   sheetActions: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
     marginTop: 8,
   },
@@ -1287,7 +1292,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   macroCardsContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
     paddingEnd: 4,
   },
@@ -1311,7 +1316,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   macroCardRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
@@ -1341,7 +1346,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   macroCardFooter: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
@@ -1381,7 +1386,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   rmrValueContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "baseline",
     justifyContent: "center",
     gap: 8,
@@ -1403,7 +1408,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   rmrDetailRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 6,

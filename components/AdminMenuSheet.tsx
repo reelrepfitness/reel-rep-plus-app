@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   drawerHeaderContent: {
-    flexDirection: isRTL ? 'row-reverse' : 'row',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   adminInfo: {
-    flexDirection: isRTL ? 'row-reverse' : 'row',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     borderLeftColor: '#3FCDD1',
   },
   menuItemContent: {
-    flexDirection: isRTL ? 'row-reverse' : 'row',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },

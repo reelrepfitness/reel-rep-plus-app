@@ -10,9 +10,10 @@ import {
   Keyboard,
   Image,
   ScrollView,
+  I18nManager,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
+import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState, useEffect, useCallback } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
@@ -313,7 +314,11 @@ export default function BarcodeScannerScreen() {
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+            {I18nManager.isRTL ? (
+              <ChevronRight color="#FFFFFF" size={24} strokeWidth={2.5} />
+            ) : (
+              <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+            )}
           </TouchableOpacity>
           <Text style={styles.headerTitle}>סורק ברקוד</Text>
           <View style={{ width: 40 }} />
@@ -366,7 +371,11 @@ export default function BarcodeScannerScreen() {
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+          {I18nManager.isRTL ? (
+            <ChevronRight color="#FFFFFF" size={24} strokeWidth={2.5} />
+          ) : (
+            <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+          )}
         </TouchableOpacity>
         <Text style={styles.headerTitle}>סורק ברקוד</Text>
         <View style={{ width: 40 }} />

@@ -410,13 +410,13 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   clientHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     marginBottom: 16,
   },
   clientInfo: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     flex: 1,
   },
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   progressLabelRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
@@ -486,12 +486,12 @@ const styles = StyleSheet.create({
     borderTopColor: "#E5E7EB",
   },
   waterProgressHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   waterProgressLabel: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 4,
   },
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 16,
     paddingHorizontal: 24,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
     minHeight: 400,
   },
   sheetHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sendWhatsappButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

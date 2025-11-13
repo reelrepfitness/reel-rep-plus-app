@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   formRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
   },
   label: {
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
   categoryGrid: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
   },
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   saveButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  I18nManager,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
+import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -64,7 +65,11 @@ export default function RestaurantsScreen() {
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+            {I18nManager.isRTL ? (
+              <ChevronRight color="#FFFFFF" size={24} strokeWidth={2.5} />
+            ) : (
+              <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+            )}
           </TouchableOpacity>
 
           <Text style={styles.headerTitle}>בחר מסעדה</Text>

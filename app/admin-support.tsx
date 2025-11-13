@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   tabsContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     padding: 16,
     gap: 8,
   },
@@ -277,13 +277,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   ticketHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
   },
   ticketType: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 6,
   },
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     color: "#4B5563",
   },
   statusBadge: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 10,
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   ticketFooter: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     paddingTop: 12,
     borderTopWidth: 1,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     minHeight: 80,
   },
   sendButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   replyButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,

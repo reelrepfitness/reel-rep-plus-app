@@ -11,10 +11,11 @@ import {
   Keyboard,
   InputAccessoryView,
   Platform,
+  I18nManager,
 } from "react-native";
 import { Stack, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ArrowLeft, Scale, Ruler, TrendingUp, Weight, Percent, X, Activity } from "lucide-react-native";
+import { ChevronLeft, ChevronRight, Scale, Ruler, TrendingUp, Weight, Percent, X, Activity } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/constants/colors";
 import { useAuth } from "@/contexts/auth";
@@ -234,7 +235,11 @@ export default function MeasurementsScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <ArrowLeft color={colors.white} size={24} />
+            {I18nManager.isRTL ? (
+              <ChevronRight color={colors.white} size={24} />
+            ) : (
+              <ChevronLeft color={colors.white} size={24} />
+            )}
           </TouchableOpacity>
           <Text style={styles.headerTitle}>הערכה גופנית</Text>
           <View style={styles.addButton} />
@@ -263,7 +268,11 @@ export default function MeasurementsScreen() {
       <View style={[styles.customHeader, { paddingTop: insets.top }]}>
         <View style={styles.headerRow1}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButtonNew}>
-            <ArrowLeft color={colors.white} size={24} />
+            {I18nManager.isRTL ? (
+              <ChevronRight color={colors.white} size={24} />
+            ) : (
+              <ChevronLeft color={colors.white} size={24} />
+            )}
           </TouchableOpacity>
           <Activity color={colors.white} size={28} />
           <View style={styles.backButtonNew} />
@@ -939,7 +948,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#D1D5DB",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row" as any,
     justifyContent: "flex-end",
   },
   keyboardDoneButton: {

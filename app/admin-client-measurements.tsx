@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 16,
     paddingHorizontal: 16,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   summaryRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
     marginBottom: 16,
   },
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     }),
   },
   cardHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
     marginBottom: 16,

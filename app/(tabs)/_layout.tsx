@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, DynamicColorIOS } from 'react-native';
 import { NativeTabs, Label, Icon } from 'expo-router/unstable-native-tabs';
-import { Home, PlusCircle, User } from 'lucide-react-native';
+import { Home, Plus, User } from 'lucide-react-native';
 
 export default function TabLayout() {
   const tintColor = Platform.OS === 'ios'
@@ -18,38 +18,38 @@ export default function TabLayout() {
       labelStyle={{ color: labelColor }}
     >
       <NativeTabs.Trigger name="profile">
-        <Icon 
+        <Icon
           src={
-            <User 
-              size={24} 
+            <User
+              size={24}
               color={tintColor as any}
-              strokeWidth={2.5}
+              strokeWidth={2}
             />
           }
         />
         <Label>פרופיל</Label>
       </NativeTabs.Trigger>
-      
+
       <NativeTabs.Trigger name="add">
-        <Icon 
+        <Icon
           src={
-            <PlusCircle 
-              size={24} 
+            <Plus
+              size={24}
               color={tintColor as any}
-              strokeWidth={2.5}
+              strokeWidth={3}
             />
           }
         />
         <Label>הוסף</Label>
       </NativeTabs.Trigger>
-      
+
       <NativeTabs.Trigger name="home">
-        <Icon 
+        <Icon
           src={
-            <Home 
-              size={24} 
+            <Home
+              size={24}
               color={tintColor as any}
-              strokeWidth={2.5}
+              strokeWidth={2}
             />
           }
         />

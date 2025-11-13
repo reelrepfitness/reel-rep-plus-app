@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     borderColor: '#EDF1F3',
     borderRadius: 10,
     paddingHorizontal: 14,
-    flexDirection: (isRTL ? 'row-reverse' : 'row') as const,
+    flexDirection: 'row' as const,
     alignItems: 'center' as const,
     gap: 10,
     shadowColor: '#E4E5E7',

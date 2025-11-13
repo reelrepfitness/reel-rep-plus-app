@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 12,
     marginBottom: 16,
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   settingRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     color: "#718096",
   },
   inputRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     color: "#2d3748",
   },
   actionButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
     gap: 12,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   saveButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 12,

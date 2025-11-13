@@ -5,6 +5,12 @@ import { Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatDate } from "@/lib/utils";
 import { registerForPushNotificationsAsync } from "@/lib/pushNotifications";
+import * as WebBrowser from "expo-web-browser";
+import * as AppleAuthentication from "expo-apple-authentication";
+import { makeRedirectUri } from "expo-auth-session";
+import { Platform } from "react-native";
+
+WebBrowser.maybeCompleteAuthSession();
 
 interface AuthContextValue {
   session: Session | null;
@@ -12,6 +18,8 @@ interface AuthContextValue {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -212,15 +220,133 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
     console.log("[Auth] Sign up successful");
   }, []);
 
+  const signInWithGoogle = useCallback(async () => {
+    try {
+      console.log("[Auth] Starting Google sign-in");
+
+      const redirectUrl = makeRedirectUri({
+        scheme: 'rork-app',
+        path: 'auth/callback',
+      });
+
+      console.log("[Auth] Redirect URL:", redirectUrl);
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: false,
+        },
+      });
+
+      if (error) {
+        console.error("[Auth] Google OAuth error:", error.message || JSON.stringify(error));
+        throw error;
+      }
+
+      if (data?.url) {
+        const result = await WebBrowser.openAuthSessionAsync(
+          data.url,
+          redirectUrl
+        );
+
+        if (result.type === 'success' && result.url) {
+          const url = new URL(result.url);
+          const access_token = url.searchParams.get('access_token');
+          const refresh_token = url.searchParams.get('refresh_token');
+
+          if (access_token && refresh_token) {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token,
+              refresh_token,
+            });
+
+            if (sessionError) {
+              console.error("[Auth] Session error:", sessionError);
+              throw sessionError;
+            }
+
+            console.log("[Auth] Google sign-in successful");
+          }
+        } else if (result.type === 'cancel') {
+          console.log("[Auth] Google sign-in cancelled");
+          throw new Error('CANCELLED');
+        }
+      }
+    } catch (error) {
+      console.error("[Auth] Google sign-in error:", error);
+      throw error;
+    }
+  }, []);
+
+  const signInWithApple = useCallback(async () => {
+    try {
+      console.log("[Auth] Starting Apple sign-in");
+
+      if (Platform.OS !== 'ios') {
+        throw new Error('Apple sign-in is only available on iOS');
+      }
+
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      console.log("[Auth] Apple credential received");
+
+      if (credential.identityToken) {
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: credential.identityToken,
+        });
+
+        if (error) {
+          console.error("[Auth] Apple auth error:", error);
+          throw error;
+        }
+
+        if (data.user && credential.fullName) {
+          const fullName = [
+            credential.fullName.givenName,
+            credential.fullName.familyName,
+          ]
+            .filter(Boolean)
+            .join(' ');
+
+          if (fullName) {
+            console.log("[Auth] Updating profile with name:", fullName);
+            await supabase
+              .from('profiles')
+              .update({ name: fullName })
+              .eq('user_id', data.user.id);
+          }
+        }
+
+        console.log("[Auth] Apple sign-in successful");
+      } else {
+        throw new Error('No identity token received');
+      }
+    } catch (error: any) {
+      if (error.code === 'ERR_REQUEST_CANCELED') {
+        console.log("[Auth] Apple sign-in cancelled");
+        throw new Error('CANCELLED');
+      }
+      console.error("[Auth] Apple sign-in error:", error);
+      throw error;
+    }
+  }, []);
+
   const signOut = useCallback(async () => {
     console.log("[Auth] Signing out");
     const { error } = await supabase.auth.signOut();
-    
+
     if (error) {
       console.error("[Auth] Sign out error:", error.message || JSON.stringify(error));
       throw error;
     }
-    
+
     console.log("[Auth] Sign out successful");
   }, []);
 
@@ -230,6 +356,8 @@ export const [AuthProvider, useAuth] = createContextHook<AuthContextValue>(() =>
     loading,
     signIn,
     signUp,
+    signInWithGoogle,
+    signInWithApple,
     signOut,
-  }), [session, user, loading, signIn, signUp, signOut]);
+  }), [session, user, loading, signIn, signUp, signInWithGoogle, signInWithApple, signOut]);
 });

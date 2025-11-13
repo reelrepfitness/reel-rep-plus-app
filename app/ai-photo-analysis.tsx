@@ -6,9 +6,10 @@ import {
   ActivityIndicator,
   Image,
   ScrollView,
+  I18nManager,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Camera, Image as ImageIcon, RefreshCw, Utensils, Lightbulb, Check } from "lucide-react-native";
+import { ChevronLeft, ChevronRight, Camera, Image as ImageIcon, RefreshCw, Utensils, Lightbulb, Check } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { colors } from "@/constants/colors";
@@ -257,7 +258,11 @@ export default function AIPhotoAnalysisScreen() {
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+          {I18nManager.isRTL ? (
+            <ChevronRight color="#FFFFFF" size={24} strokeWidth={2.5} />
+          ) : (
+            <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+          )}
         </TouchableOpacity>
         <Text style={styles.headerTitle}>ניתוח AI</Text>
         <View style={{ width: 40 }} />

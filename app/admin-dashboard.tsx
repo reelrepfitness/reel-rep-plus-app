@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
     fontWeight: "500" as const,
   },
   statsGrid: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     flexWrap: "wrap" as any,
     gap: 12,
     marginBottom: 24,
@@ -638,13 +638,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   notificationHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
   },
   notificationHeaderActions: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
@@ -702,7 +702,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   alertCard: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,
@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   systemCardHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
     gap: 12,
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   metricRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 8,

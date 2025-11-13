@@ -627,13 +627,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   tabsContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     padding: 16,
     gap: 12,
   },
   tab: {
     flex: 1,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   templateHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 12,
   },
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   templateTitleRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
     marginBottom: 8,
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
     textAlign: isRTL ? "right" : "left",
   },
   templateMeta: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 8,
   },
   templateMetaText: {
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   deleteButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
@@ -765,12 +765,12 @@ const styles = StyleSheet.create({
     height: 100,
   },
   triggerOptions: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     flexWrap: "wrap" as any,
     gap: 8,
   },
   triggerOption: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingVertical: 10,
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   saveButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -816,12 +816,12 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   recipientOptions: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 8,
   },
   recipientOption: {
     flex: 1,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
@@ -851,7 +851,7 @@ const styles = StyleSheet.create({
     borderColor: "#E5E7EB",
   },
   userItem: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 12,
@@ -890,7 +890,7 @@ const styles = StyleSheet.create({
     fontWeight: "700" as const,
   },
   sendButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image, Platform, Animated, TextInput, Modal, InputAccessoryView, Keyboard } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image, Platform, Animated, TextInput, Modal, InputAccessoryView, Keyboard, I18nManager } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Droplets, ChevronLeft, CupSoda, X, Plus, Trash2 } from "lucide-react-native";
+import { Droplets, ChevronLeft, ChevronRight, CupSoda, X, Plus, Trash2 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
@@ -279,7 +279,11 @@ export default function HomeScreen() {
                 <Text style={styles.greetingText}>ניהול לקוחות</Text>
               </View>
               <View style={styles.adminArrow}>
-                <ChevronLeft color="#FFFFFF" size={28} strokeWidth={2.5} />
+                {I18nManager.isRTL ? (
+                  <ChevronLeft color="#FFFFFF" size={28} strokeWidth={2.5} />
+                ) : (
+                  <ChevronRight color="#FFFFFF" size={28} strokeWidth={2.5} />
+                )}
               </View>
             </View>
           </TouchableOpacity>

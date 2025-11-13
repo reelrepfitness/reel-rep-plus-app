@@ -692,7 +692,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 20,
     paddingVertical: 16,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   rmrValueContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "baseline",
     justifyContent: "center",
     gap: 8,
@@ -773,7 +773,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   rmrDetailRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 4,

@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   searchInputContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   foodCardContent: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     maxHeight: "80%",
   },
   sheetHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 24,
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   formRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
   },
   label: {
@@ -467,13 +467,13 @@ const styles = StyleSheet.create({
     borderColor: "#E5E7EB",
   },
   sheetActions: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
     marginTop: 16,
   },
   saveButton: {
     flex: 1,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   deleteButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

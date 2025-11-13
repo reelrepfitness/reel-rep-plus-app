@@ -11,9 +11,10 @@ import {
   Animated,
   Keyboard,
   Pressable,
+  I18nManager,
 } from "react-native";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Weight, Coffee, Soup, Hash, Heart, Beef, Fish, Egg, Drumstick, Milk, Package, UtensilsCrossed, Beer, Wine, Martini } from "lucide-react-native";
+import { ChevronLeft, ChevronRight, Weight, Coffee, Soup, Hash, Heart, Beef, Fish, Egg, Drumstick, Milk, Package, UtensilsCrossed, Beer, Wine, Martini } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SearchBar } from "@/components/ui/searchbar";
 import { Picker, PickerOption } from "@/components/ui/picker";
@@ -872,7 +873,11 @@ export default function FoodBankScreen() {
               onPress={() => router.back()}
               activeOpacity={0.7}
             >
-              <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+              {I18nManager.isRTL ? (
+                <ChevronRight color="#FFFFFF" size={24} strokeWidth={2.5} />
+              ) : (
+                <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+              )}
             </TouchableOpacity>
 
             <Text style={styles.headerTitle}>

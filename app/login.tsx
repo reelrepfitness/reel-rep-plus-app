@@ -24,10 +24,11 @@ I18nManager.forceRTL(true);
 I18nManager.allowRTL(true);
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle, signInWithApple } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [socialLoading, setSocialLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const emailError = email && !email.includes('@') ? 'נא להזין כתובת אימייל תקינה' : '';
@@ -48,7 +49,7 @@ export default function LoginScreen() {
     } catch (err: unknown) {
       console.error("Login error:", err);
       const errorMessage = err instanceof Error ? err.message : "שגיאה בהתחברות";
-      
+
       if (errorMessage.includes("Invalid login") || errorMessage.includes("Invalid")) {
         setError("אימייל או סיסמה שגויים");
       } else if (errorMessage.includes("Email not confirmed")) {
@@ -58,6 +59,56 @@ export default function LoginScreen() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setSocialLoading(true);
+    setError("");
+
+    try {
+      await signInWithGoogle();
+      router.replace("/(tabs)/home");
+    } catch (err: unknown) {
+      console.error("Google sign-in error:", err);
+      const errorMessage = err instanceof Error ? err.message : "שגיאה בהתחברות";
+
+      if (errorMessage === 'CANCELLED') {
+        // User cancelled - don't show error
+        return;
+      } else if (errorMessage.includes('network')) {
+        setError("בעיית רשת. בדוק את החיבור לאינטרנט.");
+      } else {
+        setError("שגיאה בהתחברות עם Google. נסה שוב.");
+      }
+    } finally {
+      setSocialLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setSocialLoading(true);
+    setError("");
+
+    try {
+      await signInWithApple();
+      router.replace("/(tabs)/home");
+    } catch (err: unknown) {
+      console.error("Apple sign-in error:", err);
+      const errorMessage = err instanceof Error ? err.message : "שגיאה בהתחברות";
+
+      if (errorMessage === 'CANCELLED') {
+        // User cancelled - don't show error
+        return;
+      } else if (errorMessage.includes('only available on iOS')) {
+        setError("התחברות עם Apple זמינה רק ב-iOS.");
+      } else if (errorMessage.includes('network')) {
+        setError("בעיית רשת. בדוק את החיבור לאינטרנט.");
+      } else {
+        setError("שגיאה בהתחברות עם Apple. נסה שוב.");
+      }
+    } finally {
+      setSocialLoading(false);
     }
   };
 
@@ -145,19 +196,41 @@ export default function LoginScreen() {
                 </View>
 
                 <View style={styles.socialColumn}>
-                  <TouchableOpacity style={styles.socialButtonFull} activeOpacity={0.7}>
-                    <View style={styles.googleIcon}>
-                      <View style={[styles.googlePart, { backgroundColor: "#4285F4", left: "50.9%", right: "6.25%", top: "42.03%", bottom: "16.85%" }]} />
-                      <View style={[styles.googlePart, { backgroundColor: "#34A853", left: "11.01%", right: "19.54%", top: "58.65%", bottom: "6.25%" }]} />
-                      <View style={[styles.googlePart, { backgroundColor: "#FBBC05", left: "6.25%", right: "74.5%", top: "30.15%", bottom: "30.36%" }]} />
-                      <View style={[styles.googlePart, { backgroundColor: "#EB4335", left: "11.01%", right: "19.24%", top: "6.25%", bottom: "58.65%" }]} />
-                    </View>
-                    <Text style={styles.socialButtonText}>התחבר עם Google</Text>
+                  <TouchableOpacity
+                    style={styles.socialButtonFull}
+                    activeOpacity={0.7}
+                    onPress={handleGoogleSignIn}
+                    disabled={loading || socialLoading}
+                  >
+                    {socialLoading ? (
+                      <ActivityIndicator color="#1A1C1E" size="small" />
+                    ) : (
+                      <>
+                        <View style={styles.googleIcon}>
+                          <View style={[styles.googlePart, { backgroundColor: "#4285F4", left: "50.9%", right: "6.25%", top: "42.03%", bottom: "16.85%" }]} />
+                          <View style={[styles.googlePart, { backgroundColor: "#34A853", left: "11.01%", right: "19.54%", top: "58.65%", bottom: "6.25%" }]} />
+                          <View style={[styles.googlePart, { backgroundColor: "#FBBC05", left: "6.25%", right: "74.5%", top: "30.15%", bottom: "30.36%" }]} />
+                          <View style={[styles.googlePart, { backgroundColor: "#EB4335", left: "11.01%", right: "19.24%", top: "6.25%", bottom: "58.65%" }]} />
+                        </View>
+                        <Text style={styles.socialButtonText}>התחבר עם Google</Text>
+                      </>
+                    )}
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.socialButtonFull} activeOpacity={0.7}>
-                    <Ionicons name="logo-apple" size={18} color="#000000" />
-                    <Text style={styles.socialButtonText}>התחבר עם Apple</Text>
+                  <TouchableOpacity
+                    style={styles.socialButtonFull}
+                    activeOpacity={0.7}
+                    onPress={handleAppleSignIn}
+                    disabled={loading || socialLoading}
+                  >
+                    {socialLoading ? (
+                      <ActivityIndicator color="#1A1C1E" size="small" />
+                    ) : (
+                      <>
+                        <Ionicons name="logo-apple" size={18} color="#000000" />
+                        <Text style={styles.socialButtonText}>התחבר עם Apple</Text>
+                      </>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>

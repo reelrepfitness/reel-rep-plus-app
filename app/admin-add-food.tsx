@@ -379,13 +379,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   tabsContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     padding: 16,
     gap: 8,
   },
   tab: {
     flex: 1,
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   searchContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   headerRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     color: "#2d3748",
   },
   addButton: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingVertical: 10,
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statsRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
   },
   statBox: {
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   actionCard: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,

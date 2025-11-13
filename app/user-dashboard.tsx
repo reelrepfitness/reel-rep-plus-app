@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Platform, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Platform, Image, I18nManager } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
 import { useMemo } from "react";
-import { User, Edit, Activity, ChefHat, ArrowLeft } from "lucide-react-native";
+import { User, Edit, Activity, ChefHat, ChevronLeft, ChevronRight } from "lucide-react-native";
 import Svg, { Circle } from "react-native-svg";
 import { isRTL } from '@/lib/utils';
 
@@ -175,7 +175,11 @@ export default function UserDashboardScreen() {
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <ArrowLeft color="#FFFFFF" size={24} />
+            {I18nManager.isRTL ? (
+              <ChevronRight color="#FFFFFF" size={24} strokeWidth={2.5} />
+            ) : (
+              <ChevronLeft color="#FFFFFF" size={24} strokeWidth={2.5} />
+            )}
           </TouchableOpacity>
           <User color="#FFFFFF" size={28} />
           <View style={styles.backButton} />
@@ -472,7 +476,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   chartContainer: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
     height: 220,
@@ -532,7 +536,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   legend: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "center",
     gap: 20,
     marginBottom: 20,
@@ -541,7 +545,7 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(42, 36, 57, 0.15)",
   },
   legendItem: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 6,
   },
@@ -556,7 +560,7 @@ const styles = StyleSheet.create({
     fontWeight: "500" as const,
   },
   statsRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     justifyContent: "space-between",
     gap: 12,
   },
@@ -579,7 +583,7 @@ const styles = StyleSheet.create({
     fontWeight: "500" as const,
   },
   actionCardsRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
     marginTop: 24,
   },
@@ -620,7 +624,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   summaryRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
     marginBottom: 16,
   },
@@ -673,7 +677,7 @@ const styles = StyleSheet.create({
     }),
   },
   cardHeader: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 8,
     marginBottom: 16,
@@ -699,7 +703,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   legendRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
@@ -742,7 +746,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   workoutCardsRow: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     gap: 12,
     marginTop: 16,
   },
@@ -836,7 +840,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   notchRow1: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 12,

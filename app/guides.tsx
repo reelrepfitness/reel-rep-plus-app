@@ -7,16 +7,18 @@ import {
   ActivityIndicator,
   Animated,
   Modal,
+  I18nManager,
 } from "react-native";
 import { Stack, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { 
-  ChevronRight, 
-  BookOpen, 
-  Utensils, 
-  Calendar, 
-  Plane, 
-  Activity, 
+import {
+  ChevronRight,
+  ChevronLeft,
+  BookOpen,
+  Utensils,
+  Calendar,
+  Plane,
+  Activity,
   Sun,
   CheckCircle2,
   CircleDot,
@@ -313,7 +315,11 @@ export default function GuidesScreen() {
             onPress={handleBack}
             style={styles.backButton}
           >
-            <ChevronRight color={colors.white} size={24} />
+            {I18nManager.isRTL ? (
+              <ChevronRight color={colors.white} size={24} />
+            ) : (
+              <ChevronLeft color={colors.white} size={24} />
+            )}
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{selectedGuide.title}</Text>
           <View style={{ width: 40 }} />
@@ -388,7 +394,11 @@ export default function GuidesScreen() {
                         <Text style={styles.importantBadgeText}>חשוב במיוחד</Text>
                       </View>
                       <View style={styles.importantContent}>
-                        <ChevronRight color={colors.white} size={24} />
+                        {I18nManager.isRTL ? (
+                          <ChevronLeft color={colors.white} size={24} />
+                        ) : (
+                          <ChevronRight color={colors.white} size={24} />
+                        )}
                         <View style={styles.guideInfo}>
                           <Text style={styles.importantGuideTitle}>
                             {guide.title}
@@ -424,7 +434,11 @@ export default function GuidesScreen() {
                   style={styles.guideCard}
                   onPress={() => setSelectedGuide(guide)}
                 >
-                  <ChevronRight color={colors.gray} size={20} />
+                  {I18nManager.isRTL ? (
+                    <ChevronLeft color={colors.gray} size={20} />
+                  ) : (
+                    <ChevronRight color={colors.gray} size={20} />
+                  )}
                   <View style={styles.guideInfo}>
                     <Text style={styles.guideTitle}>
                       {guide.title}

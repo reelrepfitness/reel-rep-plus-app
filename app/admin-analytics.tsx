@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     textAlign: isRTL ? "right" : "left",
   },
   statsGrid: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     flexWrap: "wrap" as any,
     gap: 12,
     marginBottom: 24,
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   insightCard: {
-    flexDirection: (isRTL ? "row-reverse" : "row") as any,
+    flexDirection: "row",
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,
