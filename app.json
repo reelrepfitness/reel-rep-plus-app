@@ -91,9 +91,11 @@
       "fallbackToCacheTimeout": 0,
       "useEmbeddedUpdate": true,
       "assetPatternsToBeBundled": [],
-      "disableAntiBrickingMeasures": false
+      "disableAntiBrickingMeasures": false,
+      "codeSigningCertificate": "<UNKNOWN>",
+      "codeSigningMetadata": "<UNKNOWN>"
     },
-    "runtimeVersion":"1.0.0",
+    "runtimeVersion": "1.0.0",
     "extra": {
       "router": {
         "origin": "https://rork.com/"
